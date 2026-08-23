@@ -22,6 +22,7 @@ import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities";
 import type { Company } from "@paperclipai/shared";
 import { Link, useLocation, useNavigate } from "@/lib/router";
+import { useTranslation } from "@/i18n";
 import { authApi } from "@/api/auth";
 import { cloudApi, type CloudStackSummary } from "@/api/cloud";
 import { Button } from "@/components/ui/button";
@@ -197,6 +198,7 @@ function SortableCompanyItem({
 }
 
 export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: SidebarCompanyMenuProps = {}) {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const [isEditingOrder, setIsEditingOrder] = useState(false);
   const { companies, selectedCompany, setSelectedCompanyId, companyListUnavailable, retryCompanies } =
@@ -251,7 +253,6 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
       ?? null
     : null;
   const createStackUrl = isCloud ? cloudStackCreateUrl(cloudBaseUrl) : null;
-  const switcherNoun = isCloud ? "organization" : "company";
   // The one name the chrome shows for "where am I": the stack in cloud, the
   // company when self-hosted.
   const currentName = isCloud
@@ -349,8 +350,13 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
           className="h-9 min-w-0 flex-1 justify-start gap-2 px-3 text-left"
           aria-label={
             currentName
-              ? `Open ${currentName} ${switcherNoun} switcher`
-              : `Open ${switcherNoun} switcher`
+              ? t(isCloud ? "companyMenu.openWithOrganization" : "companyMenu.openWithCompany", {
+                  defaultValue: isCloud ? "Open {{name}} organization switcher" : "Open {{name}} company switcher",
+                  name: currentName,
+                })
+              : t(isCloud ? "companyMenu.openOrganizationSwitcher" : "companyMenu.openCompanySwitcher", {
+                  defaultValue: isCloud ? "Open organization switcher" : "Open company switcher",
+                })
           }
         >
           <span className="flex min-w-0 flex-1 items-center gap-2">
@@ -368,7 +374,10 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               )}
               title={currentName ?? undefined}
             >
-              {currentName ?? (isCloud ? "Select organization" : "Select company")}
+              {currentName ??
+                (isCloud
+                  ? t("companyMenu.selectOrganization", { defaultValue: "Select organization" })
+                  : t("companyMenu.selectCompany", { defaultValue: "Select company" }))}
             </span>
           </span>
           {!rail && <ChevronsUpDown className="size-3.5 shrink-0 text-muted-foreground" />}
@@ -377,7 +386,9 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
       <DropdownMenuContent align="start" sideOffset={8} className="w-64 p-1">
         <div className="flex items-center justify-between gap-2 px-2 py-1.5">
           <DropdownMenuLabel className="p-0 text-(length:--text-micro) font-semibold uppercase text-muted-foreground">
-            {isCloud ? "Switch organization" : "Switch company"}
+            {isCloud
+              ? t("companyMenu.switchOrganization", { defaultValue: "Switch organization" })
+              : t("companyMenu.switchCompany", { defaultValue: "Switch company" })}
           </DropdownMenuLabel>
           {/* Stack order is owned by cloud's own portfolio in v1, so the
               drag-to-reorder affordance stays self-hosted-only. */}
@@ -391,7 +402,9 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               }}
               className="rounded px-1.5 py-0.5 text-(length:--text-micro) font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              {isEditingOrder ? "Done" : "Edit"}
+              {isEditingOrder
+                ? t("common.done", { defaultValue: "Done" })
+                : t("common.edit", { defaultValue: "Edit" })}
             </button>
           )}
         </div>
@@ -409,10 +422,12 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               {stacks.length === 0 ? (
                 <DropdownMenuItem disabled>
                   {stacksQuery.isLoading
-                    ? "Loading organizations..."
+                    ? t("companyMenu.loadingOrganizations", { defaultValue: "Loading organizations..." })
                     : stacksQuery.isError
-                      ? "Could not load organizations"
-                      : "No organizations"}
+                      ? t("companyMenu.couldNotLoadOrganizations", {
+                          defaultValue: "Could not load organizations",
+                        })
+                      : t("companyMenu.noOrganizations", { defaultValue: "No organizations" })}
                 </DropdownMenuItem>
               ) : null}
             </>
@@ -445,7 +460,9 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
                 // offer the way back.
                 companyListUnavailable ? (
                   <>
-                    <DropdownMenuItem disabled>Couldn&apos;t load companies</DropdownMenuItem>
+                    <DropdownMenuItem disabled>
+                      {t("companyMenu.couldNotLoadCompanies", { defaultValue: "Couldn't load companies" })}
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={(event) => {
                         // Keep the menu open so the result of the retry is visible.
@@ -454,11 +471,13 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
                       }}
                     >
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Try again
+                      {t("common.tryAgain", { defaultValue: "Try again" })}
                     </DropdownMenuItem>
                   </>
                 ) : (
-                  <DropdownMenuItem disabled>No companies</DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    {t("companyMenu.noCompanies", { defaultValue: "No companies" })}
+                  </DropdownMenuItem>
                 )
               ) : null}
             </>
@@ -475,7 +494,7 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               disabled={isEditingOrder}
             >
               <Plus className="size-4" />
-              <span>Create new organization...</span>
+              <span>{t("companyMenu.createOrganization", { defaultValue: "Create new organization..." })}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -493,7 +512,9 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
           >
             <UserPlus className="size-4" />
             <span className="truncate">
-              {currentName ? `Invite people to ${currentName}` : "Invite people"}
+              {currentName
+                ? t("companyMenu.invitePeopleTo", { defaultValue: "Invite people to {{name}}", name: currentName })
+                : t("companyMenu.invitePeople", { defaultValue: "Invite people" })}
             </span>
           </Link>
         </DropdownMenuItem>
@@ -506,7 +527,11 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               disabled={isEditingOrder || signOutMutation.isPending}
             >
               <LogOut className="size-4" />
-              <span>{signOutMutation.isPending ? "Signing out..." : "Sign out"}</span>
+              <span>
+                {signOutMutation.isPending
+                  ? t("common.signingOut", { defaultValue: "Signing out..." })
+                  : t("common.signOut", { defaultValue: "Sign out" })}
+              </span>
             </DropdownMenuItem>
           </>
         ) : null}

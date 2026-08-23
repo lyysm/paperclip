@@ -43,12 +43,12 @@ function activeLocale(language: string | null | undefined): SelectableLocale {
  * cycle.
  */
 export function LanguageToggle({ className, variant = "icon", onAfterChange }: LanguageToggleProps) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const current = activeLocale(i18n.resolvedLanguage ?? i18n.language);
   const nextIndex = (SELECTABLE_LOCALES.indexOf(current) + 1) % SELECTABLE_LOCALES.length;
   const next = SELECTABLE_LOCALES[nextIndex] ?? DEFAULT_LOCALE;
-  const label = `Switch to ${LOCALE_DISPLAY_NAMES[next]}`;
-  const description = `Language: ${LOCALE_DISPLAY_NAMES[current]}`;
+  const label = t("language.switchTo", { defaultValue: "Switch to {{name}}", name: LOCALE_DISPLAY_NAMES[next] });
+  const description = t("language.current", { defaultValue: "Language: {{name}}", name: LOCALE_DISPLAY_NAMES[current] });
 
   function handleClick() {
     void setLocale(next);

@@ -9,7 +9,19 @@ const mockSetLocale = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 const mockI18n = vi.hoisted(() => ({ resolvedLanguage: "en" as string | null | undefined }));
 
 vi.mock("../i18n", () => ({
-  useTranslation: () => ({ i18n: mockI18n }),
+  useTranslation: () => ({
+    i18n: mockI18n,
+    // Minimal t(): defaultValue with {{name}} interpolation, mirroring the
+    // English fallback path the component relies on.
+    t: (key: string, options?: { defaultValue?: string } & Record<string, unknown>) => {
+      let value = options?.defaultValue ?? key;
+      for (const [name, replacement] of Object.entries(options ?? {})) {
+        if (name === "defaultValue") continue;
+        value = value.replaceAll(`{{${name}}}`, String(replacement));
+      }
+      return value;
+    },
+  }),
   setLocale: mockSetLocale,
 }));
 

@@ -34,6 +34,29 @@ for (const [locale, messages] of Object.entries(localeMessages)) {
 
 export const supportedLocales = Object.keys(localeMessages);
 
+/**
+ * Locales surfaced in the language switcher. The full catalog stays bundled
+ * and validated; this list controls which locales users can activate.
+ */
+export const SELECTABLE_LOCALES = ["en", "zh-CN"] as const;
+export type SelectableLocale = (typeof SELECTABLE_LOCALES)[number];
+
+/** Native endonyms so each option reads correctly regardless of active locale. */
+export const LOCALE_DISPLAY_NAMES: Record<SelectableLocale, string> = {
+  en: "English",
+  "zh-CN": "简体中文",
+};
+
+for (const locale of SELECTABLE_LOCALES) {
+  if (!(locale in localeMessages)) {
+    throw new Error(`Selectable locale ${locale} has no locale messages`);
+  }
+}
+
+export function isSelectableLocale(value: unknown): value is SelectableLocale {
+  return typeof value === "string" && (SELECTABLE_LOCALES as readonly string[]).includes(value);
+}
+
 export const i18nextResources: Resource = Object.fromEntries(
   Object.entries(localeMessages).map(([locale, messages]) => [locale, { translation: messages }]),
 ) as Resource;

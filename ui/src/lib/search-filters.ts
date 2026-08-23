@@ -2,6 +2,7 @@ import {
   COMPANY_SEARCH_SORTS,
   type CompanySearchSort,
 } from "@paperclipai/shared";
+import { t } from "@/i18n";
 import type { ParsedSearchQuery } from "./search-query-parser";
 
 /**
@@ -20,6 +21,10 @@ export const SORT_LABELS: Record<CompanySearchSort, string> = {
   priority: "Priority",
 };
 
+export function searchSortLabel(value: CompanySearchSort): string {
+  return t(`searchPage.sort.${value}`, { defaultValue: SORT_LABELS[value] });
+}
+
 export const UPDATED_WITHIN_LABELS: Record<string, string> = {
   "24h": "Last 24 hours",
   "7d": "Last 7 days",
@@ -28,7 +33,9 @@ export const UPDATED_WITHIN_LABELS: Record<string, string> = {
 };
 
 export function updatedWithinLabel(value: string): string {
-  return UPDATED_WITHIN_LABELS[value] ?? `Updated ≤ ${value}`;
+  return UPDATED_WITHIN_LABELS[value]
+    ? t(`searchPage.updatedWithin.${value}`, { defaultValue: UPDATED_WITHIN_LABELS[value] })
+    : t("searchPage.updatedWithinFallback", { defaultValue: "Updated ≤ {{value}}", value });
 }
 
 const SORT_SET = new Set<string>(COMPANY_SEARCH_SORTS);
@@ -109,15 +116,15 @@ function humanize(value: string): string {
 }
 
 function assigneeChipLabel(filters: SearchFilters, lookups: FilterChipLookups): string {
-  if (filters.assigneeAgentId === null) return "Unassigned";
+  if (filters.assigneeAgentId === null) return t("issuesList.unassigned", { defaultValue: "Unassigned" });
   if (typeof filters.assigneeAgentId === "string") {
-    return lookups.agentName(filters.assigneeAgentId) ?? "Agent";
+    return lookups.agentName(filters.assigneeAgentId) ?? t("searchPage.agentFallback", { defaultValue: "Agent" });
   }
   if (filters.assigneeUserId) {
-    if (filters.assigneeUserId === lookups.currentUserId) return "Me";
-    return lookups.userName(filters.assigneeUserId) ?? "User";
+    if (filters.assigneeUserId === lookups.currentUserId) return t("issuesList.me", { defaultValue: "Me" });
+    return lookups.userName(filters.assigneeUserId) ?? t("issuesList.userFallback", { defaultValue: "User" });
   }
-  return "Assignee";
+  return t("newIssueDialog.assignee", { defaultValue: "Assignee" });
 }
 
 /** Removable chip descriptors for the active-filter row. */
@@ -126,7 +133,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   for (const status of filters.status ?? []) {
     chips.push({
       id: `status:${status}`,
-      label: `Status: ${humanize(status)}`,
+      label: t("searchPage.chipStatus", { defaultValue: "Status: {{value}}", value: humanize(status) }),
       remove: (current) => {
         const next = { ...current };
         const remaining = (current.status ?? []).filter((value) => value !== status);
@@ -144,7 +151,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   for (const priority of filters.priority ?? []) {
     chips.push({
       id: `priority:${priority}`,
-      label: `Priority: ${humanize(priority)}`,
+      label: t("searchPage.chipPriority", { defaultValue: "Priority: {{value}}", value: humanize(priority) }),
       remove: (current) => {
         const next = { ...current };
         const remaining = (current.priority ?? []).filter((value) => value !== priority);
@@ -157,7 +164,10 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.assigneeAgentId !== undefined || filters.assigneeUserId) {
     chips.push({
       id: "assignee",
-      label: `Assignee: ${assigneeChipLabel(filters, lookups)}`,
+      label: t("searchPage.chipAssignee", {
+        defaultValue: "Assignee: {{value}}",
+        value: assigneeChipLabel(filters, lookups),
+      }),
       remove: (current) => {
         const next = { ...current };
         delete next.assigneeAgentId;
@@ -169,7 +179,10 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.projectId) {
     chips.push({
       id: "project",
-      label: `Project: ${lookups.projectName(filters.projectId) ?? "Project"}`,
+      label: t("searchPage.chipProject", {
+        defaultValue: "Project: {{value}}",
+        value: lookups.projectName(filters.projectId) ?? t("issuesList.column.project", { defaultValue: "Project" }),
+      }),
       remove: (current) => {
         const next = { ...current };
         delete next.projectId;
@@ -180,7 +193,10 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.labelId) {
     chips.push({
       id: "label",
-      label: `Label: ${lookups.labelName(filters.labelId) ?? "Label"}`,
+      label: t("searchPage.chipLabel", {
+        defaultValue: "Label: {{value}}",
+        value: lookups.labelName(filters.labelId) ?? t("issuesList.labels", { defaultValue: "Label" }),
+      }),
       remove: (current) => {
         const next = { ...current };
         delete next.labelId;
@@ -191,7 +207,10 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.updatedWithin) {
     chips.push({
       id: "updated",
-      label: `Updated: ${updatedWithinLabel(filters.updatedWithin)}`,
+      label: t("searchPage.chipUpdated", {
+        defaultValue: "Updated: {{value}}",
+        value: updatedWithinLabel(filters.updatedWithin),
+      }),
       remove: (current) => {
         const next = { ...current };
         delete next.updatedWithin;
@@ -207,20 +226,36 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
 export function describeLoosenSuggestion(filterKey: string, values: string[], lookups: FilterChipLookups): string {
   switch (filterKey) {
     case "status":
-      return `Status: ${values.map(humanize).join(", ")}`;
+      return t("searchPage.chipStatus", { defaultValue: "Status: {{value}}", value: values.map(humanize).join(", ") });
     case "priority":
-      return `Priority: ${values.map(humanize).join(", ")}`;
+      return t("searchPage.chipPriority", { defaultValue: "Priority: {{value}}", value: values.map(humanize).join(", ") });
     case "assigneeAgentId":
-      return `Assignee: ${values.map((id) => lookups.agentName(id) ?? "Agent").join(", ")}`;
+      return t("searchPage.chipAssignee", {
+        defaultValue: "Assignee: {{value}}",
+        value: values.map((id) => lookups.agentName(id) ?? t("searchPage.agentFallback", { defaultValue: "Agent" })).join(", "),
+      });
     case "assigneeUserId":
-      return `Assignee: ${values.map((id) => (id === lookups.currentUserId ? "Me" : lookups.userName(id) ?? "User")).join(", ")}`;
+      return t("searchPage.chipAssignee", {
+        defaultValue: "Assignee: {{value}}",
+        value: values
+          .map((id) => (id === lookups.currentUserId
+            ? t("issuesList.me", { defaultValue: "Me" })
+            : lookups.userName(id) ?? t("issuesList.userFallback", { defaultValue: "User" })))
+          .join(", "),
+      });
     case "projectId":
-      return `Project: ${values.map((id) => lookups.projectName(id) ?? "Project").join(", ")}`;
+      return t("searchPage.chipProject", {
+        defaultValue: "Project: {{value}}",
+        value: values.map((id) => lookups.projectName(id) ?? t("issuesList.column.project", { defaultValue: "Project" })).join(", "),
+      });
     case "labelId":
-      return `Label: ${values.map((id) => lookups.labelName(id) ?? "Label").join(", ")}`;
+      return t("searchPage.chipLabel", {
+        defaultValue: "Label: {{value}}",
+        value: values.map((id) => lookups.labelName(id) ?? t("issuesList.labels", { defaultValue: "Label" })).join(", "),
+      });
     case "updatedWithin":
     case "updatedAfter":
-      return "Updated window";
+      return t("searchPage.updatedWindow", { defaultValue: "Updated window" });
     default:
       return humanize(filterKey);
   }

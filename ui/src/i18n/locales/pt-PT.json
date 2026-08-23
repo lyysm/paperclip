@@ -144,5 +144,101 @@
     "signInLink": "Iniciar sessão",
     "fillRequired": "Preencha todos os campos obrigatórios.",
     "authFailed": "Falha na autenticação"
+  },
+  "statuses": {
+    "issue": {
+      "backlog": "Backlog",
+      "todo": "Todo",
+      "in_progress": "In progress",
+      "in_review": "In review",
+      "done": "Done",
+      "blocked": "Blocked",
+      "cancelled": "Cancelled"
+    },
+    "agent": {
+      "idle": "idle",
+      "paused": "paused",
+      "running": "running",
+      "error": "error",
+      "pending_approval": "pending approval",
+      "terminated": "terminated"
+    },
+    "priority": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "change": "Change priority (current: {{label}})"
+    },
+    "generic": {
+      "queued": "queued",
+      "scheduled_retry": "scheduled retry",
+      "running": "running",
+      "succeeded": "succeeded",
+      "completed": "completed",
+      "failed": "failed",
+      "cancelled": "cancelled",
+      "coalesced": "coalesced",
+      "skipped": "skipped",
+      "claimed": "claimed",
+      "waiting": "waiting",
+      "pending": "pending",
+      "approved": "approved",
+      "rejected": "rejected",
+      "error": "error",
+      "open": "open",
+      "closed": "closed",
+      "archived": "archived",
+      "unknown": "unknown",
+      "active": "active",
+      "paused": "paused",
+      "blocked": "blocked",
+      "in_progress": "in progress",
+      "in_review": "in review",
+      "auth_required": "auth required",
+      "unreachable": "unreachable",
+      "quarantined": "quarantined",
+      "stale": "stale",
+      "received": "received",
+      "issue_created": "issue created"
+    }
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "weeksAgo": "{{count}}w ago",
+    "monthsAgo": "{{count}}mo ago"
+  },
+  "issuesList": {
+    "quickFilter": {
+      "all": "All",
+      "active": "Active",
+      "backlog": "Backlog",
+      "done": "Done"
+    },
+    "filterLabel": {
+      "backlog": "Backlog",
+      "todo": "Todo",
+      "in_progress": "In Progress",
+      "in_review": "In Review",
+      "done": "Done",
+      "blocked": "Blocked",
+      "cancelled": "Cancelled",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "externalFilter": {
+      "failed": "Any failed",
+      "waiting": "Any waiting",
+      "running": "Any running",
+      "auth_required": "Auth required",
+      "unreachable": "Unreachable",
+      "stale": "Stale",
+      "none": "No external objects"
+    }
   }
 }

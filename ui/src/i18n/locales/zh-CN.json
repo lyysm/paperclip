@@ -144,5 +144,101 @@
     "signInLink": "登录",
     "fillRequired": "请填写所有必填字段。",
     "authFailed": "认证失败"
+  },
+  "statuses": {
+    "issue": {
+      "backlog": "待办",
+      "todo": "待处理",
+      "in_progress": "进行中",
+      "in_review": "审查中",
+      "done": "已完成",
+      "blocked": "已阻塞",
+      "cancelled": "已取消"
+    },
+    "agent": {
+      "idle": "空闲",
+      "paused": "已暂停",
+      "running": "运行中",
+      "error": "错误",
+      "pending_approval": "待审批",
+      "terminated": "已终止"
+    },
+    "priority": {
+      "critical": "紧急",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "change": "更改优先级（当前：{{label}}）"
+    },
+    "generic": {
+      "queued": "排队中",
+      "scheduled_retry": "等待重试",
+      "running": "运行中",
+      "succeeded": "已成功",
+      "completed": "已完成",
+      "failed": "已失败",
+      "cancelled": "已取消",
+      "coalesced": "已合并",
+      "skipped": "已跳过",
+      "claimed": "已认领",
+      "waiting": "等待中",
+      "pending": "待处理",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "error": "错误",
+      "open": "进行中",
+      "closed": "已关闭",
+      "archived": "已归档",
+      "unknown": "未知",
+      "active": "活跃",
+      "paused": "已暂停",
+      "blocked": "已阻塞",
+      "in_progress": "进行中",
+      "in_review": "审查中",
+      "auth_required": "需要认证",
+      "unreachable": "无法访问",
+      "quarantined": "已隔离",
+      "stale": "已过期",
+      "received": "已接收",
+      "issue_created": "已创建任务"
+    }
+  },
+  "time": {
+    "justNow": "刚刚",
+    "minutesAgo": "{{count}} 分钟前",
+    "hoursAgo": "{{count}} 小时前",
+    "daysAgo": "{{count}} 天前",
+    "weeksAgo": "{{count}} 周前",
+    "monthsAgo": "{{count}} 个月前"
+  },
+  "issuesList": {
+    "quickFilter": {
+      "all": "全部",
+      "active": "活跃",
+      "backlog": "待办",
+      "done": "已完成"
+    },
+    "filterLabel": {
+      "backlog": "待办",
+      "todo": "待处理",
+      "in_progress": "进行中",
+      "in_review": "审查中",
+      "done": "已完成",
+      "blocked": "已阻塞",
+      "cancelled": "已取消",
+      "critical": "紧急",
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "externalFilter": {
+      "failed": "任意失败",
+      "waiting": "任意等待中",
+      "running": "任意运行中",
+      "auth_required": "需要认证",
+      "unreachable": "无法访问",
+      "stale": "已过期",
+      "none": "无外部对象"
+    }
   }
 }

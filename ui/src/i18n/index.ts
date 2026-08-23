@@ -32,6 +32,14 @@ export function t(key: string, options: TOptions = {}) {
 }
 
 /**
+ * Active BCP-47 locale for `Intl` date/number formatting. Falls back to the
+ * default locale while i18next is still resolving.
+ */
+export function currentLocale(): string {
+  return i18n.resolvedLanguage ?? i18n.language ?? DEFAULT_LOCALE;
+}
+
+/**
  * Explicitly switch the active locale. Persists the choice so it survives
  * reloads; init-time locale resolution never writes storage.
  */

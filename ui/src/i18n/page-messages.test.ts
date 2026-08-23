@@ -281,6 +281,28 @@ describe("zh-CN page-body messages", () => {
     expect(entry(pipelinesPage, "overrideAndMove")).toBe("覆盖并移动");
   });
 
+  it("translates the company skills page", () => {
+    const companySkills = group("companySkills");
+    expect(entry(companySkills, "storeTitle")).toBe("技能商店");
+    expect(entry(companySkills, "searchPlaceholder")).toBe("搜索技能、作者、分类…");
+    expect(entry(companySkills, "createNewSkill")).toBe("创建新技能");
+    expect(entry(companySkills, "browseCatalog")).toBe("浏览技能库");
+    expect(entry(companySkills, "installSkill")).toBe("安装技能");
+    expect(entry(companySkills, "forkSkillTitle")).toBe("复刻技能");
+    expect(entry(companySkills, "forkingName")).toContain("{{name}}");
+    expect(entry(companySkills, "createdBody")).toContain("{{name}}");
+    expect(entry(companySkills, "movedCardBody")).toContain("{{folder}}");
+    expect(entry(companySkills, "movedCardBody")).toContain("{{name}}");
+    expect(entry(companySkills, "removeSkillDescription")).toContain("智能体");
+    expect(entry(companySkills, "skillCount_one")).toContain("{{count}}");
+    expect(entry(companySkills, "skillCount_other")).toContain("{{count}}");
+    expect(entry(companySkills, "scanAcrossWorkspace_other")).toContain("{{count}}");
+    expect(entry(companySkills, "tabInstalled")).toBe("已安装");
+    expect(entry(companySkills, "tabCatalog")).toBe("技能库");
+    expect(entry(companySkills, "trustScripts")).toBe("包含脚本");
+    expect(entry(companySkills, "compatInvalid")).toBe("无效");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

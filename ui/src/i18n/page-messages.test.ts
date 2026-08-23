@@ -241,6 +241,26 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(agentDetail, "taskAssignHint"), "ceoRole")).toContain("CEO");
   });
 
+  it("translates the secrets page", () => {
+    const secretsPage = group("secretsPage");
+    expect(entry(secretsPage, "title")).toBe("密钥");
+    expect(entry(secretsPage, "newSecret")).toBe("新建密钥");
+    expect(entry(secretsPage, "eachUser")).toBe("每位用户");
+    expect(entry(secretsPage, "deploymentDefault")).toBe("部署默认值");
+    expect(entry(secretsPage, "deleteSecretBody")).toContain("{{name}}");
+    expect(entry(secretsPage, "referencedBy_other")).toContain("{{count}}");
+    expect(entry(secretsPage, "referencedBy_other")).toContain("{{name}}");
+    expect(entry(secretsPage, "rotatedToastBody")).toContain("{{version}}");
+    expect(entry(secretsPage, "pathSecretCount_other")).toContain("{{count}}");
+    expect(entry(secretsPage, "secretStatusToast")).toContain("{{status}}");
+    expect(entry(nested(secretsPage, "tabs"), "vaults")).toBe("提供方密钥库");
+    expect(entry(nested(secretsPage, "statusLabel"), "disabled")).toBe("已停用");
+    expect(entry(nested(secretsPage, "vaultStatus"), "coming_soon")).toBe("即将推出");
+    expect(entry(nested(secretsPage, "viewMode"), "folders")).toBe("文件夹");
+    expect(entry(nested(secretsPage, "deliveryMode"), "env")).toBe("环境变量");
+    expect(entry(nested(secretsPage, "consumerType"), "agent_api")).toBe("智能体 API");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { SearchableSelect } from "@/components/SearchableSelect";
+import { useTranslation } from "@/i18n";
 import {
   buildReusableExecutionWorkspaceOptionGroups,
   reusableWorkspaceOptionMatches,
@@ -36,6 +37,7 @@ export function ReusableExecutionWorkspaceSelect<TWorkspace extends ReusableExec
   triggerClassName,
   disablePortal,
 }: ReusableExecutionWorkspaceSelectProps<TWorkspace>) {
+  const { t } = useTranslation();
   const groups = useMemo(() => buildReusableExecutionWorkspaceOptionGroups(workspaces), [workspaces]);
 
   return (
@@ -43,10 +45,12 @@ export function ReusableExecutionWorkspaceSelect<TWorkspace extends ReusableExec
       value={value}
       groups={groups}
       onValueChange={onValueChange}
-      placeholder={placeholder}
-      searchPlaceholder="Search workspaces..."
-      emptyMessage={error ? "Workspaces failed to load." : "No matching workspaces."}
-      loadingMessage="Loading workspaces..."
+      placeholder={placeholder ?? t("newIssueDialog.chooseWorkspace", { defaultValue: "Choose an existing workspace" })}
+      searchPlaceholder={t("newIssueDialog.searchWorkspaces", { defaultValue: "Search workspaces..." })}
+      emptyMessage={error
+        ? t("newIssueDialog.workspacesFailedToLoad", { defaultValue: "Workspaces failed to load." })
+        : t("newIssueDialog.noMatchingWorkspaces", { defaultValue: "No matching workspaces." })}
+      loadingMessage={t("newIssueDialog.loadingWorkspaces", { defaultValue: "Loading workspaces..." })}
       loading={loading}
       disabled={disabled}
       className={className}

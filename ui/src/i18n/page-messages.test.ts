@@ -166,4 +166,23 @@ describe("zh-CN page-body messages", () => {
     expect(entry(caseDetail, "copyKeyLine")).toContain("{{value}}");
     expect(entry(caseDetail, "fileCount_one")).toBe("{{count}} 个文件");
   });
+
+  it("translates project detail, user profile, and costs pages", () => {
+    const projectDetail = group("projectDetail");
+    expect(entry(projectDetail, "summaryTitle")).toBe("项目摘要");
+    expect(entry(projectDetail, "archivedToast")).toContain("{{name}}");
+    expect(entry(projectDetail, "pausedByBudgetHardStop")).toContain("预算硬停");
+
+    const userProfile = group("userProfile");
+    expect(entry(userProfile, "selectCompany")).toContain("用户资料");
+    expect(entry(userProfile, "usageTooltip")).toContain("{{tokens}}");
+    expect(entry(userProfile, "billedThrough")).toContain("{{name}}");
+
+    const costsPage = group("costsPage");
+    expect(entry(costsPage, "inferenceLedger")).toBe("推理台账");
+    expect(entry(costsPage, "financeNetSubtitle")).toContain("{{debits}}");
+    expect(entry(costsPage, "utilizationOfBudget")).toContain("{{percent}}");
+    expect(entry(nested(costsPage, "preset"), "7d")).toBe("最近 7 天");
+    expect(entry(costsPage, "debitsSubtitle_one")).toContain("{{count}}");
+  });
 });

@@ -796,6 +796,13 @@
       "longest_stopped": "停滞最久"
     }
   },
+  "approvals": {
+    "title": "审批",
+    "selectCompanyFirst": "请先选择一家公司。",
+    "pending": "待处理",
+    "noPending": "没有待处理的审批。",
+    "noneYet": "还没有审批。"
+  },
   "commandPalette": {
     "placeholder": "搜索任务、智能体、项目...",
     "emptyNoMatches": "没有快速匹配的任务。按",

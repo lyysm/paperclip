@@ -118,4 +118,23 @@ describe("zh-CN page-body messages", () => {
 
     expect(entry(group("approvals"), "pending")).toBe("待处理");
   });
+
+  it("translates approval detail, what-needs-me, and decision queue pages", () => {
+    const approvalDetail = group("approvalDetail");
+    expect(entry(approvalDetail, "backToApprovals")).toBe("返回审批");
+    expect(entry(approvalDetail, "decisionNote")).toContain("{{note}}");
+    expect(entry(approvalDetail, "commentsTitle")).toContain("{{count}}");
+    expect(entry(approvalDetail, "reviewLinkedTask_one")).toBe("查看关联任务");
+
+    const whatNeedsMe = group("whatNeedsMe");
+    expect(entry(whatNeedsMe, "allCaughtUp")).toBe("您已全部处理完毕");
+    expect(entry(whatNeedsMe, "bundleProposed_other")).toContain("{{agent}}");
+    expect(entry(whatNeedsMe, "bundleProposed_other")).toContain("{{count}}");
+    expect(entry(whatNeedsMe, "agingNote")).toContain("{{days}}");
+
+    const decisionQueue = group("decisionQueue");
+    expect(entry(decisionQueue, "autoSeedingOn")).toBe("自动入队已开启");
+    expect(entry(decisionQueue, "seedingEnabledNote")).toContain("——");
+    expect(entry(decisionQueue, "reasonOptional")).toContain("（可选）");
+  });
 });

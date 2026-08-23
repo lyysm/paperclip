@@ -1043,5 +1043,42 @@
     "exclude": "排除",
     "removeFromThisQueue": "从此队列移除",
     "reasonOptional": "原因（可选）…"
+  },
+  "agentsPage": {
+    "errorTab": "错误",
+    "builtinTab": "内置",
+    "paperclipHost": "Paperclip 主机",
+    "environmentTitle": "{{label}} - {{detail}}",
+    "loadingEnvironment": "正在加载环境",
+    "managedByPaperclip": "由 Paperclip 托管",
+    "sandboxProvider": "{{provider}} 沙箱提供商",
+    "unknownEnvironment": "未知环境",
+    "setUp": "设置",
+    "runHeartbeat": "运行心跳",
+    "agentCount_one": "{{count}} 个智能体",
+    "agentCount_other": "{{count}} 个智能体",
+    "selectCompany": "选择一家公司以查看智能体。",
+    "createFirstAgent": "创建您的第一个智能体以开始。",
+    "newAgent": "新建智能体",
+    "noAgentsMatch": "没有符合所选状态的智能体。",
+    "noOrgHierarchy": "尚未定义组织层级。",
+    "orgChartView": "组织架构图视图",
+    "liveRunsCount": "进行中（{{count}}）"
+  },
+  "newAgentForm": {
+    "title": "新建智能体",
+    "subtitle": "高级智能体配置",
+    "namePlaceholder": "智能体名称",
+    "titlePlaceholder": "职位（例如：工程副总裁）",
+    "companySkills": "公司技能",
+    "companySkillsHelper": "来自公司技能库的可选技能。Paperclip 内置运行时技能会自动添加。",
+    "noCompanySkills": "尚未安装可选的公司技能。",
+    "firstAgentNote": "该智能体将成为 CEO",
+    "testing": "测试中...",
+    "testAgent": "测试智能体",
+    "creating": "创建中…",
+    "createAgent": "创建智能体",
+    "createFailed": "创建智能体失败",
+    "openCodeModelRequired": "OpenCode 需要以 provider/model 格式显式指定模型。"
   }
 }

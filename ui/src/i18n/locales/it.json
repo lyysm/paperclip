@@ -1043,5 +1043,42 @@
     "exclude": "Exclude",
     "removeFromThisQueue": "Remove from this queue",
     "reasonOptional": "Reason (optional)…"
+  },
+  "agentsPage": {
+    "errorTab": "Error",
+    "builtinTab": "Built-in",
+    "paperclipHost": "Paperclip host",
+    "environmentTitle": "{{label}} - {{detail}}",
+    "loadingEnvironment": "Loading environment",
+    "managedByPaperclip": "Managed by Paperclip",
+    "sandboxProvider": "{{provider}} sandbox provider",
+    "unknownEnvironment": "Unknown environment",
+    "setUp": "Set up",
+    "runHeartbeat": "Run Heartbeat",
+    "agentCount_one": "{{count}} agent",
+    "agentCount_other": "{{count}} agents",
+    "selectCompany": "Select a company to view agents.",
+    "createFirstAgent": "Create your first agent to get started.",
+    "newAgent": "New Agent",
+    "noAgentsMatch": "No agents match the selected status.",
+    "noOrgHierarchy": "No organizational hierarchy defined.",
+    "orgChartView": "Org chart view",
+    "liveRunsCount": "Live ({{count}})"
+  },
+  "newAgentForm": {
+    "title": "New Agent",
+    "subtitle": "Advanced agent configuration",
+    "namePlaceholder": "Agent name",
+    "titlePlaceholder": "Title (e.g. VP of Engineering)",
+    "companySkills": "Company skills",
+    "companySkillsHelper": "Optional skills from the company library. Built-in Paperclip runtime skills are added automatically.",
+    "noCompanySkills": "No optional company skills installed yet.",
+    "firstAgentNote": "This will be the CEO",
+    "testing": "Testing...",
+    "testAgent": "Test Agent",
+    "creating": "Creating…",
+    "createAgent": "Create agent",
+    "createFailed": "Failed to create agent",
+    "openCodeModelRequired": "OpenCode requires an explicit model in provider/model format."
   }
 }

@@ -137,4 +137,17 @@ describe("zh-CN page-body messages", () => {
     expect(entry(decisionQueue, "seedingEnabledNote")).toContain("——");
     expect(entry(decisionQueue, "reasonOptional")).toContain("（可选）");
   });
+
+  it("translates the agents list and new-agent form", () => {
+    const agentsPage = group("agentsPage");
+    expect(entry(agentsPage, "orgChartView")).toBe("组织架构图视图");
+    expect(entry(agentsPage, "sandboxProvider")).toContain("{{provider}}");
+    expect(entry(agentsPage, "agentCount_other")).toContain("{{count}}");
+    expect(entry(agentsPage, "liveRunsCount")).toBe("进行中（{{count}}）");
+
+    const newAgentForm = group("newAgentForm");
+    expect(entry(newAgentForm, "title")).toBe("新建智能体");
+    expect(entry(newAgentForm, "companySkillsHelper")).toContain("公司技能库");
+    expect(entry(newAgentForm, "firstAgentNote")).toContain("CEO");
+  });
 });

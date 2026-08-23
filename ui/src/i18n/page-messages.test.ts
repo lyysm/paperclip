@@ -261,6 +261,26 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(secretsPage, "consumerType"), "agent_api")).toBe("智能体 API");
   });
 
+  it("translates the pipelines page", () => {
+    const pipelinesPage = group("pipelinesPage");
+    expect(entry(pipelinesPage, "createPipeline")).toBe("创建流水线");
+    expect(entry(pipelinesPage, "newPipeline")).toBe("新建流水线");
+    expect(entry(pipelinesPage, "noPipelinesYet")).toBe("还没有流水线。");
+    expect(entry(pipelinesPage, "moveTitle")).toContain("{{title}}");
+    expect(entry(pipelinesPage, "moveToName")).toContain("{{name}}");
+    expect(entry(pipelinesPage, "approveCount")).toContain("{{count}}");
+    expect(entry(pipelinesPage, "waitingForDecision")).toContain("{{pipeline}}");
+    expect(entry(pipelinesPage, "suggestionPrompt")).toContain("{{pipeline}}");
+    expect(entry(pipelinesPage, "learningReviewDecided")).toContain("{{actor}}");
+    expect(entry(pipelinesPage, "pipelineCount")).toContain("{{count}}");
+    expect(entry(pipelinesPage, "reviewQueue")).toBe("评审队列");
+    expect(entry(pipelinesPage, "learnings")).toBe("经验沉淀");
+    expect(entry(pipelinesPage, "nestedView")).toBe("嵌套视图");
+    expect(entry(pipelinesPage, "flatList")).toBe("平铺列表");
+    expect(entry(pipelinesPage, "columnAttention")).toBe("需关注");
+    expect(entry(pipelinesPage, "overrideAndMove")).toBe("覆盖并移动");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

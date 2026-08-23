@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { CaseCopyableToken } from "@/components/CaseIdentifierKey";
 import { hasBlockingShortcutDialog, isKeyboardShortcutTextInputTarget } from "@/lib/keyboardShortcuts";
 import { cn, relativeTime } from "@/lib/utils";
+import { t, useTranslation } from "@/i18n";
 
 type GroupBy = "type" | "project" | "status" | "none";
 type CaseColumn = "id" | "key" | "title" | "status" | "updated" | "created" | "type" | "project" | "parent";
@@ -39,39 +40,70 @@ type CaseViewState = {
   treeView: boolean;
 };
 
-const STATUS_FILTER_OPTIONS: { value: CaseStatus; label: string }[] = [
-  { value: "draft", label: "Draft" },
-  { value: "in_progress", label: "In progress" },
-  { value: "in_review", label: "In review" },
-  { value: "approved", label: "Approved" },
-  { value: "done", label: "Done" },
-  { value: "cancelled", label: "Cancelled" },
-];
+const STATUS_FILTER_OPTIONS: CaseStatus[] = ["draft", "in_progress", "in_review", "approved", "done", "cancelled"];
+
+function caseStatusLabel(status: CaseStatus): string {
+  switch (status) {
+    case "draft":
+      return t("casesPage.statusDraft", { defaultValue: "Draft" });
+    case "in_progress":
+      return t("statuses.issue.in_progress", { defaultValue: "In progress" });
+    case "in_review":
+      return t("statuses.issue.in_review", { defaultValue: "In review" });
+    case "approved":
+      return t("casesPage.statusApproved", { defaultValue: "Approved" });
+    case "done":
+      return t("statuses.issue.done", { defaultValue: "Done" });
+    case "cancelled":
+      return t("statuses.issue.cancelled", { defaultValue: "Cancelled" });
+  }
+}
 
 const ALL = "__all__";
 const DEFAULT_STATUS_FILTERS: CaseStatus[] = CASE_STATUSES.filter((status) => !TERMINAL_CASE_STATUSES.includes(status));
 const DEFAULT_CASE_COLUMNS: CaseColumn[] = ["id", "title", "status", "updated"];
 const CASE_COLUMN_ORDER: CaseColumn[] = ["id", "key", "title", "type", "status", "updated", "created", "project", "parent"];
-const CASE_COLUMN_LABELS: Record<CaseColumn, string> = {
-  id: "ID",
-  key: "Key",
-  title: "Title",
-  status: "Status",
-  updated: "Updated",
-  created: "Created at",
-  type: "Type",
-  project: "Project",
-  parent: "Parent case",
-};
-const CASE_SORT_LABELS: Record<CaseSortField, string> = {
-  updated: "Last updated",
-  created: "Created at",
-  title: "Title",
-  status: "Status",
-  id: "ID",
-  type: "Type",
-  project: "Project",
-};
+function caseColumnLabel(column: CaseColumn): string {
+  switch (column) {
+    case "id":
+      return t("issuesList.column.id", { defaultValue: "ID" });
+    case "key":
+      return t("casesPage.keyLabel", { defaultValue: "Key" });
+    case "title":
+      return t("issuesList.sortField.title", { defaultValue: "Title" });
+    case "status":
+      return t("issuesList.column.status", { defaultValue: "Status" });
+    case "updated":
+      return t("issuesList.sortField.updated", { defaultValue: "Updated" });
+    case "created":
+      return t("casesPage.createdLabel", { defaultValue: "Created at" });
+    case "type":
+      return t("inbox.groupBy.type", { defaultValue: "Type" });
+    case "project":
+      return t("inbox.groupBy.project", { defaultValue: "Project" });
+    case "parent":
+      return t("casesPage.parentCaseLabel", { defaultValue: "Parent case" });
+  }
+}
+const CASE_SORT_FIELDS: CaseSortField[] = ["updated", "created", "title", "status", "id", "type", "project"];
+function caseSortLabel(field: CaseSortField): string {
+  switch (field) {
+    case "updated":
+      return t("issuesList.column.updated", { defaultValue: "Last updated" });
+    case "created":
+      return t("casesPage.createdLabel", { defaultValue: "Created at" });
+    case "title":
+      return t("issuesList.sortField.title", { defaultValue: "Title" });
+    case "status":
+      return t("issuesList.column.status", { defaultValue: "Status" });
+    case "id":
+      return t("issuesList.column.id", { defaultValue: "ID" });
+    case "type":
+      return t("inbox.groupBy.type", { defaultValue: "Type" });
+    case "project":
+      return t("inbox.groupBy.project", { defaultValue: "Project" });
+  }
+}
 const defaultCaseViewState: CaseViewState = {
   search: "",
   typeFilters: [],
@@ -213,6 +245,7 @@ function CaseStatusPicker({
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -220,7 +253,7 @@ function CaseStatusPicker({
           type="button"
           disabled={disabled}
           className="inline-flex items-center gap-1 rounded-md hover:bg-accent/50 disabled:opacity-50"
-          aria-label="Change case status"
+          aria-label={t("casesPage.changeStatusAria", { defaultValue: "Change case status" })}
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -240,16 +273,16 @@ function CaseStatusPicker({
       >
         {STATUS_FILTER_OPTIONS.map((option) => (
           <button
-            key={option.value}
+            key={option}
             type="button"
             onClick={() => {
               setOpen(false);
-              if (option.value !== status) onChange(option.value);
+              if (option !== status) onChange(option);
             }}
             className="flex w-full items-center justify-between rounded px-2 py-1.5 text-left hover:bg-accent"
           >
-            <StatusBadge status={option.value} />
-            {option.value === status && <Check className="h-4 w-4 text-muted-foreground" />}
+            <StatusBadge status={option} />
+            {option === status && <Check className="h-4 w-4 text-muted-foreground" />}
           </button>
         ))}
       </PopoverContent>
@@ -280,6 +313,7 @@ function CaseTrailingColumns({
   treeCollapsed?: boolean;
   onTreeToggle?: (caseId: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <span className="grid min-w-0 flex-1 items-center gap-2" style={{ gridTemplateColumns: caseTrailingGridTemplate(columns) }}>
       {columns.map((column) => {
@@ -288,7 +322,7 @@ function CaseTrailingColumns({
             <CaseCopyableToken
               key={column}
               value={row.identifier}
-              label="case ID"
+              label={t("casesPage.caseIdLabel", { defaultValue: "case ID" })}
               className="font-mono text-xs text-muted-foreground"
               containerClassName="shrink-0"
               stopPropagation
@@ -300,12 +334,12 @@ function CaseTrailingColumns({
             <CaseCopyableToken
               key={column}
               value={row.key}
-              label="case key"
+              label={t("casesPage.caseKeyLabel", { defaultValue: "case key" })}
               className="font-mono text-xs text-muted-foreground"
               stopPropagation
             />
           ) : (
-            <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">None</span>
+            <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">{t("inbox.groupBy.none", { defaultValue: "None" })}</span>
           );
         }
         if (column === "title") {
@@ -324,7 +358,7 @@ function CaseTrailingColumns({
                     <button
                       type="button"
                       className="flex h-4 w-4 items-center justify-center rounded-sm transition-colors hover:bg-accent/50"
-                      aria-label={`${treeCollapsed ? "Expand" : "Collapse"} ${row.title}`}
+                      aria-label={`${treeCollapsed ? t("casesPage.expand", { defaultValue: "Expand" }) : t("casesPage.collapse", { defaultValue: "Collapse" })} ${row.title}`}
                       aria-expanded={!treeCollapsed}
                       onClick={(event) => {
                         event.preventDefault();
@@ -358,12 +392,12 @@ function CaseTrailingColumns({
           return <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">{row.caseType}</span>;
         }
         if (column === "project") {
-          return <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">{projectName ?? "No project"}</span>;
+          return <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">{projectName ?? t("issuesList.noProjectShort", { defaultValue: "No project" })}</span>;
         }
         if (column === "parent") {
           return (
             <span key={column} className="min-w-0 truncate font-mono text-xs text-muted-foreground">
-              {row.parentCaseId ? "Parent" : "None"}
+              {row.parentCaseId ? t("casesPage.parentLabel", { defaultValue: "Parent" }) : t("inbox.groupBy.none", { defaultValue: "None" })}
             </span>
           );
         }
@@ -413,6 +447,7 @@ function CaseListRow({
   selected?: boolean;
   onSelect?: () => void;
 }) {
+  const { t } = useTranslation();
   const caseHref = useCaseHref();
   return (
     <Link
@@ -439,7 +474,7 @@ function CaseListRow({
           {visibleColumnSet.has("id") ? (
             <CaseCopyableToken
               value={row.identifier}
-              label="case ID"
+              label={t("casesPage.caseIdLabel", { defaultValue: "case ID" })}
               className="font-mono text-xs text-muted-foreground"
               containerClassName="shrink-0"
               stopPropagation
@@ -448,7 +483,7 @@ function CaseListRow({
           {visibleColumnSet.has("key") && row.key ? (
             <CaseCopyableToken
               value={row.key}
-              label="case key"
+              label={t("casesPage.caseKeyLabel", { defaultValue: "case key" })}
               className="shrink-0 font-mono text-xs text-muted-foreground"
               stopPropagation
             />
@@ -489,7 +524,7 @@ function CaseColumnHeader({
         <span className="grid min-w-0 flex-1 items-center gap-2" style={{ gridTemplateColumns: caseTrailingGridTemplate(trailingColumns) }}>
           {trailingColumns.map((column) => (
             <span key={column} className={cn("truncate", (column === "updated" || column === "created") && "text-right")}>
-              {CASE_COLUMN_LABELS[column]}
+              {caseColumnLabel(column)}
             </span>
           ))}
         </span>
@@ -515,6 +550,7 @@ function CaseGroup({
   onSelect: () => void;
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="mt-6 first:mt-0">
       <div
@@ -529,7 +565,7 @@ function CaseGroup({
           onToggle={onToggle}
           trailing={(
             <span className="text-xs text-muted-foreground tabular-nums">
-              {count} {count === 1 ? "case" : "cases"}
+              {t("casesPage.caseCount", { defaultValue: "{{count}} cases", count })}
             </span>
           )}
         />
@@ -636,14 +672,15 @@ function CaseColumnPicker({
   onToggle: (column: CaseColumn, enabled: boolean) => void;
   onReset: () => void;
 }) {
+  const { t } = useTranslation();
   return (
-    <CaseToolbarButton icon={Columns3} title="Columns" active={!sameStringSet([...visibleColumns], DEFAULT_CASE_COLUMNS)}>
+    <CaseToolbarButton icon={Columns3} title={t("issuesList.columns", { defaultValue: "Columns" })} active={!sameStringSet([...visibleColumns], DEFAULT_CASE_COLUMNS)}>
       <PopoverContent align="end" className="w-(--sz-300px) p-1.5">
         <div className="px-2 pb-1 pt-1.5">
           <div className="text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-            Desktop case rows
+            {t("casesPage.desktopCaseRows", { defaultValue: "Desktop case rows" })}
           </div>
-          <div className="text-sm font-medium text-foreground">Choose visible columns</div>
+          <div className="text-sm font-medium text-foreground">{t("casesPage.chooseVisibleColumns", { defaultValue: "Choose visible columns" })}</div>
         </div>
         <div className="space-y-0.5">
           {CASE_COLUMN_ORDER.map((column) => (
@@ -653,7 +690,7 @@ function CaseColumnPicker({
               className="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-accent/50"
               onClick={() => onToggle(column, !visibleColumns.has(column))}
             >
-              <span>{CASE_COLUMN_LABELS[column]}</span>
+              <span>{caseColumnLabel(column)}</span>
               {visibleColumns.has(column) ? <Check className="h-3.5 w-3.5 text-muted-foreground" /> : null}
             </button>
           ))}
@@ -664,7 +701,7 @@ function CaseColumnPicker({
             className="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent/50"
             onClick={onReset}
           >
-            Reset defaults
+            {t("issuesList.resetColumnDefaults", { defaultValue: "Reset defaults" })}
           </button>
         </div>
       </PopoverContent>
@@ -681,10 +718,11 @@ function CaseSortPicker({
   sortDir: "asc" | "desc";
   onChange: (patch: Pick<CaseViewState, "sortField" | "sortDir">) => void;
 }) {
+  const { t } = useTranslation();
   return (
-    <CaseToolbarButton icon={ArrowUpDown} title="Sort" active={sortField !== "updated" || sortDir !== "desc"}>
+    <CaseToolbarButton icon={ArrowUpDown} title={t("issuesList.sort", { defaultValue: "Sort" })} active={sortField !== "updated" || sortDir !== "desc"}>
       <PopoverContent align="end" className="w-48 p-2">
-        {(Object.keys(CASE_SORT_LABELS) as CaseSortField[]).map((field) => (
+        {CASE_SORT_FIELDS.map((field) => (
           <button
             key={field}
             type="button"
@@ -700,7 +738,7 @@ function CaseSortPicker({
               }
             }}
           >
-            <span>{CASE_SORT_LABELS[field]}</span>
+            <span>{caseSortLabel(field)}</span>
             {sortField === field ? (
               <span className="text-xs text-muted-foreground">{sortDir === "asc" ? "↑" : "↓"}</span>
             ) : null}
@@ -713,33 +751,33 @@ function CaseSortPicker({
 
 /** Full-page onboarding hero shown when the company has zero cases (§6). */
 function CasesEmptyHero() {
+  const { t } = useTranslation();
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center gap-4 py-16 text-center">
       <Layers className="h-10 w-10 text-muted-foreground" />
-      <h2 className="text-lg font-semibold">No cases yet</h2>
+      <h2 className="text-lg font-semibold">{t("casesPage.emptyTitle", { defaultValue: "No cases yet" })}</h2>
       <p className="text-sm text-muted-foreground">
-        Cases are durable work products — blog posts, tweet storms, docs pages — that tasks create and
-        iterate on. In v1 they&apos;re created by agents, not from the UI.
+        {t("casesPage.emptyDescription", { defaultValue: "Cases are durable work products — blog posts, tweet storms, docs pages — that tasks create and iterate on. In v1 they're created by agents, not from the UI." })}
       </p>
       <div className="w-full space-y-2 rounded-lg border border-border bg-muted/50 p-4 text-left">
-        <p className="text-sm font-medium">To start creating cases, add this to a skill:</p>
+        <p className="text-sm font-medium">{t("casesPage.emptyAddToSkill", { defaultValue: "To start creating cases, add this to a skill:" })}</p>
         <pre className="overflow-x-auto rounded bg-background/60 p-3 font-mono text-xs text-muted-foreground">
 {`"Create a case of type blog_post with fields
 {slug, target_audience, publish_url} and key <release>/<slug>."`}
         </pre>
         <p className="text-xs text-muted-foreground">
-          See the paperclip skill → <code className="font-mono">references/cases.md</code> for the API.
+          {t("casesPage.emptySkillIntro", { defaultValue: "See the paperclip skill →" })} <code className="font-mono">references/cases.md</code> {t("casesPage.emptySkillSuffix", { defaultValue: "for the API." })}
         </p>
       </div>
       <p className="text-xs text-muted-foreground">
-        Feature is gated by the <code className="font-mono">enableCases</code> experimental flag
-        (Settings → Experimental).
+        {t("casesPage.emptyFlagIntro", { defaultValue: "Feature is gated by the" })} <code className="font-mono">enableCases</code> {t("casesPage.emptyFlagSuffix", { defaultValue: "experimental flag (Settings → Experimental)." })}
       </p>
     </div>
   );
 }
 
 export function Cases() {
+  const { t } = useTranslation();
   const { selectedCompanyId } = useCompany();
   const { setBreadcrumbs } = useBreadcrumbs();
   const { keyboardShortcutsEnabled } = useGeneralSettings();
@@ -755,8 +793,8 @@ export function Cases() {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Cases" }]);
-  }, [setBreadcrumbs]);
+    setBreadcrumbs([{ label: t("nav.cases", { defaultValue: "Cases" }) }]);
+  }, [setBreadcrumbs, t]);
 
   useEffect(() => {
     setViewState(loadCaseViewState(viewStorageKey));
@@ -891,8 +929,8 @@ export function Cases() {
     for (const c of sorted) {
       let key: string;
       if (viewState.groupBy === "type") key = c.caseType;
-      else if (viewState.groupBy === "status") key = c.status;
-      else key = c.projectId ? projectName.get(c.projectId) ?? "Unknown project" : "No project";
+      else if (viewState.groupBy === "status") key = caseStatusLabel(c.status);
+      else key = c.projectId ? projectName.get(c.projectId) ?? t("casesPage.unknownProject", { defaultValue: "Unknown project" }) : t("issuesList.noProjectShort", { defaultValue: "No project" });
       const bucket = map.get(key);
       if (bucket) bucket.push(c);
       else map.set(key, [c]);
@@ -900,7 +938,7 @@ export function Cases() {
     return [...map.entries()]
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([label, rows]) => ({ key: label, label, rows }));
-  }, [sorted, viewState.groupBy, projectName]);
+  }, [sorted, viewState.groupBy, projectName, t]);
 
   const treeRows = useMemo((): CaseTreeRow[] => {
     const rowById = new Map(sortedTreeSource.map((row) => [row.id, row]));
@@ -1020,33 +1058,33 @@ export function Cases() {
   }, [selectedIndex]);
 
   const activeFilters: FilterValue[] = [];
-  if (viewState.search.trim()) activeFilters.push({ key: "search", label: "Search", value: viewState.search.trim() });
+  if (viewState.search.trim()) activeFilters.push({ key: "search", label: t("nav.search", { defaultValue: "Search" }), value: viewState.search.trim() });
   if (viewState.typeFilters.length > 0) {
-    activeFilters.push({ key: "type", label: "Type", value: viewState.typeFilters.join(", ") });
+    activeFilters.push({ key: "type", label: t("inbox.groupBy.type", { defaultValue: "Type" }), value: viewState.typeFilters.join(", ") });
   }
   if (!usesDefaultStatusFilter) {
     activeFilters.push({
       key: "status",
-      label: "Status",
+      label: t("issuesList.column.status", { defaultValue: "Status" }),
       value: viewState.statusFilters.length === CASE_STATUSES.length
-        ? "All"
+        ? t("searchPage.all", { defaultValue: "All" })
         : viewState.statusFilters
-          .map((status) => STATUS_FILTER_OPTIONS.find((option) => option.value === status)?.label ?? status)
+          .map((status) => caseStatusLabel(status))
           .join(", "),
     });
   }
   if (viewState.projectFilters.length > 0) {
     activeFilters.push({
       key: "project",
-      label: "Project",
+      label: t("inbox.groupBy.project", { defaultValue: "Project" }),
       value: viewState.projectFilters
-        .map((projectId) => projectId === ALL ? "No project" : projectName.get(projectId) ?? "Project")
+        .map((projectId) => projectId === ALL ? t("issuesList.noProjectShort", { defaultValue: "No project" }) : projectName.get(projectId) ?? t("inbox.groupBy.project", { defaultValue: "Project" }))
         .join(", "),
     });
   }
   if (viewState.labelFilter !== ALL) {
-    const name = (labelsQuery.data ?? []).find((l) => l.id === viewState.labelFilter)?.name ?? "Label";
-    activeFilters.push({ key: "label", label: "Label", value: name });
+    const name = (labelsQuery.data ?? []).find((l) => l.id === viewState.labelFilter)?.name ?? t("casesPage.filterLabelField", { defaultValue: "Label" });
+    activeFilters.push({ key: "label", label: t("casesPage.filterLabelField", { defaultValue: "Label" }), value: name });
   }
 
   function removeFilter(key: string) {
@@ -1194,8 +1232,8 @@ export function Cases() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold">Cases</h1>
-          <Badge variant="secondary">Experimental</Badge>
+          <h1 className="text-xl font-bold">{t("nav.cases", { defaultValue: "Cases" })}</h1>
+          <Badge variant="secondary">{t("casesPage.experimentalBadge", { defaultValue: "Experimental" })}</Badge>
         </div>
       </div>
 
@@ -1209,9 +1247,9 @@ export function Cases() {
               <Input
                 value={viewState.search}
                 onChange={(e) => updateView({ search: e.target.value })}
-                placeholder="Search cases..."
+                placeholder={t("casesPage.searchPlaceholder", { defaultValue: "Search cases..." })}
                 className="pl-7 text-xs sm:text-sm"
-                aria-label="Search cases"
+                aria-label={t("casesPage.searchAria", { defaultValue: "Search cases" })}
                 data-page-search-target="true"
               />
             </div>
@@ -1222,8 +1260,8 @@ export function Cases() {
                 variant="outline"
                 size="icon"
                 className={cn("h-8 w-8 shrink-0", viewState.treeView && "bg-accent")}
-                title={viewState.treeView ? "Show flat case list" : "Show parent/children tree"}
-                aria-label={viewState.treeView ? "Show flat case list" : "Show parent/children tree"}
+                title={viewState.treeView ? t("casesPage.showFlatList", { defaultValue: "Show flat case list" }) : t("casesPage.showTree", { defaultValue: "Show parent/children tree" })}
+                aria-label={viewState.treeView ? t("casesPage.showFlatList", { defaultValue: "Show flat case list" }) : t("casesPage.showTree", { defaultValue: "Show parent/children tree" })}
                 aria-pressed={viewState.treeView}
                 onClick={() => updateView({ treeView: !viewState.treeView })}
               >
@@ -1236,13 +1274,13 @@ export function Cases() {
                 onReset={resetColumns}
               />
 
-              <CaseToolbarButton icon={Filter} title="Filters" active={hasActiveFilters}>
+              <CaseToolbarButton icon={Filter} title={t("issuesList.filters", { defaultValue: "Filters" })} active={hasActiveFilters}>
                 <PopoverContent align="end" className="w-72 p-3">
                   <div className="grid gap-3">
-                    <FilterField label="Type">
+                    <FilterField label={t("inbox.groupBy.type", { defaultValue: "Type" })}>
                       <div className="max-h-40 overflow-y-auto">
                         {distinctTypes.length === 0 ? (
-                          <p className="px-1 py-1 text-xs text-muted-foreground">No types yet</p>
+                          <p className="px-1 py-1 text-xs text-muted-foreground">{t("casesPage.noTypesYet", { defaultValue: "No types yet" })}</p>
                         ) : distinctTypes.map((type) => (
                           <FilterCheckboxRow
                             key={type}
@@ -1253,22 +1291,22 @@ export function Cases() {
                         ))}
                       </div>
                     </FilterField>
-                    <FilterField label="Status">
+                    <FilterField label={t("issuesList.statusFilterHeading", { defaultValue: "Status" })}>
                       <div>
-                        {STATUS_FILTER_OPTIONS.map((option) => (
+                        {STATUS_FILTER_OPTIONS.map((status) => (
                           <FilterCheckboxRow
-                            key={option.value}
-                            label={option.label}
-                            checked={viewState.statusFilters.includes(option.value)}
-                            onCheckedChange={(checked) => toggleStatusFilter(option.value, checked)}
+                            key={status}
+                            label={caseStatusLabel(status)}
+                            checked={viewState.statusFilters.includes(status)}
+                            onCheckedChange={(checked) => toggleStatusFilter(status, checked)}
                           />
                         ))}
                       </div>
                     </FilterField>
-                    <FilterField label="Project">
+                    <FilterField label={t("issuesList.projectFilterHeading", { defaultValue: "Project" })}>
                       <div className="max-h-40 overflow-y-auto">
                         <FilterCheckboxRow
-                          label="No project"
+                          label={t("issuesList.noProjectShort", { defaultValue: "No project" })}
                           checked={viewState.projectFilters.includes(ALL)}
                           onCheckedChange={(checked) => toggleStringFilter("projectFilters", ALL, checked)}
                         />
@@ -1282,10 +1320,10 @@ export function Cases() {
                         ))}
                       </div>
                     </FilterField>
-                    <FilterField label="Label">
+                    <FilterField label={t("casesPage.filterLabelField", { defaultValue: "Label" })}>
                       <div className="max-h-40 overflow-y-auto">
                         <FilterCheckboxRow
-                          label="All labels"
+                          label={t("casesPage.allLabels", { defaultValue: "All labels" })}
                           checked={viewState.labelFilter === ALL}
                           onCheckedChange={(checked) => {
                             if (checked) updateView({ labelFilter: ALL });
@@ -1302,7 +1340,7 @@ export function Cases() {
                       </div>
                     </FilterField>
                     <Button type="button" variant="ghost" size="sm" onClick={clearFilters} disabled={!hasActiveFilters}>
-                      Clear filters
+                      {t("casesPage.clearFilters", { defaultValue: "Clear filters" })}
                     </Button>
                   </div>
                 </PopoverContent>
@@ -1314,13 +1352,13 @@ export function Cases() {
                 onChange={updateView}
               />
 
-              <CaseToolbarButton icon={Layers} title="Group" active={viewState.groupBy !== "type"}>
+              <CaseToolbarButton icon={Layers} title={t("issuesList.group", { defaultValue: "Group" })} active={viewState.groupBy !== "type"}>
                 <PopoverContent align="end" className="w-44 p-2">
                   {([
-                    ["type", "Type"],
-                    ["project", "Project"],
-                    ["status", "Status"],
-                    ["none", "None"],
+                    ["type", t("inbox.groupBy.type", { defaultValue: "Type" })],
+                    ["project", t("inbox.groupBy.project", { defaultValue: "Project" })],
+                    ["status", t("issuesList.groupBy.status", { defaultValue: "Status" })],
+                    ["none", t("issuesList.groupBy.none", { defaultValue: "None" })],
                   ] as const).map(([value, label]) => (
                     <button
                       key={value}
@@ -1343,7 +1381,7 @@ export function Cases() {
           <FilterBar filters={activeFilters} onRemove={removeFilter} onClear={clearFilters} />
 
           {filtered.length === 0 ? (
-            <EmptyState icon={SearchX} message="No cases match these filters." action="Clear filters" onAction={clearFilters} />
+            <EmptyState icon={SearchX} message={t("casesPage.noMatches", { defaultValue: "No cases match these filters." })} action={t("casesPage.clearFilters", { defaultValue: "Clear filters" })} onAction={clearFilters} />
           ) : (
             <div ref={caseListRef}>
               <CaseColumnHeader visibleColumnSet={visibleColumnSet} trailingColumns={trailingColumns} />

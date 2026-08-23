@@ -150,4 +150,20 @@ describe("zh-CN page-body messages", () => {
     expect(entry(newAgentForm, "companySkillsHelper")).toContain("公司技能库");
     expect(entry(newAgentForm, "firstAgentNote")).toContain("CEO");
   });
+
+  it("translates the cases list and case detail pages", () => {
+    const casesPage = group("casesPage");
+    expect(entry(casesPage, "searchPlaceholder")).toBe("搜索案例...");
+    expect(entry(casesPage, "emptyTitle")).toBe("还没有案例");
+    expect(entry(casesPage, "emptyDescription")).toContain("工作产物");
+    expect(entry(casesPage, "caseCount_other")).toContain("{{count}}");
+    expect(entry(casesPage, "emptyFlagSuffix")).toContain("实验性");
+
+    const caseDetail = group("caseDetail");
+    expect(entry(caseDetail, "backToCases")).toBe("← 返回案例");
+    expect(entry(caseDetail, "attachmentsHeading")).toContain("{{count}}");
+    expect(entry(caseDetail, "createLabelValue")).toContain("{{name}}");
+    expect(entry(caseDetail, "copyKeyLine")).toContain("{{value}}");
+    expect(entry(caseDetail, "fileCount_one")).toBe("{{count}} 个文件");
+  });
 });

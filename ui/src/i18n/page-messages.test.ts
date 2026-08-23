@@ -186,6 +186,24 @@ describe("zh-CN page-body messages", () => {
     expect(entry(costsPage, "debitsSubtitle_one")).toContain("{{count}}");
   });
 
+  it("translates the company environments page", () => {
+    const environmentsPage = group("environmentsPage");
+    expect(entry(environmentsPage, "addEnvironmentTitle")).toBe("添加环境");
+    expect(entry(environmentsPage, "editEnvironmentTitle")).toBe("编辑环境");
+    expect(entry(environmentsPage, "discardConfirm")).toContain("未保存");
+    expect(entry(environmentsPage, "managedByPaperclip")).toBe("由 Paperclip 托管");
+    expect(entry(environmentsPage, "sandboxProviderWithSummary")).toContain("{{provider}}");
+    expect(entry(environmentsPage, "sandboxProviderWithSummary")).toContain("{{summary}}");
+    expect(entry(environmentsPage, "environmentReadyBody")).toContain("{{name}}");
+    expect(entry(environmentsPage, "customImageTitle")).toBe("自定义镜像");
+    expect(entry(nested(environmentsPage, "terminalStatus"), "connected")).toBe("已连接");
+    expect(entry(nested(environmentsPage, "terminalClose"), "setup_cancelled")).toBe("设置会话已取消。");
+    expect(entry(nested(environmentsPage, "sessionStatus"), "capturing")).toBe("正在捕获模板");
+    expect(entry(nested(environmentsPage, "capability"), "supportedLabel")).toBe("模板设置");
+    expect(entry(environmentsPage, "notInUseWithDrift")).toContain("{{summary}}");
+    expect(entry(environmentsPage, "templateRefTitle")).toContain("{{id}}");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

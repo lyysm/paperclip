@@ -222,6 +222,25 @@ describe("zh-CN page-body messages", () => {
     expect(entry(environmentsPage, "templateRefTitle")).toContain("{{id}}");
   });
 
+  it("translates the agent detail page", () => {
+    const agentDetail = group("agentDetail");
+    expect(entry(agentDetail, "apiKeys")).toBe("API 密钥");
+    expect(entry(agentDetail, "discardConfigChanges")).toContain("未保存");
+    expect(entry(agentDetail, "invalidChainBody")).toContain("{{name}}");
+    expect(entry(agentDetail, "onBehalfOf")).toContain("{{name}}");
+    expect(entry(agentDetail, "deleteFileConfirm")).toContain("{{path}}");
+    expect(entry(agentDetail, "showingFirstKb")).toContain("{{shown}}");
+    expect(entry(agentDetail, "clearSessionConfirm_other")).toContain("{{count}}");
+    expect(entry(nested(agentDetail, "builtIn"), "title")).toBe("内置智能体");
+    expect(entry(nested(agentDetail, "tabs"), "secrets")).toBe("密钥");
+    expect(entry(nested(agentDetail, "metrics"), "input")).toBe("输入");
+    expect(entry(nested(agentDetail, "costs"), "totalCost")).toBe("总成本");
+    expect(entry(nested(agentDetail, "sourceLabel"), "on_demand")).toBe("按需");
+    expect(entry(nested(agentDetail, "runRetry", "reason"), "transient_failure")).toBe("瞬时故障");
+    expect(entry(nested(agentDetail, "runRetry"), "retryScheduled")).toBe("已安排重试");
+    expect(entry(nested(agentDetail, "taskAssignHint"), "ceoRole")).toContain("CEO");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

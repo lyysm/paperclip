@@ -1,3 +1,4 @@
+import { t } from "@/i18n";
 import { formatDateTime } from "./utils";
 
 type RetryAwareRun = {
@@ -39,7 +40,12 @@ function joinFragments(parts: Array<string | null>) {
 export function formatRetryReason(reason: string | null | undefined) {
   const normalized = readNonEmptyString(reason);
   if (!normalized) return null;
-  return RETRY_REASON_LABELS[normalized] ?? normalized.replace(/_/g, " ");
+  if (normalized in RETRY_REASON_LABELS) {
+    return t(`agentDetail.runRetry.reason.${normalized}`, {
+      defaultValue: RETRY_REASON_LABELS[normalized] ?? normalized,
+    });
+  }
+  return normalized.replace(/_/g, " ");
 }
 
 export function describeRunRetryState(run: RetryAwareRun): RunRetryStateSummary | null {
@@ -47,7 +53,9 @@ export function describeRunRetryState(run: RetryAwareRun): RunRetryStateSummary 
     typeof run.scheduledRetryAttempt === "number" && Number.isFinite(run.scheduledRetryAttempt) && run.scheduledRetryAttempt > 0
       ? run.scheduledRetryAttempt
       : null;
-  const attemptLabel = attempt ? `Attempt ${attempt}` : null;
+  const attemptLabel = attempt
+    ? t("agentDetail.runRetry.attempt", { defaultValue: "Attempt {{attempt}}", attempt })
+    : null;
   const reasonLabel = formatRetryReason(run.scheduledRetryReason);
   const retryOfRunId = readNonEmptyString(run.retryOfRunId);
   const exhaustedReason = readNonEmptyString(run.retryExhaustedReason);
@@ -65,12 +73,18 @@ export function describeRunRetryState(run: RetryAwareRun): RunRetryStateSummary 
   if (run.status === "scheduled_retry") {
     return {
       kind: "scheduled",
-      badgeLabel: isMaxTurnContinuation ? "Continuation scheduled" : "Retry scheduled",
+      badgeLabel: isMaxTurnContinuation
+        ? t("agentDetail.runRetry.continuationScheduled", { defaultValue: "Continuation scheduled" })
+        : t("agentDetail.runRetry.retryScheduled", { defaultValue: "Retry scheduled" }),
       tone: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
       detail: joinFragments([attemptLabel, reasonLabel]),
       secondary: dueAt
-        ? `${isMaxTurnContinuation ? "Next continuation" : "Next retry"} ${dueAt}`
-        : `${isMaxTurnContinuation ? "Next continuation" : "Next retry"} pending schedule`,
+        ? (isMaxTurnContinuation
+          ? t("agentDetail.runRetry.nextContinuationAt", { defaultValue: "Next continuation {{time}}", time: dueAt })
+          : t("agentDetail.runRetry.nextRetryAt", { defaultValue: "Next retry {{time}}", time: dueAt }))
+        : (isMaxTurnContinuation
+          ? t("agentDetail.runRetry.nextContinuationPending", { defaultValue: "Next continuation pending schedule" })
+          : t("agentDetail.runRetry.nextRetryPending", { defaultValue: "Next retry pending schedule" })),
       retryOfRunId,
     };
   }
@@ -78,19 +92,30 @@ export function describeRunRetryState(run: RetryAwareRun): RunRetryStateSummary 
   if (exhaustedReason) {
     return {
       kind: "exhausted",
-      badgeLabel: isMaxTurnContinuation ? "Continuation exhausted" : "Retry exhausted",
+      badgeLabel: isMaxTurnContinuation
+        ? t("agentDetail.runRetry.continuationExhausted", { defaultValue: "Continuation exhausted" })
+        : t("agentDetail.runRetry.retryExhausted", { defaultValue: "Retry exhausted" }),
       tone: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-      detail: joinFragments([attemptLabel, reasonLabel, "Automatic retries exhausted"]),
+      detail: joinFragments([
+        attemptLabel,
+        reasonLabel,
+        t("agentDetail.runRetry.automaticRetriesExhausted", { defaultValue: "Automatic retries exhausted" }),
+      ]),
       secondary: exhaustedReason.includes("Manual intervention required")
         ? exhaustedReason
-        : `${exhaustedReason} Manual intervention required.`,
+        : t("agentDetail.runRetry.exhaustedSecondary", {
+          defaultValue: "{{reason}} Manual intervention required.",
+          reason: exhaustedReason,
+        }),
       retryOfRunId,
     };
   }
 
   return {
     kind: "attempted",
-    badgeLabel: isMaxTurnContinuation ? "Continued run" : "Retried run",
+    badgeLabel: isMaxTurnContinuation
+      ? t("agentDetail.runRetry.continuedRun", { defaultValue: "Continued run" })
+      : t("agentDetail.runRetry.retriedRun", { defaultValue: "Retried run" }),
     tone: "border-slate-500/20 bg-slate-500/10 text-slate-700 dark:text-slate-300",
     detail: joinFragments([attemptLabel, reasonLabel]),
     secondary: null,

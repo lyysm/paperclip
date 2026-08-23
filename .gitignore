@@ -51,6 +51,8 @@ diagnostics/
 .paperclip-runtime/
 /.idea/
 /.agents/
+.codegraph/
+.zcode/
 
 # Doc maintenance cursor
 .doc-review-cursor

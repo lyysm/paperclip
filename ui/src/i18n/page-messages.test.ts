@@ -186,6 +186,24 @@ describe("zh-CN page-body messages", () => {
     expect(entry(costsPage, "debitsSubtitle_one")).toContain("{{count}}");
   });
 
+  it("translates the Skill Studio surface", () => {
+    const skillStudio = group("skillStudio");
+    expect(entry(skillStudio, "studio")).toBe("Studio");
+    expect(entry(skillStudio, "newSkillTitle")).toBe("新技能");
+    expect(entry(skillStudio, "createNewSkillTitle")).toBe("创建新技能");
+    expect(entry(skillStudio, "forkSkillTitle")).toBe("复刻技能");
+    expect(entry(skillStudio, "forkingName")).toContain("{{name}}");
+    expect(entry(skillStudio, "unsavedEdits")).toBe("未保存的编辑");
+    expect(entry(skillStudio, "versionHistory")).toBe("版本历史");
+    expect(entry(skillStudio, "restoreAsV")).toContain("{{version}}");
+    expect(entry(skillStudio, "templateReadyBody")).toContain("{{name}}");
+    expect(entry(skillStudio, "deleteTemplateConfirm")).toContain("{{name}}");
+    expect(entry(skillStudio, "diffVersions")).toContain("{{left}}");
+    expect(entry(nested(skillStudio, "gate"), "pickAgent")).toBe("请选择要运行的智能体");
+    expect(entry(skillStudio, "testTaskExpired")).toBe("测试任务已过期");
+    expect(entry(skillStudio, "openTestTask")).toContain("测试任务");
+  });
+
   it("translates the company environments page", () => {
     const environmentsPage = group("environmentsPage");
     expect(entry(environmentsPage, "addEnvironmentTitle")).toBe("添加环境");

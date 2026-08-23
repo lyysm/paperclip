@@ -697,6 +697,67 @@
       "7d": "Last 7 days",
       "30d": "Last 30 days",
       "90d": "Last 90 days"
+    },
+    "filterBar": {
+      "status": "Status",
+      "openItemsPreset": "Open items",
+      "assignee": "Assignee",
+      "searchAssignees": "Search assignees…",
+      "noAssignees": "No assignees",
+      "project": "Project",
+      "searchProjects": "Search projects…",
+      "noProjects": "No projects",
+      "label": "Label",
+      "searchLabels": "Search labels…",
+      "noLabels": "No labels",
+      "priority": "Priority",
+      "updated": "Updated"
+    },
+    "filterMenu": {
+      "triggerWithValue": "{{label}}: {{value}}",
+      "triggerWithCount": "{{label}}: {{count}}",
+      "searchPlaceholder": "Search…",
+      "noOptions": "No options",
+      "filterBy": "Filter by {{label}}"
+    },
+    "filterSheet": {
+      "showResults": "Show results",
+      "showResultsCount_one": "Show {{count}} result",
+      "showResultsCount_other": "Show {{count}} results"
+    },
+    "chips": {
+      "removeFilter": "Remove filter {{label}}",
+      "clearAll": "Clear all"
+    },
+    "resultRow": {
+      "comment": "Comment",
+      "doc": "Doc",
+      "artifact": "Artifact",
+      "description": "Description"
+    },
+    "sortMenu": {
+      "sortResults": "Sort results",
+      "sortPrefix": "Sort:",
+      "sortBy": "Sort by"
+    },
+    "matchSource": {
+      "title": "Title",
+      "identifier": "Identifier",
+      "comment": "Comment",
+      "document": "Doc"
+    },
+    "zeroResults": {
+      "title": "No results with these filters",
+      "matchCount_one": "{{count}} result matches",
+      "matchCount_other": "{{count}} results match",
+      "butYour": ", but your",
+      "activeFiltersHide_one": "active filter hides",
+      "activeFiltersHide_other": "{{count}} active filters hide",
+      "allOfThem": "all of them.",
+      "loosenTitle": "Loosen a filter",
+      "additionalResults_one": "+{{count}} result",
+      "additionalResults_other": "+{{count}} results",
+      "clearAllFilters": "Clear all filters"
     }
   },
   "timeline": {
@@ -1287,5 +1348,86 @@
     "unattributed": "Unattributed",
     "usage": "usage",
     "utilizationOfBudget": "{{percent}}% of monthly budget consumed in this range."
+  },
+  "notFound": {
+    "breadcrumb": "Not Found",
+    "companyNotFound": "Company not found",
+    "pageNotFound": "Page not found",
+    "noCompanyMatchesPrefix": "No company matches prefix \"{{prefix}}\".",
+    "unknownPrefix": "unknown",
+    "routeNotExist": "This route does not exist.",
+    "requestedPath": "Requested path:",
+    "openDashboard": "Open dashboard",
+    "goHome": "Go home"
+  },
+  "companiesPage": {
+    "breadcrumb": "Companies",
+    "loading": "Loading companies...",
+    "rename": "Rename",
+    "unarchive": "Unarchive",
+    "deleteCompany": "Delete Company",
+    "agentCount_one": "{{count}} agent",
+    "agentCount_other": "{{count}} agents",
+    "taskCount_one": "{{count}} task",
+    "taskCount_other": "{{count}} tasks",
+    "createdAgo": "Created {{time}}",
+    "deleteConfirm": "Delete this company and all its data? This cannot be undone.",
+    "deleting": "Deleting…",
+    "delete": "Delete"
+  },
+  "goalsPage": {
+    "selectCompany": "Select a company to view goals.",
+    "noGoalsYet": "No goals yet.",
+    "addGoal": "Add Goal",
+    "newGoal": "New Goal"
+  },
+  "orgPage": {
+    "breadcrumb": "Org Chart",
+    "selectCompany": "Select a company to view org chart.",
+    "empty": "No agents in the organization. Create agents to build your org chart."
+  },
+  "workspacesPage": {
+    "summaryTitle": "Workspace summary",
+    "summaryDescription": "Summarizer tracks workspace activity, live services, and follow-up needs across projects.",
+    "noActivity": "No workspace activity yet.",
+    "workspaceCount_one": "{{count}} workspace",
+    "workspaceCount_other": "{{count}} workspaces",
+    "showingOf": "Showing {{shown}} of {{total}} workspaces.",
+    "loading": "Loading...",
+    "loadMore": "Load more"
+  },
+  "blockedInbox": {
+    "variant": {
+      "needs_decision": "Needs decision",
+      "stalled": "Blocked chain stalled",
+      "needs_attention": "Needs attention",
+      "recovery_required": "Recovery required",
+      "external_wait": "External wait",
+      "owner_paused": "Owner paused"
+    },
+    "reason": {
+      "pending_board_decision": "Pending board decision",
+      "pending_user_decision": "Pending user decision",
+      "missing_successful_run_disposition": "Pick disposition",
+      "blocked_chain_stalled": "Blocked chain stalled",
+      "blocked_by_unassigned_issue": "Unassigned blocker",
+      "blocked_by_assigned_backlog_issue": "Parked blocker",
+      "blocked_by_cancelled_issue": "Cancelled blocker",
+      "in_review_without_action_path": "Review without action path",
+      "invalid_review_participant": "Invalid review participant",
+      "open_recovery_issue": "Recovery in progress",
+      "external_owner_action": "External owner action",
+      "blocked_by_uninvokable_assignee": "Owner paused"
+    },
+    "stoppedFallback": "Stopped",
+    "stoppedAge": {
+      "stopped": "stopped",
+      "justNow": "stopped just now",
+      "minutes": "stopped {{count}}m",
+      "hours": "stopped {{count}}h",
+      "days": "stopped {{count}}d",
+      "weeks": "stopped {{count}}w",
+      "months": "stopped {{count}}mo"
+    }
   }
 }

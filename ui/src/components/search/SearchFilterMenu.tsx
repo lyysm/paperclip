@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { t, useTranslation } from "@/i18n";
 
 export interface FilterMenuOption {
   value: string;
@@ -51,19 +52,22 @@ function summarizeTrigger(label: string, selected: string[], options: FilterMenu
   if (selected.length === 0) return label;
   if (selected.length === 1) {
     const only = options.find((option) => option.value === selected[0]);
-    return only ? `${label}: ${only.label}` : label;
+    return only
+      ? t("searchPage.filterMenu.triggerWithValue", { defaultValue: "{{label}}: {{value}}", label, value: only.label })
+      : label;
   }
-  return `${label}: ${selected.length}`;
+  return t("searchPage.filterMenu.triggerWithCount", { defaultValue: "{{label}}: {{count}}", label, count: selected.length });
 }
 
 export function SearchFilterMenu(props: SearchFilterMenuProps) {
+  const { t } = useTranslation();
   const {
     label,
     options,
     selected,
     searchable = false,
-    searchPlaceholder = "Search…",
-    emptyMessage = "No options",
+    searchPlaceholder = t("searchPage.filterMenu.searchPlaceholder", { defaultValue: "Search…" }),
+    emptyMessage = t("searchPage.filterMenu.noOptions", { defaultValue: "No options" }),
     triggerClassName,
     contentClassName,
     align = "start",
@@ -102,7 +106,7 @@ export function SearchFilterMenu(props: SearchFilterMenuProps) {
             active && "border-primary/60 text-foreground",
             triggerClassName,
           )}
-          aria-label={`Filter by ${label}`}
+          aria-label={t("searchPage.filterMenu.filterBy", { defaultValue: "Filter by {{label}}", label })}
         >
           <span className="truncate">{summarizeTrigger(label, selected, options)}</span>
           {active ? (
@@ -123,7 +127,7 @@ export function SearchFilterMenu(props: SearchFilterMenuProps) {
               className="text-xs text-muted-foreground hover:text-foreground"
               onClick={() => props.onClear()}
             >
-              Clear
+              {t("issuesList.clearFilters", { defaultValue: "Clear" })}
             </button>
           ) : null}
         </div>

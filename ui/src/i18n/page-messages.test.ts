@@ -185,4 +185,26 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(costsPage, "preset"), "7d")).toBe("最近 7 天");
     expect(entry(costsPage, "debitsSubtitle_one")).toContain("{{count}}");
   });
+
+  it("translates the small pages, search components, and blocked-inbox labels", () => {
+    expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
+    expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");
+    expect(entry(group("companiesPage"), "agentCount_one")).toBe("{{count}} 个智能体");
+    expect(entry(group("goalsPage"), "addGoal")).toBe("添加目标");
+    expect(entry(group("orgPage"), "breadcrumb")).toBe("组织架构图");
+    expect(entry(group("workspacesPage"), "showingOf")).toContain("{{shown}}");
+    expect(entry(group("workspacesPage"), "showingOf")).toContain("{{total}}");
+
+    const searchPage = group("searchPage");
+    expect(entry(nested(searchPage, "filterBar"), "assignee")).toBe("负责人");
+    expect(entry(nested(searchPage, "filterMenu"), "filterBy")).toContain("{{label}}");
+    expect(entry(nested(searchPage, "zeroResults"), "title")).toContain("筛选");
+    expect(entry(nested(searchPage, "zeroResults"), "activeFiltersHide_other")).toContain("{{count}}");
+    expect(entry(nested(searchPage, "matchSource"), "identifier")).toBe("编号");
+
+    const blockedInbox = group("blockedInbox");
+    expect(entry(nested(blockedInbox, "variant"), "needs_decision")).toBe("需要决策");
+    expect(entry(nested(blockedInbox, "reason"), "open_recovery_issue")).toBe("恢复进行中");
+    expect(entry(nested(blockedInbox, "stoppedAge"), "hours")).toContain("{{count}}");
+  });
 });

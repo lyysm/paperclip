@@ -3,20 +3,22 @@ import { Bot, FileText, Hexagon, MessageSquare, Paperclip, Quote } from "lucide-
 import type { Agent, CompanySearchResult } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import { t, useTranslation } from "@/i18n";
 import { StatusIcon } from "../StatusIcon";
 import { Identity } from "../Identity";
 import { HighlightedText, type HighlightedTextProps } from "./HighlightedText";
 
 type SnippetStyle = {
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  labelKey?: string;
   label: string;
 };
 
 const SNIPPET_STYLES: Record<string, SnippetStyle> = {
-  comment: { Icon: MessageSquare, label: "Comment" },
-  document: { Icon: FileText, label: "Doc" },
-  artifact: { Icon: Paperclip, label: "Artifact" },
-  description: { Icon: Quote, label: "Description" },
+  comment: { Icon: MessageSquare, labelKey: "searchPage.resultRow.comment", label: "Comment" },
+  document: { Icon: FileText, labelKey: "searchPage.resultRow.doc", label: "Doc" },
+  artifact: { Icon: Paperclip, labelKey: "searchPage.resultRow.artifact", label: "Artifact" },
+  description: { Icon: Quote, labelKey: "searchPage.resultRow.description", label: "Description" },
 };
 
 function snippetStyle(field: string, fallbackLabel: string): SnippetStyle {
@@ -29,7 +31,7 @@ function formatRelativeTime(input: string | null): string {
   if (Number.isNaN(value.getTime())) return "";
   const diffMs = Date.now() - value.getTime();
   const seconds = Math.round(diffMs / 1000);
-  if (seconds < 60) return "just now";
+  if (seconds < 60) return t("time.justNow", { defaultValue: "just now" });
   const minutes = Math.round(seconds / 60);
   if (minutes < 60) return `${minutes}m`;
   const hours = Math.round(minutes / 60);
@@ -60,6 +62,7 @@ function SearchResultRowImpl({
   isActive,
   className,
 }: SearchResultRowProps) {
+  const { t } = useTranslation();
   if (result.type === "agent") {
     return (
       <Link
@@ -79,7 +82,7 @@ function SearchResultRowImpl({
               text={result.snippets[0]?.text ?? result.snippet}
               highlights={result.snippets[0]?.highlights}
               field="agent"
-              fallbackLabel={result.sourceLabel ?? "Agent"}
+              fallbackLabel={result.sourceLabel ?? t("searchPage.agentFallback", { defaultValue: "Agent" })}
             />
           ) : null}
         </div>
@@ -102,7 +105,7 @@ function SearchResultRowImpl({
               text={result.snippets[0]?.text ?? result.snippet}
               highlights={result.snippets[0]?.highlights}
               field="project"
-              fallbackLabel={result.sourceLabel ?? "Project"}
+              fallbackLabel={result.sourceLabel ?? t("issuesList.column.project", { defaultValue: "Project" })}
             />
           ) : null}
         </div>
@@ -134,7 +137,7 @@ function SearchResultRowImpl({
               text={result.snippets[0]?.text ?? result.snippet}
               highlights={result.snippets[0]?.highlights}
               field="artifact"
-              fallbackLabel={result.sourceLabel ?? "Artifact"}
+              fallbackLabel={result.sourceLabel ?? t("searchPage.resultRow.artifact", { defaultValue: "Artifact" })}
               multiline
             />
           ) : null}
@@ -244,7 +247,9 @@ interface SnippetLineProps {
 }
 
 function SnippetLine({ text, highlights, field, fallbackLabel, multiline = false }: SnippetLineProps) {
-  const { Icon, label } = snippetStyle(field, fallbackLabel);
+  const { t } = useTranslation();
+  const { Icon, labelKey, label } = snippetStyle(field, fallbackLabel);
+  const localizedLabel = labelKey ? t(labelKey, { defaultValue: label }) : label;
   return (
     <div
       className={cn(
@@ -259,7 +264,7 @@ function SnippetLine({ text, highlights, field, fallbackLabel, multiline = false
       <span
         className="shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 text-(length:--text-nano) font-medium uppercase tracking-wide text-muted-foreground"
       >
-        {label}
+        {localizedLabel}
       </span>
       <HighlightedText
         text={text}

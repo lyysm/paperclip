@@ -4,6 +4,7 @@ import type {
   IssueBlockedInboxReason,
   IssueBlockedInboxSeverity,
 } from "@paperclipai/shared";
+import { t } from "@/i18n";
 
 export type BlockedReasonVariant =
   | "needs_decision"
@@ -75,11 +76,14 @@ export function blockedReasonVariant(reason: IssueBlockedInboxReason): BlockedRe
 }
 
 export function blockedReasonLabel(reason: IssueBlockedInboxReason): string {
-  return REASON_LABELS[reason] ?? "Stopped";
+  const label = REASON_LABELS[reason];
+  return label
+    ? t(`blockedInbox.reason.${reason}`, { defaultValue: label })
+    : t("blockedInbox.stoppedFallback", { defaultValue: "Stopped" });
 }
 
 export function blockedVariantLabel(variant: BlockedReasonVariant): string {
-  return BLOCKED_VARIANT_LABELS[variant];
+  return t(`blockedInbox.variant.${variant}`, { defaultValue: BLOCKED_VARIANT_LABELS[variant] });
 }
 
 export function blockedSeverityRank(severity: IssueBlockedInboxSeverity): number {
@@ -210,7 +214,7 @@ export function groupBlockedInboxRows(
     const list = buckets.get(variant);
     if (!list || list.length === 0) continue;
     const sorted = sortBlockedInboxRows(list, sort);
-    groups.push({ variant, label: BLOCKED_VARIANT_LABELS[variant], rows: sorted });
+    groups.push({ variant, label: blockedVariantLabel(variant), rows: sorted });
   }
   return groups;
 }
@@ -249,27 +253,27 @@ export function blockedBadgeTone(rows: readonly BlockedInboxIssueRow[]): Blocked
 }
 
 export function formatStoppedAge(stoppedSinceAt: string | null, now: number = Date.now()): string {
-  if (!stoppedSinceAt) return "stopped";
+  if (!stoppedSinceAt) return t("blockedInbox.stoppedAge.stopped", { defaultValue: "stopped" });
   const then = new Date(stoppedSinceAt).getTime();
-  if (!Number.isFinite(then)) return "stopped";
+  if (!Number.isFinite(then)) return t("blockedInbox.stoppedAge.stopped", { defaultValue: "stopped" });
   const seconds = Math.max(0, Math.round((now - then) / 1000));
-  if (seconds < 60) return "stopped just now";
+  if (seconds < 60) return t("blockedInbox.stoppedAge.justNow", { defaultValue: "stopped just now" });
   if (seconds < 3600) {
     const m = Math.floor(seconds / 60);
-    return `stopped ${m}m`;
+    return t("blockedInbox.stoppedAge.minutes", { defaultValue: "stopped {{count}}m", count: m });
   }
   if (seconds < 86_400) {
     const h = Math.floor(seconds / 3600);
-    return `stopped ${h}h`;
+    return t("blockedInbox.stoppedAge.hours", { defaultValue: "stopped {{count}}h", count: h });
   }
   if (seconds < 86_400 * 7) {
     const d = Math.floor(seconds / 86_400);
-    return `stopped ${d}d`;
+    return t("blockedInbox.stoppedAge.days", { defaultValue: "stopped {{count}}d", count: d });
   }
   if (seconds < 86_400 * 30) {
     const w = Math.floor(seconds / (86_400 * 7));
-    return `stopped ${w}w`;
+    return t("blockedInbox.stoppedAge.weeks", { defaultValue: "stopped {{count}}w", count: w });
   }
   const mo = Math.floor(seconds / (86_400 * 30));
-  return `stopped ${mo}mo`;
+  return t("blockedInbox.stoppedAge.months", { defaultValue: "stopped {{count}}mo", count: mo });
 }

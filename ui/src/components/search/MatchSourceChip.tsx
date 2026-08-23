@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n";
 
 export type MatchSourceChipKind = "title" | "identifier" | "comment" | "document";
 
@@ -30,7 +31,8 @@ export interface MatchSourceChipProps {
 // design-allow(pill-pattern): --chip-match-* domain token family (DESIGN.md domain tier); a
 // deliberately separate chip system, not a Badge.
 export function MatchSourceChip({ kind, count, label, className }: MatchSourceChipProps) {
-  const text = label ?? chipLabels[kind];
+  const { t } = useTranslation();
+  const text = label ?? t(`searchPage.matchSource.${kind}`, { defaultValue: chipLabels[kind] });
   const showCount = typeof count === "number" && count > 1;
   return (
     <span

@@ -697,6 +697,67 @@
       "7d": "最近 7 天",
       "30d": "最近 30 天",
       "90d": "最近 90 天"
+    },
+    "filterBar": {
+      "status": "状态",
+      "openItemsPreset": "未完成项",
+      "assignee": "负责人",
+      "searchAssignees": "搜索负责人…",
+      "noAssignees": "暂无负责人",
+      "project": "项目",
+      "searchProjects": "搜索项目…",
+      "noProjects": "暂无项目",
+      "label": "标签",
+      "searchLabels": "搜索标签…",
+      "noLabels": "暂无标签",
+      "priority": "优先级",
+      "updated": "更新时间"
+    },
+    "filterMenu": {
+      "triggerWithValue": "{{label}}：{{value}}",
+      "triggerWithCount": "{{label}}：{{count}}",
+      "searchPlaceholder": "搜索…",
+      "noOptions": "暂无选项",
+      "filterBy": "按{{label}}筛选"
+    },
+    "filterSheet": {
+      "showResults": "显示结果",
+      "showResultsCount_one": "显示 {{count}} 条结果",
+      "showResultsCount_other": "显示 {{count}} 条结果"
+    },
+    "chips": {
+      "removeFilter": "移除筛选 {{label}}",
+      "clearAll": "全部清除"
+    },
+    "resultRow": {
+      "comment": "评论",
+      "doc": "文档",
+      "artifact": "产物",
+      "description": "描述"
+    },
+    "sortMenu": {
+      "sortResults": "排序结果",
+      "sortPrefix": "排序：",
+      "sortBy": "排序方式"
+    },
+    "matchSource": {
+      "title": "标题",
+      "identifier": "编号",
+      "comment": "评论",
+      "document": "文档"
+    },
+    "zeroResults": {
+      "title": "这些筛选条件下没有结果",
+      "matchCount_one": "{{count}} 条结果匹配",
+      "matchCount_other": "{{count}} 条结果匹配",
+      "butYour": "，但您的",
+      "activeFiltersHide_one": "生效筛选隐藏了",
+      "activeFiltersHide_other": "{{count}} 个生效筛选隐藏了",
+      "allOfThem": "全部结果。",
+      "loosenTitle": "放宽某个筛选",
+      "additionalResults_one": "+{{count}} 条结果",
+      "additionalResults_other": "+{{count}} 条结果",
+      "clearAllFilters": "清除全部筛选"
     }
   },
   "timeline": {
@@ -1287,5 +1348,86 @@
     "unattributed": "未归因",
     "usage": "用量",
     "utilizationOfBudget": "此范围内已消耗月度预算的 {{percent}}%。"
+  },
+  "notFound": {
+    "breadcrumb": "未找到",
+    "companyNotFound": "未找到公司",
+    "pageNotFound": "页面不存在",
+    "noCompanyMatchesPrefix": "没有匹配前缀“{{prefix}}”的公司。",
+    "unknownPrefix": "未知",
+    "routeNotExist": "此路由不存在。",
+    "requestedPath": "请求路径：",
+    "openDashboard": "打开仪表盘",
+    "goHome": "回到主页"
+  },
+  "companiesPage": {
+    "breadcrumb": "公司",
+    "loading": "正在加载公司...",
+    "rename": "重命名",
+    "unarchive": "取消归档",
+    "deleteCompany": "删除公司",
+    "agentCount_one": "{{count}} 个智能体",
+    "agentCount_other": "{{count}} 个智能体",
+    "taskCount_one": "{{count}} 个任务",
+    "taskCount_other": "{{count}} 个任务",
+    "createdAgo": "创建于 {{time}}",
+    "deleteConfirm": "删除这家公司及其所有数据？此操作无法撤销。",
+    "deleting": "删除中…",
+    "delete": "删除"
+  },
+  "goalsPage": {
+    "selectCompany": "选择一家公司以查看目标。",
+    "noGoalsYet": "还没有目标。",
+    "addGoal": "添加目标",
+    "newGoal": "新建目标"
+  },
+  "orgPage": {
+    "breadcrumb": "组织架构图",
+    "selectCompany": "选择一家公司以查看组织架构图。",
+    "empty": "组织中还没有智能体。创建智能体以构建您的组织架构图。"
+  },
+  "workspacesPage": {
+    "summaryTitle": "工作区摘要",
+    "summaryDescription": "摘要智能体跟踪各项目的工作区活动、在线服务和后续需求。",
+    "noActivity": "还没有工作区活动。",
+    "workspaceCount_one": "{{count}} 个工作区",
+    "workspaceCount_other": "{{count}} 个工作区",
+    "showingOf": "正在显示 {{total}} 个工作区中的 {{shown}} 个。",
+    "loading": "加载中...",
+    "loadMore": "加载更多"
+  },
+  "blockedInbox": {
+    "variant": {
+      "needs_decision": "需要决策",
+      "stalled": "阻塞链停滞",
+      "needs_attention": "需要关注",
+      "recovery_required": "需要恢复",
+      "external_wait": "等待外部",
+      "owner_paused": "负责人已暂停"
+    },
+    "reason": {
+      "pending_board_decision": "等待看板决策",
+      "pending_user_decision": "等待用户决策",
+      "missing_successful_run_disposition": "选择处置方式",
+      "blocked_chain_stalled": "阻塞链停滞",
+      "blocked_by_unassigned_issue": "阻塞项未分配",
+      "blocked_by_assigned_backlog_issue": "阻塞项已搁置",
+      "blocked_by_cancelled_issue": "阻塞项已取消",
+      "in_review_without_action_path": "审查缺少行动路径",
+      "invalid_review_participant": "审查参与者无效",
+      "open_recovery_issue": "恢复进行中",
+      "external_owner_action": "等待外部负责人操作",
+      "blocked_by_uninvokable_assignee": "负责人已暂停"
+    },
+    "stoppedFallback": "已停止",
+    "stoppedAge": {
+      "stopped": "已停止",
+      "justNow": "刚刚停止",
+      "minutes": "停止 {{count}} 分钟",
+      "hours": "停止 {{count}} 小时",
+      "days": "停止 {{count}} 天",
+      "weeks": "停止 {{count}} 周",
+      "months": "停止 {{count}} 个月"
+    }
   }
 }

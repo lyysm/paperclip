@@ -1,4 +1,5 @@
 import type { PipelineStage } from "../api/pipelines";
+import { t } from "@/i18n";
 
 /**
  * UI-side reader + copy helpers for the "Break into pieces" stage primitive.
@@ -125,8 +126,14 @@ export function joinWithAnd(items: string[]): string {
   const list = items.filter((item) => item.trim().length > 0);
   if (list.length === 0) return "";
   if (list.length === 1) return list[0]!;
-  if (list.length === 2) return `${list[0]} and ${list[1]}`;
-  return `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}`;
+  if (list.length === 2) {
+    return t("pipelineSettings.joinTwo", { defaultValue: "{{first}} and {{second}}", first: list[0], second: list[1] });
+  }
+  return t("pipelineSettings.joinMany", {
+    defaultValue: "{{list}} and {{last}}",
+    list: list.slice(0, -1).join(", "),
+    last: list[list.length - 1]!,
+  });
 }
 
 export interface BreakdownCopyNames {
@@ -151,19 +158,34 @@ export function breakdownSummarySentence(
   }
   const noun = config.pieceNoun;
   const parts: string[] = [
-    `Paperclip will create one ${noun} per item in ${names.targetPipelineName} → ${names.entryStageName}`,
+    t("pipelineSettings.summaryCreate", {
+      defaultValue: "Paperclip will create one {{noun}} per item in {{pipeline}} → {{stage}}",
+      noun,
+      pipeline: names.targetPipelineName,
+      stage: names.entryStageName,
+    }),
   ];
   if (names.inheritedFieldLabels.length > 0) {
-    parts.push(`carry over ${joinWithAnd(names.inheritedFieldLabels)}`);
+    parts.push(t("pipelineSettings.summaryCarryOver", {
+      defaultValue: "carry over {{fields}}",
+      fields: joinWithAnd(names.inheritedFieldLabels),
+    }));
   }
   if (names.advanceToName) {
-    parts.push(`move this case to ${names.advanceToName}`);
+    parts.push(t("pipelineSettings.summaryMoveCase", {
+      defaultValue: "move this case to {{stage}}",
+      stage: names.advanceToName,
+    }));
   }
-  let sentence = parts.join(", ");
+  let sentence = parts.join(t("pipelineSettings.summaryJoinSeparator", { defaultValue: ", " }));
   if (config.waitForPieces && names.whenFinishedName) {
-    sentence += `, then wait until every ${noun} is finished before moving it to ${names.whenFinishedName}`;
+    sentence += t("pipelineSettings.summaryThenWait", {
+      defaultValue: ", then wait until every {{noun}} is finished before moving it to {{stage}}",
+      noun,
+      stage: names.whenFinishedName,
+    });
   }
-  return `${sentence}.`;
+  return `${sentence}${t("pipelineSettings.summaryTerminator", { defaultValue: "." })}`;
 }
 
 /**

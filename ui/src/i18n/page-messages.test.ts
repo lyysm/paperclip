@@ -346,4 +346,35 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(blockedInbox, "reason"), "open_recovery_issue")).toBe("恢复进行中");
     expect(entry(nested(blockedInbox, "stoppedAge"), "hours")).toContain("{{count}}");
   });
+
+  it("translates the pipeline settings page", () => {
+    const pipelineSettings = group("pipelineSettings");
+    expect(entry(pipelineSettings, "sectionAutomation")).toBe("自动化");
+    expect(entry(pipelineSettings, "kindReview")).toBe("评审");
+    expect(entry(pipelineSettings, "kindWorkingDesc")).toContain("条目");
+    expect(entry(pipelineSettings, "breakdownTitle")).toBe("拆分为更小的块");
+    expect(entry(pipelineSettings, "chooseStage")).toBe("选择阶段");
+    expect(entry(pipelineSettings, "choosePipeline")).toBe("选择流水线");
+    expect(entry(pipelineSettings, "deleteStageTitle")).toBe("删除阶段");
+    expect(entry(pipelineSettings, "archivePipelineTitle")).toBe("归档流水线");
+    expect(entry(pipelineSettings, "warningCount")).toBe("{{count}} 个警告");
+    expect(entry(pipelineSettings, "stepIndex")).toContain("{{index}}");
+    expect(entry(pipelineSettings, "insertStageAfter")).toContain("{{name}}");
+    expect(entry(pipelineSettings, "reusingWorkspaceFrom")).toContain("{{name}}");
+    expect(entry(pipelineSettings, "reusingWorkspaceFrom")).toContain("{{source}}");
+    expect(entry(pipelineSettings, "agentRunsThisStep")).toContain("{{name}}");
+    expect(entry(pipelineSettings, "carryOverIdentityNote")).toContain("{{noun}}");
+    expect(entry(pipelineSettings, "waitAllFinishedLabel")).toContain("{{plural}}");
+    expect(entry(pipelineSettings, "destinationValidation")).toContain("校验");
+    expect(entry(pipelineSettings, "anyHuman")).toBe("任何人工");
+    expect(entry(pipelineSettings, "strictEnforceLabel")).toContain("流转");
+    expect(entry(pipelineSettings, "summaryCreate")).toContain("{{noun}}");
+    expect(entry(pipelineSettings, "summaryJoinSeparator")).toBe("，");
+    expect(entry(pipelineSettings, "summaryTerminator")).toBe("。");
+
+    const companySettings = group("companySettings");
+    expect(entry(companySettings, "pluginSelectCompany")).toContain("选择公司");
+    expect(entry(companySettings, "pluginExtensionsUnavailable")).toContain("{{message}}");
+    expect(entry(companySettings, "pluginRouteConflictPrefix")).toContain("插件");
+  });
 });

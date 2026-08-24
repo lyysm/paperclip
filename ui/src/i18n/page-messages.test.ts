@@ -371,6 +371,10 @@ describe("zh-CN page-body messages", () => {
     expect(entry(pipelineSettings, "summaryCreate")).toContain("{{noun}}");
     expect(entry(pipelineSettings, "summaryJoinSeparator")).toBe("，");
     expect(entry(pipelineSettings, "summaryTerminator")).toBe("。");
+    expect(entry(pipelineSettings, "secretsSaveButton")).toBe("保存密钥");
+    expect(entry(pipelineSettings, "secretsNoAutomation")).toContain("自动化");
+    expect(entry(pipelineSettings, "revisionLabel")).toContain("{{number}}");
+    expect(entry(pipelineSettings, "restoredToastTitle")).toContain("{{number}}");
 
     const companySettings = group("companySettings");
     expect(entry(companySettings, "pluginSelectCompany")).toContain("选择公司");

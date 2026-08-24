@@ -6,6 +6,7 @@ import { pipelinesApi, type PipelineDocumentRevision } from "../api/pipelines";
 import { queryKeys } from "../lib/queryKeys";
 import { useToastActions } from "../context/ToastContext";
 import { timeAgo } from "../lib/timeAgo";
+import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "../lib/utils";
@@ -30,6 +31,7 @@ export function PipelineStageHistoryPanel({
   hasDocument: boolean;
   onRestored: (body: string, baseRevisionId: string | null) => void;
 }) {
+  const { t } = useTranslation();
   const { pushToast } = useToastActions();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -56,15 +58,23 @@ export function PipelineStageHistoryPanel({
       ]);
       onRestored(result.revision.body, result.revision.id);
       pushToast({
-        title: `Restored revision ${result.restoredFromRevisionNumber}`,
-        body: `Saved as revision ${result.revision.revisionNumber}.`,
+        title: t("pipelineSettings.restoredToastTitle", {
+          defaultValue: "Restored revision {{number}}",
+          number: result.restoredFromRevisionNumber,
+        }),
+        body: t("pipelineSettings.restoredToastBody", {
+          defaultValue: "Saved as revision {{number}}.",
+          number: result.revision.revisionNumber,
+        }),
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to restore revision",
-        body: error instanceof Error ? error.message : "Paperclip could not restore the revision.",
+        title: t("pipelineSettings.restoreFailedToastTitle", { defaultValue: "Failed to restore revision" }),
+        body: error instanceof Error
+          ? error.message
+          : t("pipelineSettings.restoreFailedToastBody", { defaultValue: "Paperclip could not restore the revision." }),
         tone: "error",
       });
     },
@@ -78,8 +88,12 @@ export function PipelineStageHistoryPanel({
         <div className="flex items-center gap-2">
           <History className="h-4 w-4 text-muted-foreground" />
           <div>
-            <p className="text-sm font-medium">History</p>
-            <p className="text-xs text-muted-foreground">Past versions of these instructions.</p>
+            <p className="text-sm font-medium">
+              {t("pipelineSettings.sectionHistory", { defaultValue: "History" })}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t("pipelineSettings.historySubtitle", { defaultValue: "Past versions of these instructions." })}
+            </p>
           </div>
         </div>
         {open ? (
@@ -91,16 +105,24 @@ export function PipelineStageHistoryPanel({
       <CollapsibleContent className="border-t border-border/70">
         {!hasDocument ? (
           <p className="px-4 py-3 text-xs text-muted-foreground">
-            No history yet. Save the instructions to create the first revision.
+            {t("pipelineSettings.historyEmpty", {
+              defaultValue: "No history yet. Save the instructions to create the first revision.",
+            })}
           </p>
         ) : revisionsQuery.isLoading ? (
-          <p className="px-4 py-3 text-xs text-muted-foreground">Loading revisions…</p>
+          <p className="px-4 py-3 text-xs text-muted-foreground">
+            {t("pipelineSettings.historyLoading", { defaultValue: "Loading revisions…" })}
+          </p>
         ) : revisionsQuery.error ? (
           <p className="px-4 py-3 text-xs text-destructive">
-            {revisionsQuery.error instanceof Error ? revisionsQuery.error.message : "Could not load revisions."}
+            {revisionsQuery.error instanceof Error
+              ? revisionsQuery.error.message
+              : t("pipelineSettings.historyLoadFailed", { defaultValue: "Could not load revisions." })}
           </p>
         ) : revisions.length === 0 ? (
-          <p className="px-4 py-3 text-xs text-muted-foreground">No revisions recorded yet.</p>
+          <p className="px-4 py-3 text-xs text-muted-foreground">
+            {t("pipelineSettings.historyNoRevisions", { defaultValue: "No revisions recorded yet." })}
+          </p>
         ) : (
           <ul className="divide-y divide-border/70">
             {revisions.map((revision) => {
@@ -112,10 +134,13 @@ export function PipelineStageHistoryPanel({
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium">
-                      Revision {revision.revisionNumber}
+                      {t("pipelineSettings.revisionLabel", {
+                        defaultValue: "Revision {{number}}",
+                        number: revision.revisionNumber,
+                      })}
                       {isCurrent ? (
                         <Badge variant="ghost" className="ml-2 bg-muted text-(length:--text-micro) text-muted-foreground">
-                          Current
+                          {t("pipelineSettings.revisionCurrentBadge", { defaultValue: "Current" })}
                         </Badge>
                       ) : null}
                     </p>
@@ -133,7 +158,7 @@ export function PipelineStageHistoryPanel({
                       onClick={() => restore.mutate(revision.id)}
                     >
                       <RotateCcw className="h-3.5 w-3.5" />
-                      Restore
+                      {t("pipelineSettings.revisionRestore", { defaultValue: "Restore" })}
                     </Button>
                   )}
                 </li>

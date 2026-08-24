@@ -402,4 +402,37 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueChat, "commentButton")).toBe("评论");
     expect(entry(issueChat, "chatComposerPlaceholder")).toBe("消息…");
   });
+
+  it("translates interaction cards and recovery actions", () => {
+    const issueChat = group("issueChat");
+    expect(entry(issueChat, "kindSuggestTasks")).toBe("建议任务");
+    expect(entry(issueChat, "approveAndRun")).toBe("批准并运行");
+    expect(entry(issueChat, "applyDecisions")).toContain("{{count}}");
+    expect(entry(issueChat, "verdictThisItemAria")).toContain("{{verdict}}");
+    expect(entry(issueChat, "titleToolApprovalRequested")).toBe("已请求工具批准");
+    expect(entry(issueChat, "confirmationExpiredAuto")).toContain("终态");
+
+    const issueRecovery = group("issueRecovery");
+    expect(entry(issueRecovery, "kindStrandedTask")).toBe("搁置任务");
+    expect(entry(issueRecovery, "stateInProgress")).toBe("恢复中");
+    expect(entry(issueRecovery, "resolveTryAgain")).toBe("重试");
+    expect(entry(issueRecovery, "attemptOf")).toContain("{{count}}");
+    expect(entry(issueRecovery, "attemptOf")).toContain("{{max}}");
+    expect(entry(issueRecovery, "unassignedPickOne")).toContain("未分配");
+    expect(entry(issueRecovery, "reissueBody")).toContain("worktree");
+    expect(entry(issueRecovery, "retryMissedAt")).toContain("{{offset}}");
+  });
+
+  it("translates the execution workspace detail page", () => {
+    const executionWorkspace = group("executionWorkspace");
+    expect(entry(executionWorkspace, "tabServices")).toBe("服务");
+    expect(entry(executionWorkspace, "tabRuntimeLogs")).toBe("运行时日志");
+    expect(entry(executionWorkspace, "runNow")).toBe("立即运行");
+    expect(entry(executionWorkspace, "jobCompleted")).toBe("工作区任务已完成。");
+    expect(entry(executionWorkspace, "runtimeConfigInheriting")).toContain("继承");
+    expect(entry(executionWorkspace, "fieldWorkingDir")).toBe("工作目录");
+    expect(entry(executionWorkspace, "notScheduled")).toBe("未安排");
+    expect(entry(executionWorkspace, "backToTasks")).toBe("返回任务");
+    expect(entry(executionWorkspace, "lastRunAt")).toContain("{{time}}");
+  });
 });

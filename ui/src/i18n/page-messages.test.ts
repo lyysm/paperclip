@@ -303,6 +303,28 @@ describe("zh-CN page-body messages", () => {
     expect(entry(companySkills, "compatInvalid")).toBe("无效");
   });
 
+  it("translates the issue detail page", () => {
+    const issueDetail = group("issueDetail");
+    expect(entry(issueDetail, "copiedToClipboard")).toBe("已复制到剪贴板");
+    expect(entry(issueDetail, "subtasksTitle")).toBe("子任务");
+    expect(entry(issueDetail, "costSummaryTitle")).toBe("成本摘要");
+    expect(entry(issueDetail, "taskArchivedFromInbox")).toBe("已从收件箱归档任务");
+    expect(entry(issueDetail, "pausedByBoard")).toBe("看板已暂停。");
+    expect(entry(issueDetail, "attributionAssignee")).toBe("负责人");
+    expect(entry(issueDetail, "composerHintPausedWithAssignee")).toContain("{{assignee}}");
+    expect(entry(issueDetail, "routineOriginTitle")).toContain("{{id}}");
+    expect(entry(issueDetail, "reissueTitle")).toContain("{{title}}");
+    expect(entry(issueDetail, "stopRunUpdateFailedWithMessage")).toContain("{{message}}");
+    expect(entry(issueDetail, "workPausedCancelled_one")).toContain("{{count}}");
+    expect(entry(issueDetail, "taskCount_other")).toContain("{{count}}");
+    expect(entry(nested(issueDetail, "treeControl"), "pauseSubtree")).toBe("暂停子树");
+    expect(entry(nested(issueDetail, "treeControl"), "resumeWork")).toBe("恢复工作");
+    expect(entry(nested(issueDetail, "changeField"), "assigneeAgentId")).toBe("负责人");
+    expect(entry(nested(issueDetail, "changeValue"), "none")).toBe("无");
+    expect(entry(nested(issueDetail, "authorizationReason"), "allow_board_actor")).toBe("看板参与者");
+    expect(entry(nested(issueDetail, "reviewPolicyValue"), "human_only")).toBe("仅限人工");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

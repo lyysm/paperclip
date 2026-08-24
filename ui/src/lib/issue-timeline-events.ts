@@ -1,4 +1,5 @@
 import type { ActivityEvent, IssueWorkMode } from "@paperclipai/shared";
+import { t } from "@/i18n";
 import { isIssueWorkMode } from "@/lib/work-mode-meta";
 
 export interface IssueTimelineAssignee {
@@ -37,7 +38,7 @@ export interface IssueTimelineWorkspace {
 
 export function formatTimelineWorkspaceLabel(workspace: IssueTimelineWorkspace) {
   const fallbackId = workspace.executionWorkspaceId ?? workspace.projectWorkspaceId;
-  return workspace.label ?? (fallbackId ? fallbackId.slice(0, 8) : "None");
+  return workspace.label ?? (fallbackId ? fallbackId.slice(0, 8) : t("issueDetail.timelineWorkspaceNone", { defaultValue: "None" }));
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

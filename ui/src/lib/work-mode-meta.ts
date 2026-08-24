@@ -46,21 +46,21 @@ export function workModeMetaList(): WorkModeMeta[] {
   return [
     {
       value: "standard",
-      label: "Auto mode",
+      label: t("newIssueDialog.workMode.standard", { defaultValue: "Auto mode" }),
       icon: Hammer,
       tone: "neutral",
       classes: STANDARD_CLASSES,
     },
     {
       value: "planning",
-      label: "Plan mode",
+      label: t("newIssueDialog.workMode.planning", { defaultValue: "Plan mode" }),
       icon: ClipboardList,
       tone: "planning",
       classes: PLANNING_CLASSES,
     },
     {
       value: "ask",
-      label: "Ask mode",
+      label: t("newIssueDialog.workMode.ask", { defaultValue: "Ask mode" }),
       icon: MessageCircleQuestion,
       tone: "ask",
       classes: ASK_CLASSES,

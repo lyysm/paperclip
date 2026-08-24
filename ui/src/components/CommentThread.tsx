@@ -25,6 +25,7 @@ import { timeAgo } from "../lib/timeAgo";
 import { cn, formatDateTime } from "../lib/utils";
 import { restoreSubmittedCommentDraft } from "../lib/comment-submit-draft";
 import { copyTextToClipboard } from "../lib/clipboard";
+import { useTranslation } from "@/i18n";
 import { PluginSlotOutlet } from "@/plugins/slots";
 
 interface CommentWithRunMeta extends IssueComment {
@@ -246,6 +247,7 @@ function runStatusClass(status: string) {
 }
 
 function CopyMarkdownButton({ text }: { text: string }) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -255,7 +257,11 @@ function CopyMarkdownButton({ text }: { text: string }) {
     }
   }, []);
 
-  const label = status === "copied" ? "Copied" : status === "failed" ? "Copy failed" : "Copy";
+  const label = status === "copied"
+    ? t("issueChat.copied", { defaultValue: "Copied" })
+    : status === "failed"
+      ? t("issueChat.copyFailedToast", { defaultValue: "Copy failed" })
+      : t("issueChat.copyAria", { defaultValue: "Copy" });
 
   return (
     <button
@@ -269,7 +275,7 @@ function CopyMarkdownButton({ text }: { text: string }) {
             : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
       )}
       title={label}
-      aria-label="Copy comment as markdown"
+      aria-label={t("issueChat.copyCommentMarkdownAria", { defaultValue: "Copy comment as markdown" })}
       onClick={() => {
         void copyTextToClipboard(text)
           .then(() => setStatus("copied"))
@@ -749,6 +755,7 @@ export function CommentThread({
   composerDisabledReason = null,
   externalReferences,
 }: CommentThreadProps) {
+  const { t } = useTranslation();
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [attaching, setAttaching] = useState(false);
@@ -1016,7 +1023,7 @@ export function CommentThread({
             ref={editorRef}
             value={body}
             onChange={setBody}
-            placeholder="Leave a comment..."
+            placeholder={t("issueChat.leaveCommentPlaceholder", { defaultValue: "Leave a comment..." })}
             mentions={mentions}
             onSubmit={handleSubmit}
             imageUploadHandler={imageUploadHandler}
@@ -1037,7 +1044,7 @@ export function CommentThread({
                   size="icon-sm"
                   onClick={() => attachInputRef.current?.click()}
                   disabled={attaching}
-                  title="Attach image"
+                  title={t("issueChat.attachImageAria", { defaultValue: "Attach image" })}
                 >
                   <Paperclip className="h-4 w-4" />
                 </Button>
@@ -1047,14 +1054,20 @@ export function CommentThread({
               <InlineEntitySelector
                 value={reassignTarget}
                 options={reassignOptions}
-                placeholder="Responsible"
-                noneLabel="No responsible"
-                searchPlaceholder="Search responsible..."
-                emptyMessage="No responsible found."
+                placeholder={t("issueChat.responsibleLabel", { defaultValue: "Responsible" })}
+                noneLabel={t("issueChat.noResponsible", { defaultValue: "No responsible" })}
+                searchPlaceholder={t("issueChat.searchResponsible", { defaultValue: "Search responsible..." })}
+                emptyMessage={t("issueChat.noResponsibleFound", { defaultValue: "No responsible found." })}
                 onChange={setReassignTarget}
                 className="text-xs h-8"
                 renderTriggerValue={(option) => {
-                  if (!option) return <span className="text-muted-foreground">Responsible</span>;
+                  if (!option) {
+                return (
+                  <span className="text-muted-foreground">
+                    {t("issueChat.responsibleLabel", { defaultValue: "Responsible" })}
+                  </span>
+                );
+              }
                   const agentId = option.id.startsWith("agent:") ? option.id.slice("agent:".length) : null;
                   const agent = agentId ? agentMap?.get(agentId) : null;
                   return (
@@ -1082,7 +1095,9 @@ export function CommentThread({
               />
             )}
             <Button size="sm" disabled={!canSubmit} onClick={handleSubmit}>
-              {submitting ? "Posting..." : "Comment"}
+              {submitting
+                ? t("issueChat.posting", { defaultValue: "Posting..." })
+                : t("issueChat.commentButton", { defaultValue: "Comment" })}
             </Button>
           </div>
         </div>

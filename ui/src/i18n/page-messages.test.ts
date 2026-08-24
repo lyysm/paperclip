@@ -381,4 +381,25 @@ describe("zh-CN page-body messages", () => {
     expect(entry(companySettings, "pluginExtensionsUnavailable")).toContain("{{message}}");
     expect(entry(companySettings, "pluginRouteConflictPrefix")).toContain("插件");
   });
+
+  it("translates the task chat thread, comment thread, and chat composer", () => {
+    const issueChat = group("issueChat");
+    expect(entry(issueChat, "authorAgent")).toBe("智能体");
+    expect(entry(issueChat, "assigneePausedNotice")).toContain("{{name}}");
+    expect(entry(issueChat, "assigneePausedNotice")).toContain("暂停");
+    expect(entry(issueChat, "deleteCommentTitle")).toBe("删除评论？");
+    expect(entry(issueChat, "deleteCommentDescription")).toContain("已删除标记");
+    expect(entry(issueChat, "feedbackHelpful")).toBe("有帮助");
+    expect(entry(issueChat, "sharePrefAlwaysAllow")).toBe("始终允许");
+    expect(entry(issueChat, "sharePrefChangeLater")).toContain("设置");
+    expect(entry(issueChat, "dropToUpload")).toBe("拖放以上传");
+    expect(entry(issueChat, "responsibleLabel")).toBe("负责人");
+    expect(entry(issueChat, "noResponsibleDialogBody")).toContain("负责人");
+    expect(entry(issueChat, "noRunOutputYet")).toBe("暂无运行输出。");
+    expect(entry(issueChat, "emptyConversation")).toContain("为空");
+    expect(entry(issueChat, "jumpToLatest")).toBe("跳到最新");
+    expect(entry(issueChat, "ranCommands_one")).toContain("{{count}}");
+    expect(entry(issueChat, "commentButton")).toBe("评论");
+    expect(entry(issueChat, "chatComposerPlaceholder")).toBe("消息…");
+  });
 });

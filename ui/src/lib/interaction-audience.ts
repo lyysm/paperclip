@@ -27,6 +27,7 @@ import {
   type IssueThreadInteractionResolverPolicy,
   type IssueThreadInteractionResolverPolicyProvenance,
 } from "@paperclipai/shared";
+import { t } from "@/i18n";
 import type { IssueThreadInteraction } from "./issue-thread-interactions";
 
 /**
@@ -35,12 +36,20 @@ import type { IssueThreadInteraction } from "./issue-thread-interactions";
  */
 export const DEFAULT_RESOLVER_POLICY: IssueThreadInteractionCanonicalResolverPolicy = "anyone";
 
-/** Short label for a resolver audience — badges, select options, table cells. */
-const RESOLVER_POLICY_LABELS: Record<IssueThreadInteractionCanonicalResolverPolicy, string> = {
+/** English fallbacks for the resolver-policy short labels (badges, selects). */
+const RESOLVER_POLICY_LABEL_TEXT: Record<IssueThreadInteractionCanonicalResolverPolicy, string> = {
   anyone: "Anyone",
   not_creator: "Anyone except creator",
   human_only: "Human only",
 };
+
+function resolverPolicyLabels(): Record<IssueThreadInteractionCanonicalResolverPolicy, string> {
+  return {
+    anyone: t("interactionAudience.policy.anyone", { defaultValue: RESOLVER_POLICY_LABEL_TEXT.anyone }),
+    not_creator: t("interactionAudience.policy.not_creator", { defaultValue: RESOLVER_POLICY_LABEL_TEXT.not_creator }),
+    human_only: t("interactionAudience.policy.human_only", { defaultValue: RESOLVER_POLICY_LABEL_TEXT.human_only }),
+  };
+}
 
 /**
  * Plain-language preview of what a policy *does*, phrased for a surface that is
@@ -48,7 +57,7 @@ const RESOLVER_POLICY_LABELS: Record<IssueThreadInteractionCanonicalResolverPoli
  * that names the real creator/addressee comes from
  * {@link describeInteractionAudience}.
  */
-const RESOLVER_POLICY_EFFECTS: Record<IssueThreadInteractionCanonicalResolverPolicy, string> = {
+const RESOLVER_POLICY_EFFECT_TEXT: Record<IssueThreadInteractionCanonicalResolverPolicy, string> = {
   anyone:
     "Anyone in the company can respond — the board or any agent, including the one that asked.",
   not_creator:
@@ -58,30 +67,35 @@ const RESOLVER_POLICY_EFFECTS: Record<IssueThreadInteractionCanonicalResolverPol
 
 /** Accepts canonical values and the deprecated `board_*` compatibility aliases. */
 export function resolverPolicyLabel(policy: IssueThreadInteractionResolverPolicy): string {
-  return RESOLVER_POLICY_LABELS[normalizeIssueThreadInteractionResolverPolicy(policy)];
+  return resolverPolicyLabels()[normalizeIssueThreadInteractionResolverPolicy(policy)];
 }
 
 /** Accepts canonical values and the deprecated `board_*` compatibility aliases. */
 export function resolverPolicyEffect(policy: IssueThreadInteractionResolverPolicy): string {
-  return RESOLVER_POLICY_EFFECTS[normalizeIssueThreadInteractionResolverPolicy(policy)];
+  const canonical = normalizeIssueThreadInteractionResolverPolicy(policy);
+  return t(`interactionAudience.effect.${canonical}`, { defaultValue: RESOLVER_POLICY_EFFECT_TEXT[canonical] });
 }
 
 /**
  * Ordered choice list for every surface that picks a resolver audience. `anyone`
  * is first and marked as the default so the open option reads as the normal
- * path rather than a permission grant.
+ * path rather than a permission grant. A function, not a constant, so labels
+ * resolve in the active locale at call time.
  */
-export const RESOLVER_POLICY_CHOICES: readonly {
+export function resolverPolicyChoices(): readonly {
   value: IssueThreadInteractionCanonicalResolverPolicy;
   label: string;
   effect: string;
   isDefault: boolean;
-}[] = ISSUE_THREAD_INTERACTION_CANONICAL_RESOLVER_POLICIES.map((value) => ({
-  value,
-  label: RESOLVER_POLICY_LABELS[value],
-  effect: RESOLVER_POLICY_EFFECTS[value],
-  isDefault: value === DEFAULT_RESOLVER_POLICY,
-}));
+}[] {
+  const labels = resolverPolicyLabels();
+  return ISSUE_THREAD_INTERACTION_CANONICAL_RESOLVER_POLICIES.map((value) => ({
+    value,
+    label: labels[value],
+    effect: resolverPolicyEffect(value),
+    isDefault: value === DEFAULT_RESOLVER_POLICY,
+  }));
+}
 
 /** Why an effective audience ended up narrower than the requested one. */
 export type InteractionAudienceNarrowing =
@@ -176,26 +190,45 @@ export function describeResolverAudience({
   const policy = facts.effectiveResolverPolicy;
   const requestedPolicy = facts.requestedResolverPolicy;
   const hasAddressee = facts.hasAddressee;
-  const addressee = addresseeLabel?.trim() || "the addressed agent";
-  const creator = creatorLabel?.trim() || "the agent that created it";
+  const addressee = addresseeLabel?.trim()
+    || t("interactionAudience.addressedAgentFallback", { defaultValue: "the addressed agent" });
+  const creator = creatorLabel?.trim()
+    || t("interactionAudience.creatorFallback", { defaultValue: "the agent that created it" });
+  const labels = resolverPolicyLabels();
 
   const summary = policy === "human_only"
-    ? "Only a person on the board can respond — agents cannot resolve this card."
+    ? t("interactionAudience.summary.humanOnly", {
+        defaultValue: "Only a person on the board can respond — agents cannot resolve this card."
+      })
     : hasAddressee
-      ? `Only ${addressee} or a person on the board can respond.`
+      ? t("interactionAudience.summary.addressed", {
+          defaultValue: "Only {{addressee}} or a person on the board can respond.",
+          addressee
+        })
       : policy === "not_creator"
-        ? `Anyone in the company except ${creator} can respond.`
-        : "Anyone in the company can respond — the board or any agent, including the one that asked.";
+        ? t("interactionAudience.summary.notCreator", {
+            defaultValue: "Anyone in the company except {{creator}} can respond.",
+            creator
+          })
+        : t("interactionAudience.summary.anyone", {
+            defaultValue: "Anyone in the company can respond — the board or any agent, including the one that asked."
+          });
 
   // Same fact, fewer words: a collapsed row has to answer "is this mine to
   // decide?" in one glance, next to the buttons that act on the answer.
   const shortSummary = policy === "human_only"
-    ? "Only the board can respond"
+    ? t("interactionAudience.shortSummary.humanOnly", { defaultValue: "Only the board can respond" })
     : hasAddressee
-      ? `Only ${addressee} or the board can respond`
+      ? t("interactionAudience.shortSummary.addressed", {
+          defaultValue: "Only {{addressee}} or the board can respond",
+          addressee
+        })
       : policy === "not_creator"
-        ? `Anyone except ${creator} can respond`
-        : "Anyone can respond";
+        ? t("interactionAudience.shortSummary.notCreator", {
+            defaultValue: "Anyone except {{creator}} can respond",
+            creator
+          })
+        : t("interactionAudience.shortSummary.anyone", { defaultValue: "Anyone can respond" });
 
   const source = facts.effectiveResolverPolicySource;
   const provenance = facts.resolverPolicyProvenance;
@@ -205,11 +238,19 @@ export function describeResolverAudience({
   // open resolution existed. An explicitly requested restriction is already
   // fully described by `summary`.
   const narrowedNote = source === "governed_action"
-    ? "This card runs a governed action, so it stays human-only whatever audience was requested."
+    ? t("interactionAudience.narrowedNote.governedAction", {
+        defaultValue: "This card runs a governed action, so it stays human-only whatever audience was requested."
+      })
     : source === "company_cap"
-      ? `Company interaction governance narrowed this from ${RESOLVER_POLICY_LABELS[requestedPolicy]} to ${RESOLVER_POLICY_LABELS[policy]}.`
+      ? t("interactionAudience.narrowedNote.companyCap", {
+          defaultValue: "Company interaction governance narrowed this from {{from}} to {{to}}.",
+          from: labels[requestedPolicy],
+          to: labels[policy]
+        })
       : provenance === "legacy_inherited_restriction"
-        ? "Created before Anyone became the default, so it stays restricted. A new card would be open."
+        ? t("interactionAudience.narrowedNote.legacyRestriction", {
+            defaultValue: "Created before Anyone became the default, so it stays restricted. A new card would be open."
+          })
         : null;
 
   const narrowedBy: InteractionAudienceNarrowing | null = source === "governed_action"
@@ -231,8 +272,8 @@ export function describeResolverAudience({
     // while the sentence next to it names one agent. `human_only` still wins,
     // because an addressed agent cannot resolve a human-only card.
     label: policy !== "human_only" && hasAddressee
-      ? "Addressed"
-      : RESOLVER_POLICY_LABELS[policy],
+      ? t("interactionAudience.addressedLabel", { defaultValue: "Addressed" })
+      : labels[policy],
     summary,
     shortSummary,
     isOpen: policy === "anyone" && !hasAddressee,

@@ -3,9 +3,9 @@ import type { AttentionItem, AttentionResolverAudience } from "@paperclipai/shar
 import type { RequestConfirmationInteraction } from "./issue-thread-interactions";
 import {
   DEFAULT_RESOLVER_POLICY,
-  RESOLVER_POLICY_CHOICES,
   describeAttentionResolverAudience,
   describeInteractionAudience,
+  resolverPolicyChoices,
   resolverPolicyEffect,
   resolverPolicyLabel,
 } from "./interaction-audience";
@@ -41,13 +41,13 @@ function confirmation(
 describe("resolver policy vocabulary", () => {
   it("defaults to the open audience", () => {
     expect(DEFAULT_RESOLVER_POLICY).toBe("anyone");
-    expect(RESOLVER_POLICY_CHOICES[0]).toMatchObject({ value: "anyone", isDefault: true });
-    expect(RESOLVER_POLICY_CHOICES.map((choice) => choice.value)).toEqual([
+    expect(resolverPolicyChoices()[0]).toMatchObject({ value: "anyone", isDefault: true });
+    expect(resolverPolicyChoices().map((choice) => choice.value)).toEqual([
       "anyone",
       "not_creator",
       "human_only",
     ]);
-    expect(RESOLVER_POLICY_CHOICES.filter((choice) => choice.isDefault)).toHaveLength(1);
+    expect(resolverPolicyChoices().filter((choice) => choice.isDefault)).toHaveLength(1);
   });
 
   it("labels each canonical policy in plain language", () => {
@@ -63,7 +63,7 @@ describe("resolver policy vocabulary", () => {
   });
 
   it("previews an effect for every choice without naming a raw policy value", () => {
-    for (const choice of RESOLVER_POLICY_CHOICES) {
+    for (const choice of resolverPolicyChoices()) {
       expect(choice.effect.length).toBeGreaterThan(0);
       expect(choice.effect).not.toContain(choice.value);
     }

@@ -1,5 +1,7 @@
 import type { StatusCardRefreshPolicy, StatusCardUpdate } from "@paperclipai/shared";
 
+import { t } from "@/i18n";
+
 /** "1.1k tok" / "940 tok" — compact token count for footers and chips. */
 export function formatTokens(tokens: number | null | undefined): string | null {
   if (tokens === null || tokens === undefined) return null;
@@ -98,8 +100,8 @@ export function estimateStatusCardCost(policy: StatusCardRefreshPolicy): StatusC
     const cost = `${formatCents(EST_FULL_CENTS)} · ${formatTokens(EST_FULL_TOKENS)}`;
     return {
       cost,
-      primary: `~1 rebuild per refresh ≈ ${cost}`,
-      note: "Manual cards only cost tokens when you press Refresh.",
+      primary: t("statusCards.cost.manualPrimary", { defaultValue: "~1 rebuild per refresh ≈ {{cost}}", cost }),
+      note: t("statusCards.cost.manualNote", { defaultValue: "Manual cards only cost tokens when you press Refresh." }),
     };
   }
 
@@ -109,11 +111,11 @@ export function estimateStatusCardCost(policy: StatusCardRefreshPolicy): StatusC
   if (policy.mode === "interval") {
     const interval = policy.intervalMinutes ?? 15;
     maxPerDay = Math.floor(windowMinutes / interval);
-    cadence = `every ${interval} min`;
+    cadence = t("statusCards.cost.intervalCadence", { defaultValue: "every {{minutes}} min", minutes: interval });
   } else {
     const perHour = policy.maxUpdatesPerHour ?? 6;
     maxPerDay = Math.round((windowMinutes / 60) * perHour);
-    cadence = `up to ${perHour}/hour`;
+    cadence = t("statusCards.cost.reactiveCadence", { defaultValue: "up to {{count}}/hour", count: perHour });
   }
 
   const cap = policy.dailyTokenCap ?? null;
@@ -123,33 +125,48 @@ export function estimateStatusCardCost(policy: StatusCardRefreshPolicy): StatusC
 
   const tokens = effective * EST_INCREMENTAL_TOKENS;
   const cents = effective * EST_INCREMENTAL_CENTS;
-  const withinHours = policy.activeHours ? " during active hours" : "";
+  const withinHours = policy.activeHours
+    ? t("statusCards.cost.activeHoursSuffix", { defaultValue: " during active hours" })
+    : "";
   const cost = `${formatCents(cents)} · ${formatTokens(tokens)}`;
 
   return {
     cost,
-    primary: `Up to ~${effective} updates/day (${cadence}${withinHours}) ≈ ${cost}`,
+    primary: t("statusCards.cost.upToPrimary", {
+      defaultValue: "Up to ~{{count}} updates/day ({{cadence}}{{activeHours}}) ≈ {{cost}}",
+      count: effective,
+      cadence,
+      activeHours: withinHours,
+      cost,
+    }),
     note: cappedByTokenCap
-      ? `Capped by your ${formatTokens(cap!)} daily token cap — the card pauses when it's hit.`
-      : "Only runs when something changed; a cheap no-op check otherwise.",
+      ? t("statusCards.cost.cappedNote", {
+          defaultValue: "Capped by your {{tokens}} daily token cap — the card pauses when it's hit.",
+          tokens: formatTokens(cap!),
+        })
+      : t("statusCards.cost.noChangeNote", { defaultValue: "Only runs when something changed; a cheap no-op check otherwise." }),
   };
 }
 
 /** "0.4k in / 0.2k out" — the per-update token split shown in history rows. */
 export function formatTokenSplit(inputTokens: number, outputTokens: number): string {
   const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`);
-  return `${fmt(inputTokens)} in / ${fmt(outputTokens)} out`;
+  return t("statusCards.format.tokenSplit", {
+    defaultValue: "{{input}} in / {{output}} out",
+    input: fmt(inputTokens),
+    output: fmt(outputTokens),
+  });
 }
 
 /** Human label for an update's kind. */
 export function updateKindLabel(kind: StatusCardUpdate["kind"]): string {
   switch (kind) {
     case "compile":
-      return "compile";
+      return t("statusCards.format.kindCompile", { defaultValue: "compile" });
     case "full":
-      return "full rebuild";
+      return t("statusCards.format.kindFull", { defaultValue: "full rebuild" });
     case "incremental":
-      return "incremental";
+      return t("statusCards.format.kindIncremental", { defaultValue: "incremental" });
     default:
       return kind;
   }

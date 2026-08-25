@@ -436,6 +436,19 @@ describe("zh-CN page-body messages", () => {
     expect(entry(executionWorkspace, "lastRunAt")).toContain("{{time}}");
   });
 
+  it("translates the status cards board and detail surfaces", () => {
+    const statusCards = group("statusCards");
+    expect(entry(statusCards, "breadcrumb")).toBe("状态");
+    expect(entry(statusCards, "showArchived")).toContain("{{count}}");
+    expect(entry(nested(statusCards, "create"), "promptLabel")).toContain("关注");
+    expect(entry(nested(statusCards, "settings"), "autoUpdatePolicy")).toBe("自动更新策略");
+    expect(entry(nested(statusCards, "settings"), "minutes")).toContain("{{minutes}}");
+    expect(entry(nested(statusCards, "detail"), "revisionLatest")).toContain("{{number}}");
+    expect(entry(nested(statusCards, "detail"), "compiledBy")).toContain("{{version}}");
+    expect(entry(nested(statusCards, "tile"), "integratingMany")).toContain("{{count}}");
+    expect(entry(nested(statusCards, "archived"), "summaryLine")).toContain("{{lastSummary}}");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

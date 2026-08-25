@@ -3868,6 +3868,16 @@
     "viewWorkspaceDetails": "查看工作区详情",
     "workspace": "工作区"
   },
+  "externalObjectRows": {
+    "externalObjects": "外部对象",
+    "githubIssue": "GitHub 任务",
+    "githubPullRequest": "GitHub PR",
+    "issueShort": "任务 {{number}}",
+    "loadFailed": "无法加载外部对象。",
+    "pullRequestShort": "PR {{number}}",
+    "references": "引用",
+    "retry": "重试"
+  },
   "issueDetail": {
     "acceptFailed": "接受失败",
     "acceptedDraftsSkipped_one": "已接受 {{created}} 个草稿并跳过 {{skipped}} 个",

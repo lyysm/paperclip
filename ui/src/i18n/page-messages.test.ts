@@ -426,6 +426,13 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueWorkspaceCard, "viewWorkspaceDetails")).toBe("查看工作区详情");
   });
 
+  it("translates external object property rows", () => {
+    const externalObjectRows = group("externalObjectRows");
+    expect(entry(externalObjectRows, "externalObjects")).toBe("外部对象");
+    expect(entry(externalObjectRows, "pullRequestShort")).toContain("{{number}}");
+    expect(entry(externalObjectRows, "references")).toBe("引用");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

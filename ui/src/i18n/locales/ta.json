@@ -3868,6 +3868,16 @@
     "viewWorkspaceDetails": "View workspace details",
     "workspace": "Workspace"
   },
+  "externalObjectRows": {
+    "externalObjects": "External objects",
+    "githubIssue": "GitHub Issue",
+    "githubPullRequest": "GitHub PR",
+    "issueShort": "Issue {{number}}",
+    "loadFailed": "Couldn't load external objects.",
+    "pullRequestShort": "PR {{number}}",
+    "references": "References",
+    "retry": "Retry"
+  },
   "issueDetail": {
     "acceptFailed": "Accept failed",
     "acceptedDraftsSkipped_one": "Accepted {{created}} draft and skipped {{skipped}}",

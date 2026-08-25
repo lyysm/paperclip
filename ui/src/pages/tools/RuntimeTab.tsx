@@ -23,6 +23,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { toolsApi } from "@/api/tools";
 import { ApiError } from "@/api/client";
 import { useToast } from "@/context/ToastContext";
+import { t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import { ToolsPageHeader, LoadingState, ErrorState, RelativeTime } from "./shared";
 
@@ -62,6 +63,10 @@ const STATUS_WORD: Record<RowStatus, string> = {
   off: "Off",
 };
 
+function statusLabel(status: RowStatus): string {
+  return t(`toolsPage.runtime.status.${status}`, { defaultValue: STATUS_WORD[status] });
+}
+
 /** Filled dot (working) / triangle (needs attention) / hollow dot (off). */
 function StatusMarker({ status }: { status: RowStatus }) {
   if (status === "attention") {
@@ -81,28 +86,30 @@ function humanizeRowName(slot: ToolRuntimeSlot, connection: ToolConnection | nul
 /** Plain-words latency: "about 1.2s" / "about 240ms" / "—". */
 function formatTypicalLatency(ms: number | null | undefined): string {
   if (typeof ms !== "number" || Number.isNaN(ms)) return "—";
-  if (ms >= 950) return `about ${(ms / 1000).toFixed(1)}s`;
-  return `about ${Math.round(ms)}ms`;
+  if (ms >= 950) return t("toolsPage.runtime.latencySeconds", { defaultValue: "about {{value}}s", value: (ms / 1000).toFixed(1) });
+  return t("toolsPage.runtime.latencyMilliseconds", { defaultValue: "about {{value}}ms", value: Math.round(ms) });
 }
 
 /** How the slot runs, in plain words. */
 function howItRuns(slot: ToolRuntimeSlot): string {
-  return slot.runtimeKind === "local_stdio" ? "Runs on this machine" : "Connects over the internet";
+  return slot.runtimeKind === "local_stdio"
+    ? t("toolsPage.runtime.runsOnMachine", { defaultValue: "Runs on this machine" })
+    : t("toolsPage.runtime.connectsOverInternet", { defaultValue: "Connects over the internet" });
 }
 
 /** Humanize the owner scope into a plain phrase. */
 function scopeLabel(scope: string | null | undefined): string {
   switch (scope) {
     case "company":
-      return "Whole company";
+      return t("toolsPage.runtime.scope.company", { defaultValue: "Whole company" });
     case "project":
     case "project_workspace":
-      return "This project";
+      return t("toolsPage.runtime.scope.project", { defaultValue: "This project" });
     case "execution_workspace":
     case "issue":
-      return "This task";
+      return t("toolsPage.runtime.scope.task", { defaultValue: "This task" });
     case "agent":
-      return "A single agent";
+      return t("toolsPage.runtime.scope.agent", { defaultValue: "A single agent" });
     default:
       return scope ? scope.replace(/[_-]+/g, " ") : "—";
   }
@@ -110,13 +117,15 @@ function scopeLabel(scope: string | null | undefined): string {
 
 /** Plain-words trust tier — quarantined local code reads as such; remote is provider-side. */
 function trustTierLabel(slot: ToolRuntimeSlot): string {
-  if (slot.runtimeKind !== "local_stdio") return "Provider-verified";
+  if (slot.runtimeKind !== "local_stdio") return t("toolsPage.runtime.trust.providerVerified", { defaultValue: "Provider-verified" });
   const quarantined =
     slot.status === "failed" ||
     slot.status === "error" ||
     slot.healthStatus === "error" ||
     slot.healthStatus === "unhealthy";
-  return quarantined ? "Quarantined" : "Trusted (runs locally)";
+  return quarantined
+    ? t("toolsPage.runtime.trust.quarantined", { defaultValue: "Quarantined" })
+    : t("toolsPage.runtime.trust.trustedLocal", { defaultValue: "Trusted (runs locally)" });
 }
 
 /**
@@ -128,48 +137,48 @@ function trustTierLabel(slot: ToolRuntimeSlot): string {
 type AlertAction = "restart" | "reviewApps" | "reviewActivity";
 const ALERT_COPY: Record<string, { title: string; body: (a: ToolRuntimeAlertRecommendation) => string; action: AlertAction }> = {
   mcp_runtime_stuck_starting_slot: {
-    title: "An app is stuck starting up",
-    body: () => "It began starting but never came online. Restarting usually clears this.",
+    title: t("toolsPage.runtime.alerts.stuckStartingTitle", { defaultValue: "An app is stuck starting up" }),
+    body: () => t("toolsPage.runtime.alerts.stuckStartingBody", { defaultValue: "It began starting but never came online. Restarting usually clears this." }),
     action: "restart",
   },
   mcp_runtime_stuck_running_slot: {
-    title: "An app stopped responding",
-    body: () => "The process is still running but isn't answering. Restarting usually clears this.",
+    title: t("toolsPage.runtime.alerts.stoppedRespondingTitle", { defaultValue: "An app stopped responding" }),
+    body: () => t("toolsPage.runtime.alerts.stoppedRespondingBody", { defaultValue: "The process is still running but isn't answering. Restarting usually clears this." }),
     action: "restart",
   },
   mcp_runtime_high_timeout_rate: {
-    title: "Apps are responding slowly",
-    body: (a) => `Some actions are timing out (${a.observed.toLowerCase()}). Check the apps involved or try again shortly.`,
+    title: t("toolsPage.runtime.alerts.slowTitle", { defaultValue: "Apps are responding slowly" }),
+    body: (a) => t("toolsPage.runtime.alerts.slowBody", { defaultValue: "Some actions are timing out ({{observed}}). Check the apps involved or try again shortly.", observed: a.observed.toLowerCase() }),
     action: "reviewActivity",
   },
   mcp_runtime_high_error_rate: {
-    title: "Apps are failing more than usual",
-    body: (a) => `Recent actions failed after they were allowed (${a.observed.toLowerCase()}).`,
+    title: t("toolsPage.runtime.alerts.highErrorTitle", { defaultValue: "Apps are failing more than usual" }),
+    body: (a) => t("toolsPage.runtime.alerts.highErrorBody", { defaultValue: "Recent actions failed after they were allowed ({{observed}}).", observed: a.observed.toLowerCase() }),
     action: "reviewActivity",
   },
   mcp_runtime_capacity_deferrals_repeated: {
-    title: "Too many apps running at once",
-    body: (a) => `Some actions had to wait for a free slot (${a.observed.toLowerCase()}).`,
+    title: t("toolsPage.runtime.alerts.capacityTitle", { defaultValue: "Too many apps running at once" }),
+    body: (a) => t("toolsPage.runtime.alerts.capacityBody", { defaultValue: "Some actions had to wait for a free slot ({{observed}}).", observed: a.observed.toLowerCase() }),
     action: "reviewActivity",
   },
   mcp_runtime_restart_storm: {
-    title: "An app keeps restarting",
-    body: (a) => `It has restarted repeatedly (${a.observed.toLowerCase()}). It may be misconfigured or offline.`,
+    title: t("toolsPage.runtime.alerts.restartStormTitle", { defaultValue: "An app keeps restarting" }),
+    body: (a) => t("toolsPage.runtime.alerts.restartStormBody", { defaultValue: "It has restarted repeatedly ({{observed}}). It may be misconfigured or offline.", observed: a.observed.toLowerCase() }),
     action: "restart",
   },
   mcp_runtime_connection_health_degraded: {
-    title: "An app needs reconnecting",
-    body: () => "A connected app isn't healthy. Open it to check the key or reconnect.",
+    title: t("toolsPage.runtime.alerts.reconnectTitle", { defaultValue: "An app needs reconnecting" }),
+    body: () => t("toolsPage.runtime.alerts.reconnectBody", { defaultValue: "A connected app isn't healthy. Open it to check the key or reconnect." }),
     action: "reviewApps",
   },
   mcp_runtime_missing_secret_failures: {
-    title: "An app is missing a key",
-    body: () => "A saved key couldn't be found, so some actions failed. Reconnect the app to fix it.",
+    title: t("toolsPage.runtime.alerts.missingKeyTitle", { defaultValue: "An app is missing a key" }),
+    body: () => t("toolsPage.runtime.alerts.missingKeyBody", { defaultValue: "A saved key couldn't be found, so some actions failed. Reconnect the app to fix it." }),
     action: "reviewApps",
   },
   mcp_runtime_audit_write_failures: {
-    title: "Activity logging hit a problem",
-    body: () => "Some actions may not have been recorded. This needs an administrator to look into it.",
+    title: t("toolsPage.runtime.alerts.auditFailureTitle", { defaultValue: "Activity logging hit a problem" }),
+    body: () => t("toolsPage.runtime.alerts.auditFailureBody", { defaultValue: "Some actions may not have been recorded. This needs an administrator to look into it." }),
     action: "reviewActivity",
   },
 };
@@ -231,10 +240,10 @@ function LivePill() {
       <TooltipTrigger asChild>
         <span className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-foreground">
           <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-          Live
+          {t("toolsPage.runtime.live", { defaultValue: "Live" })}
         </span>
       </TooltipTrigger>
-      <TooltipContent>Updates automatically every 15 seconds.</TooltipContent>
+      <TooltipContent>{t("toolsPage.runtime.liveDescription", { defaultValue: "Updates automatically every 15 seconds." })}</TooltipContent>
     </Tooltip>
   );
 }
@@ -282,10 +291,10 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
     mutationFn: (slotId: string) => toolsApi.stopRuntimeSlot(companyId, slotId),
     onSuccess: () => {
       invalidateRuntime();
-      pushToast({ title: "App stopped", tone: "success" });
+      pushToast({ title: t("toolsPage.runtime.toast.appStopped", { defaultValue: "App stopped" }), tone: "success" });
     },
     onError: (err) =>
-      pushToast({ title: "Stop failed", body: err instanceof ApiError ? err.message : String(err), tone: "error" }),
+      pushToast({ title: t("toolsPage.runtime.toast.stopFailed", { defaultValue: "Stop failed" }), body: err instanceof ApiError ? err.message : String(err), tone: "error" }),
     onSettled: () => setConfirm(null),
   });
 
@@ -293,10 +302,10 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
     mutationFn: (slotId: string) => toolsApi.restartRuntimeSlot(companyId, slotId),
     onSuccess: () => {
       invalidateRuntime();
-      pushToast({ title: "App restarted", tone: "success" });
+      pushToast({ title: t("toolsPage.runtime.toast.appRestarted", { defaultValue: "App restarted" }), tone: "success" });
     },
     onError: (err) =>
-      pushToast({ title: "Restart failed", body: err instanceof ApiError ? err.message : String(err), tone: "error" }),
+      pushToast({ title: t("toolsPage.runtime.toast.restartFailed", { defaultValue: "Restart failed" }), body: err instanceof ApiError ? err.message : String(err), tone: "error" }),
     onSettled: () => setConfirm(null),
   });
 
@@ -315,7 +324,7 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
     });
   }, [slots.data, connections.data]);
 
-  if (slots.isLoading || health.isLoading || connections.isLoading) return <LoadingState />;
+  if (slots.isLoading || health.isLoading || connections.isLoading) return <LoadingState label={t("toolsPage.runtime.loading", { defaultValue: "Loading health…" })} />;
   if (slots.error || health.error) {
     return (
       <ErrorState
@@ -346,40 +355,55 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
   return (
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
-        <ToolsPageHeader title="Health" description="How your apps are doing right now." />
+        <ToolsPageHeader
+          title={t("toolsPage.runtime.title", { defaultValue: "Health" })}
+          description={t("toolsPage.runtime.description", { defaultValue: "How your apps are doing right now." })}
+        />
         <LivePill />
       </div>
 
       {/* Summary strip — plain words; ops vocabulary lives in tooltips. */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SummaryCard
-          label="Apps running"
-          value={totalCount === 0 ? "None" : `${workingCount} of ${totalCount}`}
+          label={t("toolsPage.runtime.appsRunning", { defaultValue: "Apps running" })}
+          value={totalCount === 0 ? t("toolsPage.runtime.none", { defaultValue: "None" }) : t("toolsPage.runtime.appsRunningCount", { defaultValue: "{{working}} of {{total}}", working: workingCount, total: totalCount })}
           note={
             totalCount === 0
-              ? "Apps start when an agent first needs them"
+              ? t("toolsPage.runtime.appsStartOnDemand", { defaultValue: "Apps start when an agent first needs them" })
               : attentionCount > 0
-                ? `${attentionCount} need${attentionCount === 1 ? "s" : ""} attention`
-                : "All working"
+                ? t(attentionCount === 1 ? "toolsPage.runtime.needAttentionSingular" : "toolsPage.runtime.needAttention", {
+                    defaultValue: attentionCount === 1 ? "{{count}} needs attention" : "{{count}} need attention",
+                    count: attentionCount,
+                  })
+                : t("toolsPage.runtime.allWorking", { defaultValue: "All working" })
           }
         />
         <SummaryCard
-          label="Typical response time"
+          label={t("toolsPage.runtime.typicalResponseTime", { defaultValue: "Typical response time" })}
           value={formatTypicalLatency(metrics?.averageToolLatencyMsLastHour)}
           note={
             metrics?.averageToolLatencyMsLastHour == null
-              ? "No calls in the last hour"
+              ? t("toolsPage.runtime.noCallsLastHour", { defaultValue: "No calls in the last hour" })
               : (metrics?.timeoutRateLastHour ?? 0) >= 10
-                ? "slower than usual"
-                : "across all apps"
+                ? t("toolsPage.runtime.slowerThanUsual", { defaultValue: "slower than usual" })
+                : t("toolsPage.runtime.acrossAllApps", { defaultValue: "across all apps" })
           }
-          detail={`Slowest 5% (P95): ${formatTypicalLatency(metrics?.p95ToolLatencyMsLastHour)} · timeout rate ${metrics?.timeoutRateLastHour ?? 0}%`}
+          detail={t("toolsPage.runtime.latencyDetail", {
+            defaultValue: "Slowest 5% (P95): {{latency}} · timeout rate {{rate}}%",
+            latency: formatTypicalLatency(metrics?.p95ToolLatencyMsLastHour),
+            rate: metrics?.timeoutRateLastHour ?? 0,
+          })}
         />
         <SummaryCard
-          label="Errors in the last hour"
+          label={t("toolsPage.runtime.errorsLastHour", { defaultValue: "Errors in the last hour" })}
           value={String(errors)}
-          note={errors === 0 ? "None" : "across your apps"}
-          detail={`${metrics?.toolFailuresLastHour ?? 0} failed · ${metrics?.toolTimeoutsLastHour ?? 0} timed out · ${metrics?.capacityDeferralsLastHour ?? 0} waited for capacity`}
+          note={errors === 0 ? t("toolsPage.runtime.none", { defaultValue: "None" }) : t("toolsPage.runtime.acrossYourApps", { defaultValue: "across your apps" })}
+          detail={t("toolsPage.runtime.errorsDetail", {
+            defaultValue: "{{failed}} failed · {{timedOut}} timed out · {{deferred}} waited for capacity",
+            failed: metrics?.toolFailuresLastHour ?? 0,
+            timedOut: metrics?.toolTimeoutsLastHour ?? 0,
+            deferred: metrics?.capacityDeferralsLastHour ?? 0,
+          })}
         />
       </div>
 
@@ -399,15 +423,15 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
                 {action === "restart" && localAttentionRow ? (
                   <Button size="sm" onClick={() => beginRestart(localAttentionRow)}>
                     <RotateCw className="mr-1.5 h-3.5 w-3.5" />
-                    Restart {localAttentionRow.name}
+                    {t("toolsPage.runtime.restartNamed", { defaultValue: "Restart {{name}}", name: localAttentionRow.name })}
                   </Button>
                 ) : action === "reviewApps" ? (
                   <Button size="sm" asChild>
-                    <Link to="/apps/attention">Review apps</Link>
+                    <Link to="/apps/attention">{t("toolsPage.runtime.reviewApps", { defaultValue: "Review apps" })}</Link>
                   </Button>
                 ) : (
                   <Button size="sm" asChild>
-                    <Link to="/apps/advanced/audit">Review activity</Link>
+                    <Link to="/apps/advanced/audit">{t("toolsPage.runtime.reviewActivity", { defaultValue: "Review activity" })}</Link>
                   </Button>
                 )}
                 <button
@@ -415,17 +439,17 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
                   className="text-left"
                   onClick={() => setOpenAlertDetails((s) => ({ ...s, [alert.name]: !detailsOpen }))}
                 >
-                  <Disclosure open={detailsOpen} label="Technical details" />
+                  <Disclosure open={detailsOpen} label={t("toolsPage.runtime.technicalDetails", { defaultValue: "Technical details" })} />
                 </button>
               </div>
               {detailsOpen ? (
                 <dl className="grid grid-cols-1 gap-x-8 gap-y-2 rounded-md bg-muted/40 p-3 text-xs sm:grid-cols-2">
-                  <Fact label="Alert" value={<span className="font-mono">{alert.name}</span>} />
-                  <Fact label="Severity" value={alert.severity} />
-                  <Fact label="Threshold" value={alert.threshold} />
-                  <Fact label="Observed" value={alert.observed} />
-                  <Fact label="First responder" value={alert.firstResponderAction} />
-                  <Fact label="Runbook" value={<span className="font-mono">{alert.runbookSection || health.data?.runbookPath}</span>} />
+                  <Fact label={t("toolsPage.runtime.factAlert", { defaultValue: "Alert" })} value={<span className="font-mono">{alert.name}</span>} />
+                  <Fact label={t("toolsPage.runtime.factSeverity", { defaultValue: "Severity" })} value={alert.severity} />
+                  <Fact label={t("toolsPage.runtime.factThreshold", { defaultValue: "Threshold" })} value={alert.threshold} />
+                  <Fact label={t("toolsPage.runtime.factObserved", { defaultValue: "Observed" })} value={alert.observed} />
+                  <Fact label={t("toolsPage.runtime.factFirstResponder", { defaultValue: "First responder" })} value={alert.firstResponderAction} />
+                  <Fact label={t("toolsPage.runtime.factRunbook", { defaultValue: "Runbook" })} value={<span className="font-mono">{alert.runbookSection || health.data?.runbookPath}</span>} />
                 </dl>
               ) : null}
             </CardContent>
@@ -437,23 +461,23 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
       {totalCount === 0 ? (
         <EmptyState
           icon={Server}
-          message="No apps running right now"
-          description="Apps that run on this machine start automatically the first time an agent needs them. Apps that connect over the internet don't use a local process."
+          message={t("toolsPage.runtime.noAppsRunning", { defaultValue: "No apps running right now" })}
+          description={t("toolsPage.runtime.noAppsRunningDescription", { defaultValue: "Apps that run on this machine start automatically the first time an agent needs them. Apps that connect over the internet don't use a local process." })}
         />
       ) : (
         <Card className="py-0">
           <CardContent className="px-0 py-0">
             <div className="px-5 pb-1 pt-4">
-              <h3 className="text-base font-bold text-foreground">Running apps</h3>
-              <p className="text-xs text-muted-foreground">Click a row to see how the connection is wired up.</p>
+              <h3 className="text-base font-bold text-foreground">{t("toolsPage.runtime.runningApps", { defaultValue: "Running apps" })}</h3>
+              <p className="text-xs text-muted-foreground">{t("toolsPage.runtime.runningAppsDescription", { defaultValue: "Click a row to see how the connection is wired up." })}</p>
             </div>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs font-medium text-muted-foreground">
-                  <th className="px-5 py-2.5">App</th>
-                  <th className="px-3 py-2.5">Status</th>
-                  <th className="px-3 py-2.5">Last used</th>
-                  <th className="px-5 py-2.5 text-right">Actions</th>
+                  <th className="px-5 py-2.5">{t("toolsPage.runtime.columnApp", { defaultValue: "App" })}</th>
+                  <th className="px-3 py-2.5">{t("toolsPage.runtime.columnStatus", { defaultValue: "Status" })}</th>
+                  <th className="px-3 py-2.5">{t("toolsPage.runtime.columnLastUsed", { defaultValue: "Last used" })}</th>
+                  <th className="px-5 py-2.5 text-right">{t("toolsPage.runtime.columnActions", { defaultValue: "Actions" })}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -481,8 +505,7 @@ export function RuntimeTab({ companyId }: { companyId: string }) {
       )}
 
       <p className="text-xs text-muted-foreground">
-        Apps that "connect over the internet" hide Stop and Restart — those run on the provider's side, so there's
-        no local process to control here.
+        {t("toolsPage.runtime.providerSideNote", { defaultValue: "Apps that connect over the internet hide Stop and Restart — those run on the provider's side, so there's no local process to control here." })}
       </p>
 
       <ConfirmDialog
@@ -547,7 +570,7 @@ function RuntimeRowView({
         </td>
         <td className="px-3 py-2.5">
           <span className={status === "attention" ? "font-semibold text-foreground" : "text-foreground"}>
-            {STATUS_WORD[status]}
+            {statusLabel(status)}
           </span>
         </td>
         <td className="px-3 py-2.5">
@@ -557,10 +580,10 @@ function RuntimeRowView({
           {isLocal ? (
             <Button size="sm" variant="outline" disabled={busy || status === "off"} onClick={onRestart}>
               {busy ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <RotateCw className="mr-1.5 h-3.5 w-3.5" />}
-              Restart
+              {t("toolsPage.runtime.restart", { defaultValue: "Restart" })}
             </Button>
           ) : (
-            <span className="text-xs text-muted-foreground">Runs on the provider's side</span>
+            <span className="text-xs text-muted-foreground">{t("toolsPage.runtime.runsProviderSide", { defaultValue: "Runs on the provider's side" })}</span>
           )}
         </td>
       </tr>
@@ -568,34 +591,34 @@ function RuntimeRowView({
         <tr className="bg-muted/40">
           <td colSpan={4} className="px-5 py-4">
             <dl className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-3">
-              <Fact label="Slot key" value={<span className="font-mono text-xs">{slot.slotKey ?? slot.commandTemplateKey ?? slot.id}</span>} />
-              <Fact label="How it runs" value={howItRuns(slot)} />
-              <Fact label="Process ID" value={slot.processId ?? "—"} />
-              <Fact label="Scope" value={scopeLabel(slot.ownerScopeType)} />
-              <Fact label="Trust tier" value={trustTierLabel(slot)} />
-              <Fact label="Started" value={<RelativeTime value={slot.lastStartedAt ?? slot.startedAt} />} />
+              <Fact label={t("toolsPage.runtime.factSlotKey", { defaultValue: "Slot key" })} value={<span className="font-mono text-xs">{slot.slotKey ?? slot.commandTemplateKey ?? slot.id}</span>} />
+              <Fact label={t("toolsPage.runtime.factHowItRuns", { defaultValue: "How it runs" })} value={howItRuns(slot)} />
+              <Fact label={t("toolsPage.runtime.factProcessId", { defaultValue: "Process ID" })} value={slot.processId ?? "—"} />
+              <Fact label={t("toolsPage.runtime.factScope", { defaultValue: "Scope" })} value={scopeLabel(slot.ownerScopeType)} />
+              <Fact label={t("toolsPage.runtime.factTrustTier", { defaultValue: "Trust tier" })} value={trustTierLabel(slot)} />
+              <Fact label={t("toolsPage.runtime.factStarted", { defaultValue: "Started" })} value={<RelativeTime value={slot.lastStartedAt ?? slot.startedAt} />} />
             </dl>
             {slot.lastError ? (
-              <p className="mt-3 text-xs text-destructive">Last error: {slot.lastError}</p>
+              <p className="mt-3 text-xs text-destructive">{t("toolsPage.runtime.lastError", { defaultValue: "Last error: {{error}}", error: slot.lastError })}</p>
             ) : null}
             <div className="mt-4 flex items-center gap-2">
               {canControl ? (
                 <>
                   <Button size="sm" variant="outline" disabled={busy} onClick={onStop}>
                     {busy ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Square className="mr-1.5 h-3.5 w-3.5" fill="currentColor" />}
-                    Stop
+                    {t("toolsPage.runtime.stop", { defaultValue: "Stop" })}
                   </Button>
                   <Button size="sm" variant="outline" disabled={busy} onClick={onRestart}>
                     {busy ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <RotateCw className="mr-1.5 h-3.5 w-3.5" />}
-                    Restart
+                    {t("toolsPage.runtime.restart", { defaultValue: "Restart" })}
                   </Button>
                 </>
               ) : !isLocal ? (
                 <p className="text-xs text-muted-foreground">
-                  This app runs on the provider's side — there's nothing to stop or restart here.
+                  {t("toolsPage.runtime.providerSideNoControls", { defaultValue: "This app runs on the provider's side — there's nothing to stop or restart here." })}
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground">This app is off. It will start again when an agent needs it.</p>
+                <p className="text-xs text-muted-foreground">{t("toolsPage.runtime.appOffDescription", { defaultValue: "This app is off. It will start again when an agent needs it." })}</p>
               )}
             </div>
           </td>
@@ -622,36 +645,38 @@ function ConfirmDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {isRestart ? "Restart" : "Stop"} {target?.name}?
+            {t(isRestart ? "toolsPage.runtime.restartDialogTitle" : "toolsPage.runtime.stopDialogTitle", {
+              defaultValue: isRestart ? "Restart {{name}}?" : "Stop {{name}}?",
+              name: target?.name,
+            })}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-2 text-sm text-foreground">
           {isRestart ? (
             <>
               <p>
-                Anything in progress will stop. Agents using {target?.name} right now will see a Failed result on
-                their action.
+                {t("toolsPage.runtime.restartDialogBody", { defaultValue: "Anything in progress will stop. Agents using {{name}} right now will see a Failed result on their action.", name: target?.name })}
               </p>
-              <p className="text-xs text-muted-foreground">Restart usually takes 2–3 seconds.</p>
+              <p className="text-xs text-muted-foreground">{t("toolsPage.runtime.restartDialogNote", { defaultValue: "Restart usually takes 2–3 seconds." })}</p>
             </>
           ) : (
             <>
               <p>
-                {target?.name} will stop running. Agents won't be able to use it until it starts again.
+                {t("toolsPage.runtime.stopDialogBody", { defaultValue: "{{name}} will stop running. Agents won't be able to use it until it starts again.", name: target?.name })}
               </p>
               <p className="text-xs text-muted-foreground">
-                It starts again automatically the next time an agent needs it.
+                {t("toolsPage.runtime.stopDialogNote", { defaultValue: "It starts again automatically the next time an agent needs it." })}
               </p>
             </>
           )}
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={onCancel} disabled={pending}>
-            Cancel
+            {t("toolsPage.runtime.cancel", { defaultValue: "Cancel" })}
           </Button>
           <Button onClick={onConfirm} disabled={pending}>
             {pending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
-            {isRestart ? "Restart" : "Stop"}
+            {t(isRestart ? "toolsPage.runtime.restart" : "toolsPage.runtime.stop", { defaultValue: isRestart ? "Restart" : "Stop" })}
           </Button>
         </DialogFooter>
       </DialogContent>

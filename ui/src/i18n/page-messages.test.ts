@@ -418,6 +418,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issuePlanDecomposition, "owner")).toContain("{{name}}");
   });
 
+  it("translates issue workspace controls", () => {
+    const issueWorkspaceCard = group("issueWorkspaceCard");
+    expect(entry(issueWorkspaceCard, "projectDefault")).toBe("项目默认");
+    expect(entry(issueWorkspaceCard, "copyValue")).toContain("{{label}}");
+    expect(entry(nested(issueWorkspaceCard, "status"), "in_review")).toBe("审查中");
+    expect(entry(issueWorkspaceCard, "viewWorkspaceDetails")).toBe("查看工作区详情");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

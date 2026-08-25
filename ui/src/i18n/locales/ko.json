@@ -7348,6 +7348,7 @@
       "adminOnly": "Only administrators see this option.",
       "checkContinue": "Check & continue",
       "command": "Command",
+      "commandPlaceholder": "npx -y @acme/mcp-tool",
       "commandHelp": "The command that runs the tool. From the tool's README.",
       "description": "For a tool that runs from a command. Paperclip runs it in your company's own isolated workspace. Administrators only.",
       "invalidKey": "Use letters, numbers and underscores, starting with a letter or underscore (e.g. API_KEY).",
@@ -8089,6 +8090,166 @@
         "saved": "Profile saved",
         "updateFailed": "Could not update profile",
         "updated": "Profile updated"
+      }
+    },
+    "advancedRoute": {
+      "loading": "Loading…",
+      "title": "Advanced setup is for administrators",
+      "descriptionBeforeLink": "This area lets administrators wire up tools that aren't in the gallery. Ask an administrator if you need a new app connected, or head back to",
+      "yourApps": "your apps"
+    },
+    "profilesTab": {
+      "selector": {
+        "toolName": "Tool name",
+        "riskLevel": "Risk level",
+        "application": "Application",
+        "connection": "Connection",
+        "catalogEntry": "Catalog entry ID",
+        "label": "Selector"
+      },
+      "target": {
+        "company": "Company",
+        "agent": "Agent",
+        "project": "Project",
+        "routine": "Routine",
+        "issue": "Issue ID",
+        "gateway": "Gateway"
+      },
+      "effect": {
+        "include": "Include",
+        "exclude": "Exclude",
+        "label": "Effect"
+      },
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "disabled": "Disabled",
+        "archived": "Archived"
+      },
+      "defaultAction": {
+        "allow": "allow",
+        "deny": "deny",
+        "denyUnlessIncluded": "Deny unless included",
+        "allowUnlessExcluded": "Allow unless excluded",
+        "badge": "default {{action}}"
+      },
+      "fallback": {
+        "application": "application",
+        "connection": "connection",
+        "catalogEntry": "catalog entry",
+        "riskLevel": "risk level",
+        "tool": "tool"
+      },
+      "source": {
+        "application": "app:{{name}}",
+        "connection": "conn:{{name}}",
+        "risk": "risk:{{value}}",
+        "explicit": "explicit",
+        "defaultAllow": "default allow",
+        "pattern": "pattern {{label}}"
+      },
+      "binding": {
+        "unbound": "unbound",
+        "boundToAgent": "bound to {{count}} agent",
+        "boundToAgents": "bound to {{count}} agents",
+        "binding": "{{count}} binding",
+        "bindings": "{{count}} bindings"
+      },
+      "placeholder": {
+        "application": "Select an application",
+        "connection": "Select a connection",
+        "toolName": "e.g. send_email or slack.list_*",
+        "agent": "Select an agent",
+        "project": "Select a project",
+        "routine": "Select a routine",
+        "name": "Engineering write tools",
+        "description": "Optional context for reviewers."
+      },
+      "effective": {
+        "pickAgent": "Pick an agent to see what it can use right now.",
+        "checking": "Checking access...",
+        "canUse": "Can use",
+        "toolCount": "{{count}} tool",
+        "toolsCount": "{{count}} tools",
+        "noTools": "This agent cannot use any app tools right now.",
+        "profiles": "Access profiles",
+        "noProfiles": "No active profile applies to this agent."
+      },
+      "companyDefault": "Company default",
+      "allowList": {
+        "title": "Allow list",
+        "toolCount": "{{count}} tool",
+        "toolsCount": "{{count}} tools",
+        "explicitCount": "{{count}} explicit",
+        "patternCount": "{{count}} via pattern",
+        "defaultCount": "{{count}} via default",
+        "resolving": "Resolving allowed tools…",
+        "empty": "No tools resolved for this profile. Add an include selector or refresh the tool catalog.",
+        "tool": "Tool",
+        "capabilities": "Capabilities",
+        "risk": "Risk",
+        "source": "Source",
+        "patternNoticePrefix": "Tools marked",
+        "pattern": "pattern",
+        "patternNoticeSuffix": "were pulled in by a wildcard, application, connection, or risk selector rather than named explicitly — review them when the catalog changes."
+      },
+      "toast": {
+        "profileCreated": "Profile created",
+        "createFailed": "Could not create profile",
+        "profileUpdated": "Profile updated",
+        "updateFailed": "Could not update profile",
+        "entryAdded": "Entry added",
+        "addEntryFailed": "Could not add entry",
+        "entryRemoved": "Entry removed",
+        "removeEntryFailed": "Could not remove entry",
+        "profileBound": "Profile bound",
+        "bindFailed": "Could not bind profile",
+        "bindingRemoved": "Binding removed",
+        "removeBindingFailed": "Could not remove binding",
+        "entryTargetRequired": "Entry target required",
+        "bindingTargetRequired": "Binding target required"
+      },
+      "title": "Access profiles",
+      "description": "Reusable bundles of allowed applications, connections, and tools, assignable to agents, projects, routines, or issues.",
+      "newProfile": "New profile",
+      "emptyTitle": "No access profiles yet",
+      "emptyDescription": "Create a profile to group tool selectors, then bind it to the company or a specific agent.",
+      "editProfile": "Edit profile",
+      "profileDialogDescription": "Profile rules are enforced by the tool gateway policy service.",
+      "form": {
+        "name": "Name",
+        "key": "Key",
+        "description": "Description",
+        "defaultAction": "Default action",
+        "status": "Status",
+        "targetType": "Target type",
+        "priority": "Priority"
+      },
+      "cancel": "Cancel",
+      "save": "Save",
+      "creating": "Creating...",
+      "create": "Create",
+      "addEntry": "Add entry",
+      "bindProfile": "Bind profile",
+      "bind": "Bind",
+      "edit": "Edit",
+      "entry": "Entry",
+      "toolCount": "{{count}} tool",
+      "toolsCount": "{{count}} tools",
+      "updated": "updated",
+      "detail": {
+        "targets": "Targets",
+        "noTargets": "No targets bound.",
+        "effectiveScope": "Effective scope",
+        "default": "Default",
+        "toolAllowed": "{{count}} tool allowed",
+        "toolsAllowed": "{{count}} tools allowed",
+        "selectors": "Selectors",
+        "noSelectors": "No selectors."
+      },
+      "aria": {
+        "removeBinding": "Remove {{target}} binding",
+        "deleteEntry": "Delete {{selector}} entry"
       }
     },
     "gateways": {

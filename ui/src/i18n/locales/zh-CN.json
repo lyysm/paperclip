@@ -7238,6 +7238,7 @@
       "adminOnly": "只有管理员能看到此选项。",
       "checkContinue": "检查并继续",
       "command": "命令",
+      "commandPlaceholder": "npx -y @acme/mcp-tool",
       "commandHelp": "运行工具的命令，来自工具的 README。",
       "description": "适用于通过命令运行的工具。Paperclip 会在公司自己的隔离工作区中运行它。仅限管理员。",
       "invalidKey": "只能使用字母、数字和下划线，且必须以字母或下划线开头（例如 API_KEY）。",
@@ -7979,6 +7980,166 @@
         "saved": "配置已保存",
         "updateFailed": "无法更新配置",
         "updated": "配置已更新"
+      }
+    },
+    "advancedRoute": {
+      "loading": "正在加载…",
+      "title": "高级设置仅限管理员",
+      "descriptionBeforeLink": "此区域供管理员接入应用库中没有的工具。如需连接新应用，请联系管理员，或返回",
+      "yourApps": "你的应用"
+    },
+    "profilesTab": {
+      "selector": {
+        "toolName": "工具名称",
+        "riskLevel": "风险等级",
+        "application": "应用",
+        "connection": "连接",
+        "catalogEntry": "目录条目 ID",
+        "label": "选择器"
+      },
+      "target": {
+        "company": "公司",
+        "agent": "智能体",
+        "project": "项目",
+        "routine": "例行任务",
+        "issue": "议题 ID",
+        "gateway": "网关"
+      },
+      "effect": {
+        "include": "包含",
+        "exclude": "排除",
+        "label": "效果"
+      },
+      "status": {
+        "draft": "草稿",
+        "active": "启用",
+        "disabled": "已禁用",
+        "archived": "已归档"
+      },
+      "defaultAction": {
+        "allow": "允许",
+        "deny": "拒绝",
+        "denyUnlessIncluded": "除非被包含，否则拒绝",
+        "allowUnlessExcluded": "除非被排除，否则允许",
+        "badge": "默认{{action}}"
+      },
+      "fallback": {
+        "application": "应用",
+        "connection": "连接",
+        "catalogEntry": "目录条目",
+        "riskLevel": "风险等级",
+        "tool": "工具"
+      },
+      "source": {
+        "application": "应用：{{name}}",
+        "connection": "连接：{{name}}",
+        "risk": "风险：{{value}}",
+        "explicit": "明确指定",
+        "defaultAllow": "默认允许",
+        "pattern": "模式 {{label}}"
+      },
+      "binding": {
+        "unbound": "未绑定",
+        "boundToAgent": "绑定到 {{count}} 个智能体",
+        "boundToAgents": "绑定到 {{count}} 个智能体",
+        "binding": "{{count}} 个绑定",
+        "bindings": "{{count}} 个绑定"
+      },
+      "placeholder": {
+        "application": "选择应用",
+        "connection": "选择连接",
+        "toolName": "例如 send_email 或 slack.list_*",
+        "agent": "选择智能体",
+        "project": "选择项目",
+        "routine": "选择例行任务",
+        "name": "工程写入工具",
+        "description": "供审核者参考的可选上下文。"
+      },
+      "effective": {
+        "pickAgent": "选择一个智能体，查看它当前可以使用的内容。",
+        "checking": "正在检查访问权限…",
+        "canUse": "可以使用",
+        "toolCount": "{{count}} 个工具",
+        "toolsCount": "{{count}} 个工具",
+        "noTools": "此智能体当前无法使用任何应用工具。",
+        "profiles": "访问配置",
+        "noProfiles": "没有生效于此智能体的启用配置。"
+      },
+      "companyDefault": "公司默认",
+      "allowList": {
+        "title": "允许列表",
+        "toolCount": "{{count}} 个工具",
+        "toolsCount": "{{count}} 个工具",
+        "explicitCount": "{{count}} 个明确指定",
+        "patternCount": "{{count}} 个来自模式",
+        "defaultCount": "{{count}} 个来自默认设置",
+        "resolving": "正在解析允许的工具…",
+        "empty": "此配置没有解析出工具。请添加包含选择器，或刷新工具目录。",
+        "tool": "工具",
+        "capabilities": "能力",
+        "risk": "风险",
+        "source": "来源",
+        "patternNoticePrefix": "标记为",
+        "pattern": "模式",
+        "patternNoticeSuffix": "的工具来自通配符、应用、连接或风险选择器，而不是明确指定；工具目录变化后请重新检查。"
+      },
+      "toast": {
+        "profileCreated": "配置已创建",
+        "createFailed": "无法创建配置",
+        "profileUpdated": "配置已更新",
+        "updateFailed": "无法更新配置",
+        "entryAdded": "条目已添加",
+        "addEntryFailed": "无法添加条目",
+        "entryRemoved": "条目已移除",
+        "removeEntryFailed": "无法移除条目",
+        "profileBound": "配置已绑定",
+        "bindFailed": "无法绑定配置",
+        "bindingRemoved": "绑定已移除",
+        "removeBindingFailed": "无法移除绑定",
+        "entryTargetRequired": "必须指定条目目标",
+        "bindingTargetRequired": "必须指定绑定目标"
+      },
+      "title": "访问配置",
+      "description": "可复用的应用、连接和工具允许项集合，可分配给智能体、项目、例行任务或议题。",
+      "newProfile": "新建配置",
+      "emptyTitle": "还没有访问配置",
+      "emptyDescription": "创建配置来组织工具选择器，然后将它绑定到公司或特定智能体。",
+      "editProfile": "编辑配置",
+      "profileDialogDescription": "配置规则由工具网关策略服务执行。",
+      "form": {
+        "name": "名称",
+        "key": "键",
+        "description": "描述",
+        "defaultAction": "默认操作",
+        "status": "状态",
+        "targetType": "目标类型",
+        "priority": "优先级"
+      },
+      "cancel": "取消",
+      "save": "保存",
+      "creating": "正在创建…",
+      "create": "创建",
+      "addEntry": "添加条目",
+      "bindProfile": "绑定配置",
+      "bind": "绑定",
+      "edit": "编辑",
+      "entry": "条目",
+      "toolCount": "{{count}} 个工具",
+      "toolsCount": "{{count}} 个工具",
+      "updated": "更新于",
+      "detail": {
+        "targets": "目标",
+        "noTargets": "尚未绑定目标。",
+        "effectiveScope": "生效范围",
+        "default": "默认",
+        "toolAllowed": "允许 {{count}} 个工具",
+        "toolsAllowed": "允许 {{count}} 个工具",
+        "selectors": "选择器",
+        "noSelectors": "没有选择器。"
+      },
+      "aria": {
+        "removeBinding": "移除 {{target}} 绑定",
+        "deleteEntry": "删除 {{selector}} 条目"
       }
     },
     "gateways": {

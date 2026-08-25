@@ -4,6 +4,7 @@ import { Link } from "@/lib/router";
 import { accessApi } from "@/api/access";
 import { queryKeys } from "@/lib/queryKeys";
 import { useCompany } from "@/context/CompanyContext";
+import { t } from "@/i18n";
 import { ToolsAccess } from "./ToolsAccess";
 
 /**
@@ -22,7 +23,7 @@ export function AdvancedToolsRoute() {
   });
 
   if (boardAccess.isLoading) {
-    return <div className="mx-auto max-w-xl py-10 text-sm text-muted-foreground">Loading…</div>;
+    return <div className="mx-auto max-w-xl py-10 text-sm text-muted-foreground">{t("toolsPage.advancedRoute.loading", { defaultValue: "Loading…" })}</div>;
   }
 
   const data = boardAccess.data;
@@ -38,13 +39,12 @@ export function AdvancedToolsRoute() {
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
           <div className="flex items-center gap-2 text-foreground">
             <ShieldAlert className="h-5 w-5 text-muted-foreground" />
-            <h1 className="text-lg font-semibold">Advanced setup is for administrators</h1>
+            <h1 className="text-lg font-semibold">{t("toolsPage.advancedRoute.title", { defaultValue: "Advanced setup is for administrators" })}</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            This area lets administrators wire up tools that aren't in the gallery. Ask an administrator if you
-            need a new app connected, or head back to{" "}
+            {t("toolsPage.advancedRoute.descriptionBeforeLink", { defaultValue: "This area lets administrators wire up tools that aren't in the gallery. Ask an administrator if you need a new app connected, or head back to" })}{" "}
             <Link to="/apps" className="font-medium text-primary hover:underline">
-              your apps
+              {t("toolsPage.advancedRoute.yourApps", { defaultValue: "your apps" })}
             </Link>
             .
           </p>

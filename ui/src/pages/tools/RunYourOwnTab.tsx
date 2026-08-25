@@ -123,7 +123,7 @@ export function RunYourOwnTab({ companyId }: { companyId: string }) {
             id="ryo-command"
             value={command}
             onChange={(event) => setCommand(event.target.value)}
-            placeholder="npx -y @acme/mcp-tool"
+            placeholder={t("toolsPage.runYourOwn.commandPlaceholder", { defaultValue: "npx -y @acme/mcp-tool" })}
             spellCheck={false}
             className="bg-slate-900 font-mono text-(length:--text-compact) text-slate-100 placeholder:text-slate-500 focus-visible:ring-slate-400"
           />

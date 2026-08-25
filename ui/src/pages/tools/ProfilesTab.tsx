@@ -49,6 +49,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/context/ToastContext";
 import { EmptyState } from "@/components/EmptyState";
+import { t } from "@/i18n";
 import {
   CapabilityBadges,
   ErrorState,
@@ -58,23 +59,69 @@ import {
   ToolsPageHeader,
 } from "./shared";
 
-const SELECTOR_TYPES: Array<{ value: ToolProfileEntrySelectorType; label: string }> = [
-  { value: "tool_name", label: "Tool name" },
-  { value: "risk_level", label: "Risk level" },
-  { value: "application", label: "Application" },
-  { value: "connection", label: "Connection" },
-  { value: "catalog_entry", label: "Catalog entry ID" },
+const SELECTOR_TYPES: Array<{ value: ToolProfileEntrySelectorType }> = [
+  { value: "tool_name" },
+  { value: "risk_level" },
+  { value: "application" },
+  { value: "connection" },
+  { value: "catalog_entry" },
 ];
 
-const TARGET_TYPES: Array<{ value: ToolProfileBindingTargetType; label: string }> = [
-  { value: "company", label: "Company" },
-  { value: "agent", label: "Agent" },
-  { value: "project", label: "Project" },
-  { value: "routine", label: "Routine" },
-  { value: "issue", label: "Issue ID" },
+const TARGET_TYPES: Array<{ value: ToolProfileBindingTargetType }> = [
+  { value: "company" },
+  { value: "agent" },
+  { value: "project" },
+  { value: "routine" },
+  { value: "issue" },
 ];
 
 const RISK_LEVELS: ToolRiskLevel[] = ["read", "write", "destructive", "low", "medium", "high", "critical"];
+
+function selectorTypeLabel(value: ToolProfileEntrySelectorType): string {
+  switch (value) {
+    case "tool_name":
+      return t("toolsPage.profilesTab.selector.toolName", { defaultValue: "Tool name" });
+    case "risk_level":
+      return t("toolsPage.profilesTab.selector.riskLevel", { defaultValue: "Risk level" });
+    case "application":
+      return t("toolsPage.profilesTab.selector.application", { defaultValue: "Application" });
+    case "connection":
+      return t("toolsPage.profilesTab.selector.connection", { defaultValue: "Connection" });
+    case "catalog_entry":
+      return t("toolsPage.profilesTab.selector.catalogEntry", { defaultValue: "Catalog entry ID" });
+  }
+}
+
+function targetTypeLabel(value: ToolProfileBindingTargetType): string {
+  switch (value) {
+    case "company":
+      return t("toolsPage.profilesTab.target.company", { defaultValue: "Company" });
+    case "agent":
+      return t("toolsPage.profilesTab.target.agent", { defaultValue: "Agent" });
+    case "project":
+      return t("toolsPage.profilesTab.target.project", { defaultValue: "Project" });
+    case "routine":
+      return t("toolsPage.profilesTab.target.routine", { defaultValue: "Routine" });
+    case "issue":
+      return t("toolsPage.profilesTab.target.issue", { defaultValue: "Issue ID" });
+    case "gateway":
+      return t("toolsPage.profilesTab.target.gateway", { defaultValue: "Gateway" });
+  }
+}
+
+function effectLabel(value: ToolProfileEntryEffect): string {
+  return value === "include"
+    ? t("toolsPage.profilesTab.effect.include", { defaultValue: "Include" })
+    : t("toolsPage.profilesTab.effect.exclude", { defaultValue: "Exclude" });
+}
+
+function statusLabel(value: ToolProfileStatus): string {
+  return t(`toolsPage.profilesTab.status.${value}`, { defaultValue: value });
+}
+
+function defaultActionLabel(value: ToolProfileDefaultAction): string {
+  return t(`toolsPage.profilesTab.defaultAction.${value}`, { defaultValue: value });
+}
 
 function slugifyProfileKey(name: string) {
   return name
@@ -138,11 +185,15 @@ function entryLabel(
   applicationsById: Map<string, string>,
   connectionsById: Map<string, string>,
 ) {
-  if (entry.selectorType === "application") return applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? "application";
-  if (entry.selectorType === "connection") return connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? "connection";
-  if (entry.selectorType === "catalog_entry") return entry.catalogEntryId ?? "catalog entry";
-  if (entry.selectorType === "risk_level") return entry.riskLevel ?? "risk level";
-  return entry.toolName ?? "tool";
+  if (entry.selectorType === "application") {
+    return applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? t("toolsPage.profilesTab.fallback.application", { defaultValue: "application" });
+  }
+  if (entry.selectorType === "connection") {
+    return connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? t("toolsPage.profilesTab.fallback.connection", { defaultValue: "connection" });
+  }
+  if (entry.selectorType === "catalog_entry") return entry.catalogEntryId ?? t("toolsPage.profilesTab.fallback.catalogEntry", { defaultValue: "catalog entry" });
+  if (entry.selectorType === "risk_level") return entry.riskLevel ?? t("toolsPage.profilesTab.fallback.riskLevel", { defaultValue: "risk level" });
+  return entry.toolName ?? t("toolsPage.profilesTab.fallback.tool", { defaultValue: "tool" });
 }
 
 function bindingLabel(
@@ -155,7 +206,7 @@ function bindingLabel(
     routinesById: Map<string, string>;
   },
 ) {
-  if (targetType === "company") return targetId === labels.companyId ? "Company" : targetId;
+  if (targetType === "company") return targetId === labels.companyId ? targetTypeLabel("company") : targetId;
   if (targetType === "agent") return labels.agentsById.get(targetId) ?? targetId;
   if (targetType === "project") return labels.projectsById.get(targetId) ?? targetId;
   if (targetType === "routine") return labels.routinesById.get(targetId) ?? targetId;
@@ -164,10 +215,18 @@ function bindingLabel(
 
 /** Short, human subtitle for the master rail: prefers the agent count the spec calls for. */
 function bindingsSubtitle(bindings: ToolProfileBinding[]): string {
-  if (bindings.length === 0) return "unbound";
+  if (bindings.length === 0) return t("toolsPage.profilesTab.binding.unbound", { defaultValue: "unbound" });
   const agents = bindings.filter((b) => b.targetType === "agent").length;
-  if (agents === bindings.length) return `bound to ${agents} agent${agents === 1 ? "" : "s"}`;
-  return `${bindings.length} binding${bindings.length === 1 ? "" : "s"}`;
+  if (agents === bindings.length) {
+    return t(agents === 1 ? "toolsPage.profilesTab.binding.boundToAgent" : "toolsPage.profilesTab.binding.boundToAgents", {
+      defaultValue: agents === 1 ? "bound to {{count}} agent" : "bound to {{count}} agents",
+      count: agents,
+    });
+  }
+  return t(bindings.length === 1 ? "toolsPage.profilesTab.binding.binding" : "toolsPage.profilesTab.binding.bindings", {
+    defaultValue: bindings.length === 1 ? "{{count}} binding" : "{{count}} bindings",
+    count: bindings.length,
+  });
 }
 
 // --- Allow-list resolution ------------------------------------------------
@@ -239,12 +298,30 @@ function sourceFromEntry(
       : { kind: "explicit" };
   }
   if (entry.selectorType === "application") {
-    return { kind: "pattern", label: `app:${applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? "?"}` };
+    return {
+      kind: "pattern",
+      label: t("toolsPage.profilesTab.source.application", {
+        defaultValue: "app:{{name}}",
+        name: applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? "?",
+      }),
+    };
   }
   if (entry.selectorType === "connection") {
-    return { kind: "pattern", label: `conn:${connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? "?"}` };
+    return {
+      kind: "pattern",
+      label: t("toolsPage.profilesTab.source.connection", {
+        defaultValue: "conn:{{name}}",
+        name: connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? "?",
+      }),
+    };
   }
-  return { kind: "pattern", label: `risk:${entry.riskLevel ?? "?"}` };
+  return {
+    kind: "pattern",
+    label: t("toolsPage.profilesTab.source.risk", {
+      defaultValue: "risk:{{value}}",
+      value: entry.riskLevel ?? "?",
+    }),
+  };
 }
 
 export function resolveAllowList(
@@ -377,7 +454,7 @@ function EntryFields({
   return (
     <div className="grid gap-3 sm:grid-cols-(--gtc-60)">
       <div className="space-y-1.5">
-        <Label>Selector</Label>
+        <Label>{t("toolsPage.profilesTab.selector.label", { defaultValue: "Selector" })}</Label>
         <Select value={selectorType} onValueChange={(value) => setSelectorType(value as ToolProfileEntrySelectorType)}>
           <SelectTrigger>
             <SelectValue />
@@ -385,30 +462,30 @@ function EntryFields({
           <SelectContent>
             {SELECTOR_TYPES.map((type) => (
               <SelectItem key={type.value} value={type.value}>
-                {type.label}
+                {selectorTypeLabel(type.value)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       <div className="space-y-1.5">
-        <Label>Effect</Label>
+        <Label>{t("toolsPage.profilesTab.effect.label", { defaultValue: "Effect" })}</Label>
         <Select value={effect} onValueChange={(value) => setEffect(value as ToolProfileEntryEffect)}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="include">Include</SelectItem>
-            <SelectItem value="exclude">Exclude</SelectItem>
+            <SelectItem value="include">{effectLabel("include")}</SelectItem>
+            <SelectItem value="exclude">{effectLabel("exclude")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
       {selectorType === "application" ? (
         <div className="space-y-1.5 sm:col-span-2">
-          <Label>Application</Label>
+          <Label>{selectorTypeLabel("application")}</Label>
           <Select value={applicationId} onValueChange={setApplicationId}>
             <SelectTrigger>
-              <SelectValue placeholder="Select an application" />
+              <SelectValue placeholder={t("toolsPage.profilesTab.placeholder.application", { defaultValue: "Select an application" })} />
             </SelectTrigger>
             <SelectContent>
               {applications.map((app) => (
@@ -422,10 +499,10 @@ function EntryFields({
       ) : null}
       {selectorType === "connection" ? (
         <div className="space-y-1.5 sm:col-span-2">
-          <Label>Connection</Label>
+          <Label>{selectorTypeLabel("connection")}</Label>
           <Select value={connectionId} onValueChange={setConnectionId}>
             <SelectTrigger>
-              <SelectValue placeholder="Select a connection" />
+              <SelectValue placeholder={t("toolsPage.profilesTab.placeholder.connection", { defaultValue: "Select a connection" })} />
             </SelectTrigger>
             <SelectContent>
               {connections.map((conn) => (
@@ -439,19 +516,24 @@ function EntryFields({
       ) : null}
       {selectorType === "catalog_entry" ? (
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="catalog-entry-id">Catalog entry ID</Label>
+          <Label htmlFor="catalog-entry-id">{selectorTypeLabel("catalog_entry")}</Label>
           <Input id="catalog-entry-id" value={catalogEntryId} onChange={(event) => setCatalogEntryId(event.target.value)} />
         </div>
       ) : null}
       {selectorType === "tool_name" ? (
         <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="tool-name">Tool name</Label>
-          <Input id="tool-name" value={toolName} onChange={(event) => setToolName(event.target.value)} placeholder="e.g. send_email or slack.list_*" />
+          <Label htmlFor="tool-name">{selectorTypeLabel("tool_name")}</Label>
+          <Input
+            id="tool-name"
+            value={toolName}
+            onChange={(event) => setToolName(event.target.value)}
+            placeholder={t("toolsPage.profilesTab.placeholder.toolName", { defaultValue: "e.g. send_email or slack.list_*" })}
+          />
         </div>
       ) : null}
       {selectorType === "risk_level" ? (
         <div className="space-y-1.5 sm:col-span-2">
-          <Label>Risk level</Label>
+          <Label>{selectorTypeLabel("risk_level")}</Label>
           <Select value={riskLevel} onValueChange={(value) => setRiskLevel(value as ToolRiskLevel)}>
             <SelectTrigger>
               <SelectValue />
@@ -483,10 +565,10 @@ export function EffectiveAgentPanel({ companyId, agentOptions }: { companyId: st
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="space-y-1.5">
-        <Label>Agent</Label>
+        <Label>{targetTypeLabel("agent")}</Label>
         <Select value={agentId} onValueChange={setAgentId}>
           <SelectTrigger>
-            <SelectValue placeholder="Select an agent" />
+            <SelectValue placeholder={t("toolsPage.profilesTab.placeholder.agent", { defaultValue: "Select an agent" })} />
           </SelectTrigger>
           <SelectContent>
             {agentOptions.map((agent) => (
@@ -499,24 +581,32 @@ export function EffectiveAgentPanel({ companyId, agentOptions }: { companyId: st
       </div>
       {!agentId ? (
         <div className="rounded-lg border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
-          Pick an agent to see what it can use right now.
+          {t("toolsPage.profilesTab.effective.pickAgent", { defaultValue: "Pick an agent to see what it can use right now." })}
         </div>
       ) : effective.isLoading ? (
-        <LoadingState label="Checking access..." />
+        <LoadingState label={t("toolsPage.profilesTab.effective.checking", { defaultValue: "Checking access..." })} />
       ) : effective.error ? (
         <ErrorState error={effective.error} onRetry={() => effective.refetch()} />
       ) : (
         <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-foreground">Can use</h3>
+              <h3 className="text-sm font-semibold text-foreground">{t("toolsPage.profilesTab.effective.canUse", { defaultValue: "Can use" })}</h3>
               <span className="text-xs text-muted-foreground tabular-nums">
-                {(effective.data?.allowedToolNames ?? []).length} tools
+                {t(
+                  (effective.data?.allowedToolNames ?? []).length === 1
+                    ? "toolsPage.profilesTab.effective.toolCount"
+                    : "toolsPage.profilesTab.effective.toolsCount",
+                  {
+                    defaultValue: (effective.data?.allowedToolNames ?? []).length === 1 ? "{{count}} tool" : "{{count}} tools",
+                    count: (effective.data?.allowedToolNames ?? []).length,
+                  },
+                )}
               </span>
             </div>
             {(effective.data?.allowedToolNames ?? []).length === 0 ? (
               <div className="rounded-lg border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
-                This agent cannot use any app tools right now.
+                {t("toolsPage.profilesTab.effective.noTools", { defaultValue: "This agent cannot use any app tools right now." })}
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
@@ -527,10 +617,10 @@ export function EffectiveAgentPanel({ companyId, agentOptions }: { companyId: st
             )}
           </div>
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-foreground">Access profiles</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t("toolsPage.profilesTab.effective.profiles", { defaultValue: "Access profiles" })}</h3>
             {(effective.data?.profiles ?? []).length === 0 ? (
               <div className="rounded-lg border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
-                No active profile applies to this agent.
+                {t("toolsPage.profilesTab.effective.noProfiles", { defaultValue: "No active profile applies to this agent." })}
               </div>
             ) : (
               <div className="divide-y divide-border rounded-lg border border-border">
@@ -538,7 +628,7 @@ export function EffectiveAgentPanel({ companyId, agentOptions }: { companyId: st
                   <div key={profile.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
                     <span className="min-w-0 truncate text-sm font-medium text-foreground">{profile.name}</span>
                     {profile.summary.isCompanyDefault ? (
-                      <Badge variant="secondary">Company default</Badge>
+                      <Badge variant="secondary">{t("toolsPage.profilesTab.companyDefault", { defaultValue: "Company default" })}</Badge>
                     ) : null}
                   </div>
                 ))}
@@ -554,15 +644,17 @@ export function EffectiveAgentPanel({ companyId, agentOptions }: { companyId: st
 /** The Source column — the key v2 addition. Patterns are flagged as a foot-gun. */
 function SourceBadge({ source }: { source: AllowSource }) {
   if (source.kind === "explicit") {
-    return <Badge variant="secondary">explicit</Badge>;
+    return <Badge variant="secondary">{t("toolsPage.profilesTab.source.explicit", { defaultValue: "explicit" })}</Badge>;
   }
   if (source.kind === "default") {
-    return <Badge variant="outline">default allow</Badge>;
+    return <Badge variant="outline">{t("toolsPage.profilesTab.source.defaultAllow", { defaultValue: "default allow" })}</Badge>;
   }
   return (
     <Badge variant="outline" className="gap-1 border-amber-500/50 text-amber-700 dark:text-amber-400">
       <AlertTriangle className="h-3 w-3" />
-      <span className="font-mono text-(length:--text-micro)">pattern {source.label}</span>
+      <span className="font-mono text-(length:--text-micro)">
+        {t("toolsPage.profilesTab.source.pattern", { defaultValue: "pattern {{label}}", label: source.label })}
+      </span>
     </Badge>
   );
 }
@@ -575,19 +667,22 @@ function AllowList({ rows, catalogLoading }: { rows: AllowListRow[]; catalogLoad
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h4 className="text-sm font-semibold text-foreground">Allow list</h4>
+        <h4 className="text-sm font-semibold text-foreground">{t("toolsPage.profilesTab.allowList.title", { defaultValue: "Allow list" })}</h4>
         <p className="text-xs text-muted-foreground">
-          {rows.length} tool{rows.length === 1 ? "" : "s"}
-          {explicitCount > 0 ? ` · ${explicitCount} explicit` : ""}
-          {patternCount > 0 ? ` · ${patternCount} via pattern` : ""}
-          {defaultCount > 0 ? ` · ${defaultCount} via default` : ""}
+          {t(rows.length === 1 ? "toolsPage.profilesTab.allowList.toolCount" : "toolsPage.profilesTab.allowList.toolsCount", {
+            defaultValue: rows.length === 1 ? "{{count}} tool" : "{{count}} tools",
+            count: rows.length,
+          })}
+          {explicitCount > 0 ? ` · ${t("toolsPage.profilesTab.allowList.explicitCount", { defaultValue: "{{count}} explicit", count: explicitCount })}` : ""}
+          {patternCount > 0 ? ` · ${t("toolsPage.profilesTab.allowList.patternCount", { defaultValue: "{{count}} via pattern", count: patternCount })}` : ""}
+          {defaultCount > 0 ? ` · ${t("toolsPage.profilesTab.allowList.defaultCount", { defaultValue: "{{count}} via default", count: defaultCount })}` : ""}
         </p>
       </div>
       {rows.length === 0 ? (
         <div className="rounded-md border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground">
           {catalogLoading
-            ? "Resolving allowed tools…"
-            : "No tools resolved for this profile. Add an include selector or refresh the tool catalog."}
+            ? t("toolsPage.profilesTab.allowList.resolving", { defaultValue: "Resolving allowed tools…" })
+            : t("toolsPage.profilesTab.allowList.empty", { defaultValue: "No tools resolved for this profile. Add an include selector or refresh the tool catalog." })}
         </div>
       ) : (
         <Card>
@@ -595,11 +690,11 @@ function AllowList({ rows, catalogLoading }: { rows: AllowListRow[]; catalogLoad
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="px-3 py-2.5 font-medium">Tool</th>
-                  <th className="px-3 py-2.5 font-medium">Application</th>
-                  <th className="px-3 py-2.5 font-medium">Capabilities</th>
-                  <th className="px-3 py-2.5 font-medium">Risk</th>
-                  <th className="px-3 py-2.5 font-medium">Source</th>
+                  <th className="px-3 py-2.5 font-medium">{t("toolsPage.profilesTab.allowList.tool", { defaultValue: "Tool" })}</th>
+                  <th className="px-3 py-2.5 font-medium">{selectorTypeLabel("application")}</th>
+                  <th className="px-3 py-2.5 font-medium">{t("toolsPage.profilesTab.allowList.capabilities", { defaultValue: "Capabilities" })}</th>
+                  <th className="px-3 py-2.5 font-medium">{t("toolsPage.profilesTab.allowList.risk", { defaultValue: "Risk" })}</th>
+                  <th className="px-3 py-2.5 font-medium">{t("toolsPage.profilesTab.allowList.source", { defaultValue: "Source" })}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -638,8 +733,11 @@ function AllowList({ rows, catalogLoading }: { rows: AllowListRow[]; catalogLoad
       {patternCount > 0 ? (
         <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
           <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
-          Tools marked <span className="font-medium">pattern</span> were pulled in by a wildcard, application,
-          connection, or risk selector rather than named explicitly — review them when the catalog changes.
+          {t("toolsPage.profilesTab.allowList.patternNoticePrefix", { defaultValue: "Tools marked" })}{" "}
+          <span className="font-medium">{t("toolsPage.profilesTab.allowList.pattern", { defaultValue: "pattern" })}</span>{" "}
+          {t("toolsPage.profilesTab.allowList.patternNoticeSuffix", {
+            defaultValue: "were pulled in by a wildcard, application, connection, or risk selector rather than named explicitly — review them when the catalog changes.",
+          })}
         </p>
       ) : null}
     </div>
@@ -736,10 +834,10 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       setSelectedId(created.id);
       resetProfileForm();
       resetEntryForm();
-      pushToast({ title: "Profile created", tone: "success" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.profileCreated", { defaultValue: "Profile created" }), tone: "success" });
     },
     onError: (error) => pushToast({
-      title: "Could not create profile",
+      title: t("toolsPage.profilesTab.toast.createFailed", { defaultValue: "Could not create profile" }),
       body: error instanceof ApiError ? error.message : String(error),
       tone: "error",
     }),
@@ -752,10 +850,10 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       invalidateProfiles();
       setEditProfile(null);
       resetProfileForm();
-      pushToast({ title: "Profile updated", tone: "success" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.profileUpdated", { defaultValue: "Profile updated" }), tone: "success" });
     },
     onError: (error) => pushToast({
-      title: "Could not update profile",
+      title: t("toolsPage.profilesTab.toast.updateFailed", { defaultValue: "Could not update profile" }),
       body: error instanceof ApiError ? error.message : String(error),
       tone: "error",
     }),
@@ -768,10 +866,10 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       invalidateProfiles();
       setEntryProfile(null);
       resetEntryForm();
-      pushToast({ title: "Entry added", tone: "success" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.entryAdded", { defaultValue: "Entry added" }), tone: "success" });
     },
     onError: (error) => pushToast({
-      title: "Could not add entry",
+      title: t("toolsPage.profilesTab.toast.addEntryFailed", { defaultValue: "Could not add entry" }),
       body: error instanceof ApiError ? error.message : String(error),
       tone: "error",
     }),
@@ -781,10 +879,10 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
     mutationFn: (entryId: string) => toolsApi.deleteProfileEntry(entryId),
     onSuccess: () => {
       invalidateProfiles();
-      pushToast({ title: "Entry removed", tone: "success" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.entryRemoved", { defaultValue: "Entry removed" }), tone: "success" });
     },
     onError: (error) => pushToast({
-      title: "Could not remove entry",
+      title: t("toolsPage.profilesTab.toast.removeEntryFailed", { defaultValue: "Could not remove entry" }),
       body: error instanceof ApiError ? error.message : String(error),
       tone: "error",
     }),
@@ -798,10 +896,10 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       setBindProfileFor(null);
       setTargetType("agent");
       setPriority("100");
-      pushToast({ title: "Profile bound", tone: "success" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.profileBound", { defaultValue: "Profile bound" }), tone: "success" });
     },
     onError: (error) => pushToast({
-      title: "Could not bind profile",
+      title: t("toolsPage.profilesTab.toast.bindFailed", { defaultValue: "Could not bind profile" }),
       body: error instanceof ApiError ? error.message : String(error),
       tone: "error",
     }),
@@ -815,10 +913,10 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
     }) => toolsApi.unbindProfile(companyId, profileId, { targetType, targetId }),
     onSuccess: () => {
       invalidateProfiles();
-      pushToast({ title: "Binding removed", tone: "success" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.bindingRemoved", { defaultValue: "Binding removed" }), tone: "success" });
     },
     onError: (error) => pushToast({
-      title: "Could not remove binding",
+      title: t("toolsPage.profilesTab.toast.removeBindingFailed", { defaultValue: "Could not remove binding" }),
       body: error instanceof ApiError ? error.message : String(error),
       tone: "error",
     }),
@@ -886,7 +984,7 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       riskLevel,
     });
     if (!entry) {
-      pushToast({ title: "Entry target required", tone: "error" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.entryTargetRequired", { defaultValue: "Entry target required" }), tone: "error" });
       return;
     }
     addEntry.mutate({ profileId: entryProfile.id, input: entry });
@@ -903,7 +1001,7 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       issueId: targetIssueId,
     });
     if (!targetId) {
-      pushToast({ title: "Binding target required", tone: "error" });
+      pushToast({ title: t("toolsPage.profilesTab.toast.bindingTargetRequired", { defaultValue: "Binding target required" }), tone: "error" });
       return;
     }
     bind.mutate({
@@ -919,12 +1017,12 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
   return (
     <div className="space-y-4">
       <ToolsPageHeader
-        title="Access profiles"
-        description="Reusable bundles of allowed applications, connections, and tools, assignable to agents, projects, routines, or issues."
+        title={t("toolsPage.profilesTab.title", { defaultValue: "Access profiles" })}
+        description={t("toolsPage.profilesTab.description", { defaultValue: "Reusable bundles of allowed applications, connections, and tools, assignable to agents, projects, routines, or issues." })}
         actions={
           <Button size="sm" onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
-            New profile
+            {t("toolsPage.profilesTab.newProfile", { defaultValue: "New profile" })}
           </Button>
         }
       />
@@ -934,9 +1032,9 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       {list.length === 0 ? (
         <EmptyState
           icon={Layers}
-          message="No access profiles yet"
-          description="Create a profile to group tool selectors, then bind it to the company or a specific agent."
-          action="New profile"
+          message={t("toolsPage.profilesTab.emptyTitle", { defaultValue: "No access profiles yet" })}
+          description={t("toolsPage.profilesTab.emptyDescription", { defaultValue: "Create a profile to group tool selectors, then bind it to the company or a specific agent." })}
+          action={t("toolsPage.profilesTab.newProfile", { defaultValue: "New profile" })}
           onAction={() => setCreateOpen(true)}
         />
       ) : (
@@ -967,12 +1065,15 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
                           <span className="truncate font-medium text-foreground">{profile.name}</span>
                           {profile.status !== "active" ? (
                             <Badge variant={statusVariant(profile.status)} className="text-(length:--text-nano)">
-                              {profile.status}
+                              {statusLabel(profile.status)}
                             </Badge>
                           ) : null}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {toolCount} tool{toolCount === 1 ? "" : "s"} · {bindingsSubtitle(profile.bindings)}
+                          {t(toolCount === 1 ? "toolsPage.profilesTab.toolCount" : "toolsPage.profilesTab.toolsCount", {
+                            defaultValue: toolCount === 1 ? "{{count}} tool" : "{{count}} tools",
+                            count: toolCount,
+                          })} · {bindingsSubtitle(profile.bindings)}
                         </span>
                       </button>
                     </li>
@@ -1019,15 +1120,17 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editProfile ? "Edit profile" : "New profile"}</DialogTitle>
+            <DialogTitle>{editProfile
+              ? t("toolsPage.profilesTab.editProfile", { defaultValue: "Edit profile" })
+              : t("toolsPage.profilesTab.newProfile", { defaultValue: "New profile" })}</DialogTitle>
             <DialogDescription>
-              Profile rules are enforced by the tool gateway policy service.
+              {t("toolsPage.profilesTab.profileDialogDescription", { defaultValue: "Profile rules are enforced by the tool gateway policy service." })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="profile-name">Name</Label>
+                <Label htmlFor="profile-name">{t("toolsPage.profilesTab.form.name", { defaultValue: "Name" })}</Label>
                 <Input
                   id="profile-name"
                   value={name}
@@ -1035,46 +1138,46 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
                     setName(event.target.value);
                     if (!editProfile && !profileKey.trim()) setProfileKey(slugifyProfileKey(event.target.value));
                   }}
-                  placeholder="Engineering write tools"
+                  placeholder={t("toolsPage.profilesTab.placeholder.name", { defaultValue: "Engineering write tools" })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="profile-key">Key</Label>
+                <Label htmlFor="profile-key">{t("toolsPage.profilesTab.form.key", { defaultValue: "Key" })}</Label>
                 <Input id="profile-key" value={profileKey} onChange={(event) => setProfileKey(event.target.value)} />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="profile-description">Description</Label>
+              <Label htmlFor="profile-description">{t("toolsPage.profilesTab.form.description", { defaultValue: "Description" })}</Label>
               <Textarea
                 id="profile-description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Optional context for reviewers."
+                placeholder={t("toolsPage.profilesTab.placeholder.description", { defaultValue: "Optional context for reviewers." })}
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Default action</Label>
+                <Label>{t("toolsPage.profilesTab.form.defaultAction", { defaultValue: "Default action" })}</Label>
                 <Select value={defaultAction} onValueChange={(value) => setDefaultAction(value as ToolProfileDefaultAction)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="deny">Deny unless included</SelectItem>
-                    <SelectItem value="allow">Allow unless excluded</SelectItem>
+                    <SelectItem value="deny">{t("toolsPage.profilesTab.defaultAction.denyUnlessIncluded", { defaultValue: "Deny unless included" })}</SelectItem>
+                    <SelectItem value="allow">{t("toolsPage.profilesTab.defaultAction.allowUnlessExcluded", { defaultValue: "Allow unless excluded" })}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Status</Label>
+                <Label>{t("toolsPage.profilesTab.form.status", { defaultValue: "Status" })}</Label>
                 <Select value={status} onValueChange={(value) => setStatus(value as ToolProfileStatus)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="disabled">Disabled</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
+                    <SelectItem value="active">{statusLabel("active")}</SelectItem>
+                    <SelectItem value="disabled">{statusLabel("disabled")}</SelectItem>
+                    <SelectItem value="archived">{statusLabel("archived")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1107,10 +1210,14 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
               resetProfileForm();
               resetEntryForm();
             }}>
-              Cancel
+              {t("toolsPage.profilesTab.cancel", { defaultValue: "Cancel" })}
             </Button>
             <Button disabled={!name.trim() || createProfile.isPending || updateProfile.isPending} onClick={saveProfile}>
-              {editProfile ? "Save" : createProfile.isPending ? "Creating..." : "Create"}
+              {editProfile
+                ? t("toolsPage.profilesTab.save", { defaultValue: "Save" })
+                : createProfile.isPending
+                  ? t("toolsPage.profilesTab.creating", { defaultValue: "Creating..." })
+                  : t("toolsPage.profilesTab.create", { defaultValue: "Create" })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1124,7 +1231,7 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Add entry</DialogTitle>
+            <DialogTitle>{t("toolsPage.profilesTab.addEntry", { defaultValue: "Add entry" })}</DialogTitle>
             <DialogDescription>{entryProfile?.name}</DialogDescription>
           </DialogHeader>
           <EntryFields
@@ -1146,9 +1253,9 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
             connections={connectionOptions}
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEntryProfile(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setEntryProfile(null)}>{t("toolsPage.profilesTab.cancel", { defaultValue: "Cancel" })}</Button>
             <Button disabled={addEntry.isPending} onClick={saveEntry}>
-              Add entry
+              {t("toolsPage.profilesTab.addEntry", { defaultValue: "Add entry" })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1159,12 +1266,12 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Bind profile</DialogTitle>
+            <DialogTitle>{t("toolsPage.profilesTab.bindProfile", { defaultValue: "Bind profile" })}</DialogTitle>
             <DialogDescription>{bindProfileFor?.name}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label>Target type</Label>
+              <Label>{t("toolsPage.profilesTab.form.targetType", { defaultValue: "Target type" })}</Label>
               <Select value={targetType} onValueChange={(value) => setTargetType(value as ToolProfileBindingTargetType)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1172,7 +1279,7 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
                 <SelectContent>
                   {TARGET_TYPES.map((target) => (
                     <SelectItem key={target.value} value={target.value}>
-                      {target.label}
+                      {targetTypeLabel(target.value)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1180,9 +1287,9 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
             </div>
             {targetType === "agent" ? (
               <div className="space-y-1.5">
-                <Label>Agent</Label>
+                <Label>{targetTypeLabel("agent")}</Label>
                 <Select value={targetAgentId} onValueChange={setTargetAgentId}>
-                  <SelectTrigger><SelectValue placeholder="Select an agent" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("toolsPage.profilesTab.placeholder.agent", { defaultValue: "Select an agent" })} /></SelectTrigger>
                   <SelectContent>
                     {agentOptions.map((agent) => <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>)}
                   </SelectContent>
@@ -1191,9 +1298,9 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
             ) : null}
             {targetType === "project" ? (
               <div className="space-y-1.5">
-                <Label>Project</Label>
+                <Label>{targetTypeLabel("project")}</Label>
                 <Select value={targetProjectId} onValueChange={setTargetProjectId}>
-                  <SelectTrigger><SelectValue placeholder="Select a project" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("toolsPage.profilesTab.placeholder.project", { defaultValue: "Select a project" })} /></SelectTrigger>
                   <SelectContent>
                     {projectOptions.map((project) => <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>)}
                   </SelectContent>
@@ -1202,9 +1309,9 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
             ) : null}
             {targetType === "routine" ? (
               <div className="space-y-1.5">
-                <Label>Routine</Label>
+                <Label>{targetTypeLabel("routine")}</Label>
                 <Select value={targetRoutineId} onValueChange={setTargetRoutineId}>
-                  <SelectTrigger><SelectValue placeholder="Select a routine" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("toolsPage.profilesTab.placeholder.routine", { defaultValue: "Select a routine" })} /></SelectTrigger>
                   <SelectContent>
                     {routineOptions.map((routine) => <SelectItem key={routine.id} value={routine.id}>{routine.title}</SelectItem>)}
                   </SelectContent>
@@ -1213,19 +1320,19 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
             ) : null}
             {targetType === "issue" ? (
               <div className="space-y-1.5">
-                <Label htmlFor="target-issue-id">Issue ID</Label>
+                <Label htmlFor="target-issue-id">{targetTypeLabel("issue")}</Label>
                 <Input id="target-issue-id" value={targetIssueId} onChange={(event) => setTargetIssueId(event.target.value)} />
               </div>
             ) : null}
             <div className="space-y-1.5">
-              <Label htmlFor="profile-priority">Priority</Label>
+              <Label htmlFor="profile-priority">{t("toolsPage.profilesTab.form.priority", { defaultValue: "Priority" })}</Label>
               <Input id="profile-priority" type="number" min={0} max={10000} value={priority} onChange={(event) => setPriority(event.target.value)} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setBindProfileFor(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setBindProfileFor(null)}>{t("toolsPage.profilesTab.cancel", { defaultValue: "Cancel" })}</Button>
             <Button disabled={bind.isPending} onClick={saveBinding}>
-              Bind
+              {t("toolsPage.profilesTab.bind", { defaultValue: "Bind" })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1281,50 +1388,50 @@ function ProfileDetail({
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-medium text-foreground">{profile.name}</span>
               <Badge variant="outline">{profile.profileKey}</Badge>
-              <Badge variant={statusVariant(profile.status)}>{profile.status}</Badge>
+              <Badge variant={statusVariant(profile.status)}>{statusLabel(profile.status)}</Badge>
               <Badge variant={profile.defaultAction === "allow" ? "secondary" : "outline"}>
-                default {profile.defaultAction}
+                {t("toolsPage.profilesTab.defaultAction.badge", { defaultValue: "default {{action}}", action: defaultActionLabel(profile.defaultAction) })}
               </Badge>
             </div>
             {profile.description ? (
               <p className="mt-1 text-sm text-muted-foreground">{profile.description}</p>
             ) : null}
             <p className="mt-1 text-xs text-muted-foreground">
-              updated <RelativeTime value={profile.updatedAt} />
+              {t("toolsPage.profilesTab.updated", { defaultValue: "updated" })} <RelativeTime value={profile.updatedAt} />
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-1.5">
             <Button size="sm" variant="outline" onClick={onEdit}>
               <Pencil className="mr-1 h-3.5 w-3.5" />
-              Edit
+              {t("toolsPage.profilesTab.edit", { defaultValue: "Edit" })}
             </Button>
             <Button size="sm" variant="outline" onClick={onAddEntry}>
               <Plus className="mr-1 h-3.5 w-3.5" />
-              Entry
+              {t("toolsPage.profilesTab.entry", { defaultValue: "Entry" })}
             </Button>
             <Button size="sm" variant="outline" onClick={onBind}>
               <Link2 className="mr-1 h-3.5 w-3.5" />
-              Bind
+              {t("toolsPage.profilesTab.bind", { defaultValue: "Bind" })}
             </Button>
           </div>
         </div>
 
         {/* Targets */}
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-foreground">Targets</h4>
+          <h4 className="text-sm font-semibold text-foreground">{t("toolsPage.profilesTab.detail.targets", { defaultValue: "Targets" })}</h4>
           <div className="flex flex-wrap gap-2">
             {profile.bindings.length === 0 ? (
-              <span className="text-sm text-muted-foreground">No targets bound.</span>
+              <span className="text-sm text-muted-foreground">{t("toolsPage.profilesTab.detail.noTargets", { defaultValue: "No targets bound." })}</span>
             ) : profile.bindings.map((binding) => (
               <span key={binding.id} className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs">
-                <Badge variant="outline">{binding.targetType}</Badge>
+                <Badge variant="outline">{targetTypeLabel(binding.targetType)}</Badge>
                 <span>{bindingLabel(binding.targetType, binding.targetId, { companyId, ...maps })}</span>
                 <span className="text-muted-foreground">p{binding.priority}</span>
                 <button
                   type="button"
                   className="rounded p-0.5 text-muted-foreground hover:text-destructive"
                   onClick={() => onUnbind(binding)}
-                  aria-label={`Remove ${binding.targetType} binding`}
+                  aria-label={t("toolsPage.profilesTab.aria.removeBinding", { defaultValue: "Remove {{target}} binding", target: targetTypeLabel(binding.targetType) })}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -1335,31 +1442,35 @@ function ProfileDetail({
 
         {/* Effective scope summary */}
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-foreground">Effective scope</h4>
+          <h4 className="text-sm font-semibold text-foreground">{t("toolsPage.profilesTab.detail.effectiveScope", { defaultValue: "Effective scope" })}</h4>
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="rounded-md border border-border px-2 py-1 text-muted-foreground">
-              Default <span className="font-medium text-foreground">{profile.defaultAction}</span>
+              {t("toolsPage.profilesTab.detail.default", { defaultValue: "Default" })}{" "}
+              <span className="font-medium text-foreground">{defaultActionLabel(profile.defaultAction)}</span>
             </span>
             <span className="rounded-md border border-border px-2 py-1 text-muted-foreground">
-              <span className="font-medium text-foreground">{rows.length}</span> tools allowed
+              {t(rows.length === 1 ? "toolsPage.profilesTab.detail.toolAllowed" : "toolsPage.profilesTab.detail.toolsAllowed", {
+                defaultValue: rows.length === 1 ? "{{count}} tool allowed" : "{{count}} tools allowed",
+                count: rows.length,
+              })}
             </span>
             <span className="rounded-md border border-border px-2 py-1 text-muted-foreground">
-              <span className="font-medium text-foreground">{includeCount}</span> include /{" "}
-              <span className="font-medium text-foreground">{excludeCount}</span> exclude
+              <span className="font-medium text-foreground">{includeCount}</span> {effectLabel("include").toLowerCase()} /{" "}
+              <span className="font-medium text-foreground">{excludeCount}</span> {effectLabel("exclude").toLowerCase()}
             </span>
           </div>
         </div>
 
         {/* Selectors (entry management) */}
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-foreground">Selectors</h4>
+          <h4 className="text-sm font-semibold text-foreground">{t("toolsPage.profilesTab.detail.selectors", { defaultValue: "Selectors" })}</h4>
           <div className="flex flex-wrap gap-2">
             {profile.entries.length === 0 ? (
-              <span className="text-sm text-muted-foreground">No selectors.</span>
+              <span className="text-sm text-muted-foreground">{t("toolsPage.profilesTab.detail.noSelectors", { defaultValue: "No selectors." })}</span>
             ) : profile.entries.map((entry) => (
               <span key={entry.id} className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs">
-                <Badge variant={entry.effect === "include" ? "secondary" : "destructive"}>{entry.effect}</Badge>
-                <span className="font-mono">{entry.selectorType}</span>
+                <Badge variant={entry.effect === "include" ? "secondary" : "destructive"}>{effectLabel(entry.effect)}</Badge>
+                <span className="font-mono">{selectorTypeLabel(entry.selectorType)}</span>
                 {entry.selectorType === "risk_level" ? <RiskBadge risk={entry.riskLevel} /> : (
                   <span className="max-w-64 truncate">{entryLabel(entry, maps.applicationsById, maps.connectionsById)}</span>
                 )}
@@ -1367,7 +1478,7 @@ function ProfileDetail({
                   type="button"
                   className="rounded p-0.5 text-muted-foreground hover:text-destructive"
                   onClick={() => onDeleteEntry(entry.id)}
-                  aria-label={`Delete ${entry.selectorType} entry`}
+                  aria-label={t("toolsPage.profilesTab.aria.deleteEntry", { defaultValue: "Delete {{selector}} entry", selector: selectorTypeLabel(entry.selectorType) })}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

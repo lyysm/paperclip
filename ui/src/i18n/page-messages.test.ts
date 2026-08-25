@@ -370,6 +370,15 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(issueDetail, "reviewPolicyValue"), "human_only")).toBe("仅限人工");
   });
 
+  it("translates the issue documents section", () => {
+    const issueDocuments = group("issueDocuments");
+    expect(entry(issueDocuments, "documents")).toBe("文档");
+    expect(entry(issueDocuments, "lockDocumentAria")).toContain("{{key}}");
+    expect(entry(issueDocuments, "viewingRevision")).toContain("{{revision}}");
+    expect(entry(issueDocuments, "remoteRevision")).toContain("{{revision}}");
+    expect(entry(issueDocuments, "updated")).toContain("{{time}}");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

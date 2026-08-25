@@ -454,6 +454,21 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(statusCards, "archived"), "summaryLine")).toContain("{{lastSummary}}");
   });
 
+  it("translates live runs, goal details, and join request queue copy", () => {
+    const liveRuns = group("dashboardLive");
+    expect(entry(liveRuns, "title")).toBe("智能体实时运行");
+    expect(entry(liveRuns, "showingUpTo")).toContain("{{count}}");
+
+    const goalDetail = group("goalDetail");
+    expect(entry(goalDetail, "showProperties")).toBe("显示属性");
+    expect(entry(goalDetail, "subGoals")).toContain("{{count}}");
+
+    const joinRequests = group("joinRequestQueue");
+    expect(entry(joinRequests, "title")).toBe("加入请求队列");
+    expect(entry(joinRequests, "inviteSummary")).toContain("{{roleSuffix}}");
+    expect(entry(joinRequests, "submitted")).toContain("{{time}}");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

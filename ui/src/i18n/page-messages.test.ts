@@ -535,6 +535,10 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueRecovery, "unassignedPickOne")).toContain("未分配");
     expect(entry(issueRecovery, "reissueBody")).toContain("worktree");
     expect(entry(issueRecovery, "retryMissedAt")).toContain("{{offset}}");
+    expect(entry(issueRecovery, "ancestryVerdict")).toBe("祖先判定");
+    expect(entry(issueRecovery, "boardActor")).toBe("看板");
+    expect(entry(issueRecovery, "systemActor")).toBe("系统");
+    expect(entry(issueRecovery, "restoreTo")).toBe("恢复至");
   });
 
   it("translates the execution workspace detail page", () => {

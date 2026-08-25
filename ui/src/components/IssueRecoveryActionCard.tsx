@@ -604,7 +604,9 @@ function BreakGlassOverride({
             </dd>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <dt className="shrink-0 text-muted-foreground">Ancestry verdict</dt>
+            <dt className="shrink-0 text-muted-foreground">
+              {t("issueRecovery.ancestryVerdict", { defaultValue: "Ancestry verdict" })}
+            </dt>
             <dd className="font-medium">{verdictBadge.label()}</dd>
           </div>
         </dl>
@@ -736,20 +738,26 @@ function RepairWorkspace({
           className="space-y-1.5 rounded-md border border-sky-400/30 bg-sky-500/5 px-2.5 py-2 text-(length:--text-micro)"
         >
           <div className="flex items-center justify-between gap-2">
-            <dt className="shrink-0 text-muted-foreground">Dirty changes</dt>
+            <dt className="shrink-0 text-muted-foreground">
+              {t("issueRecovery.dirtyChanges", { defaultValue: "Dirty changes" })}
+            </dt>
             <dd data-testid="recovery-repair-dirty-count" className="font-medium text-foreground/90">
               {dirtyLabel}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <dt className="shrink-0 text-muted-foreground">Live branch</dt>
+            <dt className="shrink-0 text-muted-foreground">
+              {t("issueRecovery.liveBranch", { defaultValue: "Live branch" })}
+            </dt>
             <dd className="min-w-0 truncate font-mono text-foreground/90">
               {divergence.liveBranch ?? "detached"}
               <span className="ml-1 font-sans text-muted-foreground">(left untouched)</span>
             </dd>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <dt className="shrink-0 text-muted-foreground">Rescue branch</dt>
+            <dt className="shrink-0 text-muted-foreground">
+              {t("issueRecovery.rescueBranch", { defaultValue: "Rescue branch" })}
+            </dt>
             <dd
               data-testid="recovery-repair-rescue-branch"
               className="min-w-0 truncate font-mono text-foreground/90"
@@ -759,7 +767,9 @@ function RepairWorkspace({
             </dd>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <dt className="shrink-0 text-muted-foreground">Restore to</dt>
+            <dt className="shrink-0 text-muted-foreground">
+              {t("issueRecovery.restoreTo", { defaultValue: "Restore to" })}
+            </dt>
             <dd className="min-w-0 truncate font-mono text-foreground/90">
               {divergence.expectedBranch ?? t("issueRecovery.recordedBranchFallback", { defaultValue: "recorded branch" })}
             </dd>
@@ -1224,7 +1234,9 @@ export function IssueRecoveryActionCard({
                   </>
                 ) : action.ownerType === "board" ? (
                   <>
-                    <span className="font-medium">Board</span>
+                    <span className="font-medium">
+                      {t("issueRecovery.boardActor", { defaultValue: "Board" })}
+                    </span>
                     <span className="text-muted-foreground">decides the next step only</span>
                   </>
                 ) : action.ownerType === "user" && action.ownerUserId ? (
@@ -1300,11 +1312,15 @@ export function IssueRecoveryActionCard({
                 <AgentLink agentId={action.ownerAgentId} agentMap={agentMap} />
               </>
             ) : action.ownerType === "board" ? (
-              <span className="font-medium">Board</span>
+              <span className="font-medium">
+                {t("issueRecovery.boardActor", { defaultValue: "Board" })}
+              </span>
             ) : action.ownerType === "user" && action.ownerUserId ? (
               <span className="font-medium">user {action.ownerUserId.slice(0, 6)}</span>
             ) : action.ownerType === "system" ? (
-              <span className="font-medium">System</span>
+              <span className="font-medium">
+                {t("issueRecovery.systemActor", { defaultValue: "System" })}
+              </span>
             ) : (
               <span className="text-muted-foreground">{t("issueRecovery.unassignedPickOne", { defaultValue: "unassigned — pick one to wake them" })}</span>
             )}

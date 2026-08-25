@@ -379,6 +379,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueDocuments, "updated")).toContain("{{time}}");
   });
 
+  it("translates the related work panel", () => {
+    const issueRelatedWork = group("issueRelatedWork");
+    expect(entry(issueRelatedWork, "references")).toBe("引用");
+    expect(entry(issueRelatedWork, "externalObjects")).toBe("外部对象");
+    expect(entry(issueRelatedWork, "externalObjectsDescription")).toContain("拉取请求");
+    expect(entry(issueRelatedWork, "retry")).toBe("重试");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

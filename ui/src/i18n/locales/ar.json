@@ -3719,6 +3719,20 @@
     "viewingHistoricalRevision": "Viewing historical revision",
     "viewingRevision": "Viewing revision {{revision}}"
   },
+  "issueRelatedWork": {
+    "externalObjects": "External objects",
+    "externalObjectsDescription": "Remote work referenced from this issue — pull requests, deployments, tickets in other systems, and more.",
+    "externalObjectsLoadFailed": "Couldn't load external objects.",
+    "loadingExternalObjects": "Loading external objects…",
+    "noExternalObjects": "This issue does not reference any external objects yet.",
+    "references": "References",
+    "referencesDescription": "Other tasks this task currently points at in its title, description, comments, or documents.",
+    "referencesEmpty": "This task does not reference any other tasks yet.",
+    "referencedBy": "Referenced by",
+    "referencedByDescription": "Other tasks that currently point at this task.",
+    "referencedByEmpty": "No other tasks reference this task yet.",
+    "retry": "Retry"
+  },
   "issueDetail": {
     "acceptFailed": "Accept failed",
     "acceptedDraftsSkipped_one": "Accepted {{created}} draft and skipped {{skipped}}",

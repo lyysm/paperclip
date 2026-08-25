@@ -3719,6 +3719,20 @@
     "viewingHistoricalRevision": "正在查看历史版本",
     "viewingRevision": "正在查看版本 {{revision}}"
   },
+  "issueRelatedWork": {
+    "externalObjects": "外部对象",
+    "externalObjectsDescription": "此任务引用的远程工作，包括拉取请求、部署、其他系统中的工单等。",
+    "externalObjectsLoadFailed": "无法加载外部对象。",
+    "loadingExternalObjects": "正在加载外部对象…",
+    "noExternalObjects": "此任务目前还没有引用外部对象。",
+    "references": "引用",
+    "referencesDescription": "此任务目前在标题、描述、评论或文档中指向的其他任务。",
+    "referencesEmpty": "此任务目前还没有引用其他任务。",
+    "referencedBy": "被引用",
+    "referencedByDescription": "目前引用此任务的其他任务。",
+    "referencedByEmpty": "目前还没有其他任务引用此任务。",
+    "retry": "重试"
+  },
   "issueDetail": {
     "acceptFailed": "接受失败",
     "acceptedDraftsSkipped_one": "已接受 {{created}} 个草稿并跳过 {{skipped}} 个",

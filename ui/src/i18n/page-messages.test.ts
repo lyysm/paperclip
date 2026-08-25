@@ -516,6 +516,16 @@ describe("zh-CN page-body messages", () => {
     expect(entry(pluginPage, "back")).toBe("返回");
   });
 
+  it("translates agent skill controls and release copy", () => {
+    const agentSkills = group("agentSkills");
+    expect(entry(agentSkills, "enabledSummary")).toContain("{{enabled}}");
+    expect(entry(agentSkills, "enabledSummary")).toContain("{{total}}");
+    expect(entry(agentSkills, "browseStore")).toBe("浏览技能商店");
+    expect(entry(agentSkills, "noLibraryTitle")).toContain("技能库");
+    expect(entry(nested(agentSkills, "release"), "defaultLabel")).toContain("默认");
+    expect(entry(nested(agentSkills, "release"), "optionWithDate")).toContain("{{date}}");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

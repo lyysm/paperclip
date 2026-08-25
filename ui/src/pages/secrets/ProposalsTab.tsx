@@ -15,6 +15,7 @@ import { secretsApi } from "../../api/secrets";
 import { queryKeys } from "../../lib/queryKeys";
 import { cn } from "../../lib/utils";
 import { EmptyState } from "../../components/EmptyState";
+import { useTranslation } from "@/i18n";
 import { SecretPathName } from "./SecretPathName";
 import {
   AgentRefChip,
@@ -29,14 +30,18 @@ import {
 } from "./proposal-review";
 
 /** ISO expiry → "expires in 12d" / "expires in 5h" / "expired". */
-function expiryLabel(expiresAt: string): { text: string; urgent: boolean } {
+function expiryLabel(expiresAt: string): {
+  kind: "noExpiry" | "expired" | "hours" | "days";
+  count?: number;
+  urgent: boolean;
+} {
   const ms = new Date(expiresAt).getTime() - Date.now();
-  if (Number.isNaN(ms)) return { text: "no expiry", urgent: false };
-  if (ms <= 0) return { text: "expired", urgent: true };
+  if (Number.isNaN(ms)) return { kind: "noExpiry", urgent: false };
+  if (ms <= 0) return { kind: "expired", urgent: true };
   const hours = Math.floor(ms / 3_600_000);
-  if (hours < 24) return { text: `expires in ${hours}h`, urgent: true };
+  if (hours < 24) return { kind: "hours", count: hours, urgent: true };
   const days = Math.floor(hours / 24);
-  return { text: `expires in ${days}d`, urgent: days <= 2 };
+  return { kind: "days", count: days, urgent: days <= 2 };
 }
 
 function ProposalRow({
@@ -50,10 +55,25 @@ function ProposalRow({
   onReject: (p: SecretProposalView) => void;
   disabled: boolean;
 }) {
+  const { t } = useTranslation();
   const isSecret = proposal.kind === "secret";
   const expiry = expiryLabel(proposal.expiresAt);
   const secret = bindingSecretLabel(proposal);
   const envKey = bindingEnvKey(proposal);
+  const expiryText =
+    expiry.kind === "noExpiry"
+      ? t("secretsPage.proposals.noExpiry", { defaultValue: "no expiry" })
+      : expiry.kind === "expired"
+        ? t("secretsPage.proposals.expired", { defaultValue: "expired" })
+        : expiry.kind === "hours"
+          ? t("secretsPage.proposals.expiresInHours", {
+              count: expiry.count ?? 0,
+              defaultValue: "expires in {{count}}h",
+            })
+          : t("secretsPage.proposals.expiresInDays", {
+              count: expiry.count ?? 0,
+              defaultValue: "expires in {{count}}d",
+            });
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-start sm:gap-3">
@@ -74,7 +94,9 @@ function ProposalRow({
               {proposal.target ? (
                 <AgentRefChip agent={proposal.target} className="font-medium" />
               ) : (
-                <span className="text-muted-foreground">agent</span>
+                <span className="text-muted-foreground">
+                  {t("secretsPage.proposals.agent", { defaultValue: "agent" })}
+                </span>
               )}
               <DeliveryBadge configPath={proposal.configPath} />
               <code className="font-mono text-xs">{envKey || proposal.configPath}</code>
@@ -91,7 +113,8 @@ function ProposalRow({
         {/* Provenance meta */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            by <AgentRefChip agent={proposal.proposedBy} className="font-medium text-foreground" />
+            {t("secretsPage.proposals.by", { defaultValue: "by" })}{" "}
+            <AgentRefChip agent={proposal.proposedBy} className="font-medium text-foreground" />
           </span>
           {proposal.originIssue ? (
             <>
@@ -117,7 +140,7 @@ function ProposalRow({
           ) : null}
           <span aria-hidden="true">·</span>
           <span className={cn(expiry.urgent && "text-amber-600 dark:text-amber-400")}>
-            {expiry.text}
+            {expiryText}
           </span>
         </div>
 
@@ -144,6 +167,7 @@ export function ProposalsTab({
   companyId: string;
   providerConfigs: CompanySecretProviderConfig[];
 }) {
+  const { t } = useTranslation();
   const proposalsQuery = useQuery({
     queryKey: queryKeys.secrets.proposals(companyId, "pending"),
     queryFn: () => secretsApi.listProposals(companyId, "pending"),
@@ -167,7 +191,8 @@ export function ProposalsTab({
   if (proposalsQuery.isError) {
     return (
       <div className="flex items-center gap-2 py-4 text-sm text-destructive">
-        <AlertCircle className="size-4" /> Couldn’t load proposals. Try again.
+        <AlertCircle className="size-4" />{" "}
+        {t("secretsPage.proposals.loadFailed", { defaultValue: "Couldn’t load proposals. Try again." })}
       </div>
     );
   }
@@ -175,7 +200,8 @@ export function ProposalsTab({
   if (proposalsQuery.isPending) {
     return (
       <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> Loading proposals…
+        <Loader2 className="size-4 animate-spin" />{" "}
+        {t("secretsPage.proposals.loading", { defaultValue: "Loading proposals…" })}
       </div>
     );
   }
@@ -184,8 +210,10 @@ export function ProposalsTab({
     return (
       <EmptyState
         icon={Inbox}
-        title="No pending proposals"
-        message="When an agent proposes a secret or an access binding, it shows up here for review."
+        title={t("secretsPage.proposals.emptyTitle", { defaultValue: "No pending proposals" })}
+        message={t("secretsPage.proposals.emptyMessage", {
+          defaultValue: "When an agent proposes a secret or an access binding, it shows up here for review.",
+        })}
       />
     );
   }
@@ -193,8 +221,10 @@ export function ProposalsTab({
   return (
     <div className="space-y-2">
       <p className="text-xs text-muted-foreground">
-        Agents propose credentials and access bindings; you approve or reject them here. Proposed
-        values are never shown — only a fingerprint and length.
+        {t("secretsPage.proposals.description", {
+          defaultValue:
+            "Agents propose credentials and access bindings; you approve or reject them here. Proposed values are never shown — only a fingerprint and length.",
+        })}
       </p>
       {sorted.map((proposal) => (
         <ProposalRow

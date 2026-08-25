@@ -499,6 +499,17 @@ describe("zh-CN page-body messages", () => {
     expect(entry(secretsPage, "notSet")).toBe("未设置");
   });
 
+  it("translates secret proposal review actions and expiry copy", () => {
+    const proposals = nested(group("secretsPage"), "proposals");
+    expect(entry(proposals, "emptyTitle")).toBe("没有待处理的提案");
+    expect(entry(proposals, "approveAndCreate")).toBe("批准并创建");
+    expect(entry(proposals, "approveSecretAndBind")).toBe("批准密钥并绑定");
+    expect(entry(proposals, "rejectTitle")).toBe("拒绝提案");
+    expect(entry(proposals, "expiresInDays")).toContain("{{count}}");
+    expect(entry(proposals, "copyDigest")).toContain("{{digest}}");
+    expect(entry(proposals, "rejectDescriptionAfter")).toContain("依赖");
+  });
+
   it("translates CLI authorization and board claim entry points", () => {
     const cliAuth = group("cliAuth");
     expect(entry(cliAuth, "approvedTitle")).toBe("CLI 访问已批准");

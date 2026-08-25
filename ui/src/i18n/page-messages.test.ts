@@ -469,6 +469,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(joinRequests, "submitted")).toContain("{{time}}");
   });
 
+  it("translates the audit feed controls and empty states", () => {
+    const auditFeed = group("auditFeed");
+    expect(entry(auditFeed, "title")).toBe("活动");
+    expect(entry(auditFeed, "allActivity")).toBe("全部活动");
+    expect(entry(auditFeed, "onBehalfOf")).toContain("{{name}}");
+    expect(entry(auditFeed, "filteredEmptyDescription")).toContain("筛选");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

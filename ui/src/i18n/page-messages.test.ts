@@ -433,6 +433,12 @@ describe("zh-CN page-body messages", () => {
     expect(entry(externalObjectRows, "references")).toBe("引用");
   });
 
+  it("translates issue write denial labels", () => {
+    const issueWriteDenial = group("issueWriteDenial");
+    expect(entry(issueWriteDenial, "whoCanAct")).toBe("可执行者：");
+    expect(entry(issueWriteDenial, "tryThis")).toBe("尝试操作：");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

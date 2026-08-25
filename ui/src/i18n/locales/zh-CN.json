@@ -3878,6 +3878,10 @@
     "references": "引用",
     "retry": "重试"
   },
+  "issueWriteDenial": {
+    "tryThis": "尝试操作：",
+    "whoCanAct": "可执行者："
+  },
   "issueDetail": {
     "acceptFailed": "接受失败",
     "acceptedDraftsSkipped_one": "已接受 {{created}} 个草稿并跳过 {{skipped}} 个",

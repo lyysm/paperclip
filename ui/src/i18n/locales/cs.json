@@ -3878,6 +3878,10 @@
     "references": "References",
     "retry": "Retry"
   },
+  "issueWriteDenial": {
+    "tryThis": "Try this:",
+    "whoCanAct": "Who can act:"
+  },
   "issueDetail": {
     "acceptFailed": "Accept failed",
     "acceptedDraftsSkipped_one": "Accepted {{created}} draft and skipped {{skipped}}",

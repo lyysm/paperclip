@@ -377,6 +377,8 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueDocuments, "viewingRevision")).toContain("{{revision}}");
     expect(entry(issueDocuments, "remoteRevision")).toContain("{{revision}}");
     expect(entry(issueDocuments, "updated")).toContain("{{time}}");
+    expect(entry(issueDocuments, "revisionLabel")).toContain("{{actor}}");
+    expect(entry(issueDocuments, "selectTwoRevisions")).toBe("请选择两个版本进行比较。");
   });
 
   it("translates the related work panel", () => {

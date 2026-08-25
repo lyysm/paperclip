@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { t } from "@/i18n";
 import {
   Select,
   SelectContent,
@@ -16,12 +17,11 @@ import {
 } from "@/components/ui/select";
 import {
   appCheckState,
-  appSelectionLabel,
   isToolSelected,
+  selectedToolIds,
   toggleApp,
   toggleTool,
   toolCapability,
-  CAPABILITY_LABEL,
   type AdvancedRule,
   type AdvancedRuleKind,
   type AppGroup,
@@ -74,7 +74,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
       .filter((entry) => entry.tools.length > 0);
   }, [appGroups, search, capabilityFilter]);
 
-  if (catalogLoading) return <LoadingState label="Loading tools…" />;
+  if (catalogLoading) return <LoadingState label={t("toolsPage.profiles.loadingTools", { defaultValue: "Loading tools…" })} />;
 
   // Cold state A (AP17): nothing connected at all.
   if (appGroups.length === 0) {
@@ -82,14 +82,13 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
       <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border py-12 text-center">
         <Plug className="h-6 w-6 text-muted-foreground" />
         <div>
-          <p className="text-sm font-medium text-foreground">App connections are coming soon</p>
+          <p className="text-sm font-medium text-foreground">{t("toolsPage.profiles.connectionsComingSoon", { defaultValue: "App connections are coming soon" })}</p>
           <p className="mx-auto max-w-sm text-sm text-muted-foreground">
-            Profiles will be available once app connections are ready. Browse the planned integrations in the
-            meantime.
+            {t("toolsPage.profiles.connectionsComingSoonDescription", { defaultValue: "Profiles will be available once app connections are ready. Browse the planned integrations in the meantime." })}
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link to="/apps">Browse app connections</Link>
+          <Link to="/apps">{t("toolsPage.profiles.browseAppConnections", { defaultValue: "Browse app connections" })}</Link>
         </Button>
       </div>
     );
@@ -103,7 +102,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search tools…"
+            placeholder={t("toolsPage.profiles.searchTools", { defaultValue: "Search tools…" })}
             className="pl-8"
           />
         </div>
@@ -120,7 +119,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
                   : "border-border text-muted-foreground hover:bg-accent",
               )}
             >
-              {CAPABILITY_LABEL[cap]}
+              {capabilityLabel(cap)}
             </button>
           ))}
         </div>
@@ -129,7 +128,9 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
       {filteredGroups.length === 0 ? (
         // Cold state B (AP17): a search/filter that matches nothing.
         <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border py-10 text-center">
-          <p className="text-sm font-medium text-foreground">No tools match “{search}”.</p>
+          <p className="text-sm font-medium text-foreground">
+            {t("toolsPage.profiles.noToolsMatch", { defaultValue: "No tools match “{{search}}”.", search })}
+          </p>
           <button
             type="button"
             onClick={() => {
@@ -138,7 +139,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
             }}
             className="text-sm font-medium text-primary hover:underline"
           >
-            Clear search
+            {t("toolsPage.profiles.clearSearch", { defaultValue: "Clear search" })}
           </button>
         </div>
       ) : (
@@ -190,7 +191,11 @@ function AppRow({
   return (
     <div>
       <div className="flex items-center gap-2.5 px-3 py-2">
-        <Checkbox checked={checked} onCheckedChange={onToggleApp} aria-label={`All ${group.name} tools`} />
+        <Checkbox
+          checked={checked}
+          onCheckedChange={onToggleApp}
+          aria-label={t("toolsPage.profiles.allAppToolsAria", { defaultValue: "All {{name}} tools", name: group.name })}
+        />
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
@@ -203,12 +208,12 @@ function AppRow({
           )}
           <span className="flex flex-col">
             <span className="text-sm font-medium text-foreground">
-              All {group.name} tools ({group.tools.length})
+              {t("toolsPage.profiles.allAppTools", { defaultValue: "All {{name}} tools ({{count}})", name: group.name, count: group.tools.length })}
             </span>
             <span className="text-xs text-muted-foreground">
               {state === "indeterminate"
-                ? appSelectionLabel(group, selection)
-                : "includes tools " + group.name + " adds later"}
+                ? selectionLabel(group, selection)
+                : t("toolsPage.profiles.includesFutureTools", { defaultValue: "includes tools {{name}} adds later", name: group.name })}
             </span>
           </span>
         </button>
@@ -232,7 +237,7 @@ function AppRow({
                   <span className="flex flex-wrap items-center gap-2">
                     <code className="font-mono text-xs text-foreground">{tool.toolName}</code>
                     <Badge variant={CAPABILITY_VARIANT[cap]} className="text-(length:--text-nano)">
-                      {CAPABILITY_LABEL[cap]}
+                      {capabilityLabel(cap)}
                     </Badge>
                   </span>
                   {tool.title || tool.description ? (
@@ -258,19 +263,19 @@ function NewToolsRadio({
   const options: Array<{ value: NewToolsAction; label: string; hint: string; recommended?: boolean }> = [
     {
       value: "deny",
-      label: "Stay blocked until someone allows them",
-      hint: "New tools an app adds later won't be usable until you review them.",
+      label: t("toolsPage.profiles.newToolsStayBlockedWizard", { defaultValue: "Stay blocked until someone allows them" }),
+      hint: t("toolsPage.profiles.newToolsStayBlockedWizardDescription", { defaultValue: "New tools an app adds later won't be usable until you review them." }),
       recommended: true,
     },
     {
       value: "allow",
-      label: "Allowed automatically",
-      hint: "Any tool an app adds later becomes usable right away.",
+      label: t("toolsPage.profiles.newToolsAllowedWizard", { defaultValue: "Allowed automatically" }),
+      hint: t("toolsPage.profiles.newToolsAllowedWizardDescription", { defaultValue: "Any tool an app adds later becomes usable right away." }),
     },
   ];
   return (
     <fieldset className="space-y-2 rounded-lg border border-border p-4">
-      <legend className="px-1 text-sm font-medium text-foreground">New tools that appear later</legend>
+      <legend className="px-1 text-sm font-medium text-foreground">{t("toolsPage.profiles.newToolsLater", { defaultValue: "New tools that appear later" })}</legend>
       <div className="space-y-2">
         {options.map((opt) => (
           <label key={opt.value} className="flex cursor-pointer items-start gap-2.5">
@@ -286,10 +291,10 @@ function NewToolsRadio({
                 {opt.label}
                 {opt.recommended ? (
                   <Badge variant="outline" className="text-(length:--text-nano)">
-                    Recommended
+                    {t("toolsPage.profiles.recommended", { defaultValue: "Recommended" })}
                   </Badge>
                 ) : (
-                  <span className="text-xs font-normal text-amber-600">(risky)</span>
+                  <span className="text-xs font-normal text-amber-600">({t("toolsPage.profiles.risky", { defaultValue: "risky" })})</span>
                 )}
               </span>
               <span className="text-xs text-muted-foreground">{opt.hint}</span>
@@ -302,9 +307,9 @@ function NewToolsRadio({
 }
 
 const RULE_KIND_OPTIONS: Array<{ value: AdvancedRuleKind; label: string }> = [
-  { value: "tool_name", label: "Tool name pattern" },
-  { value: "risk_level", label: "Risk level" },
-  { value: "catalog_entry", label: "By tool ID" },
+  { value: "tool_name", label: t("toolsPage.profiles.ruleKindToolName", { defaultValue: "Tool name pattern" }) },
+  { value: "risk_level", label: t("toolsPage.profiles.ruleKindRiskLevel", { defaultValue: "Risk level" }) },
+  { value: "catalog_entry", label: t("toolsPage.profiles.ruleKindCatalogEntry", { defaultValue: "By tool ID" }) },
 ];
 
 function createAdvancedRuleId() {
@@ -314,10 +319,41 @@ function createAdvancedRuleId() {
 }
 
 function ruleSummary(rule: AdvancedRule): string {
-  const verb = rule.effect === "include" ? "Allow" : "Block";
-  if (rule.kind === "tool_name") return `${verb} tools matching ${rule.value}`;
-  if (rule.kind === "risk_level") return `${verb} ${rule.riskLevel ?? rule.value} tools`;
-  return `${verb} tool ${rule.value}`;
+  const verb = rule.effect === "include"
+    ? t("toolsPage.profiles.allow", { defaultValue: "Allow" })
+    : t("toolsPage.profiles.block", { defaultValue: "Block" });
+  if (rule.kind === "tool_name") return t("toolsPage.profiles.ruleSummaryToolName", { defaultValue: "{{verb}} tools matching {{value}}", verb, value: rule.value });
+  if (rule.kind === "risk_level") {
+    return t("toolsPage.profiles.ruleSummaryRisk", {
+      defaultValue: "{{verb}} {{risk}} tools",
+      verb,
+      risk: capabilityLabel((rule.riskLevel ?? rule.value) as ToolCapability),
+    });
+  }
+  return t("toolsPage.profiles.ruleSummaryCatalog", { defaultValue: "{{verb}} tool {{value}}", verb, value: rule.value });
+}
+
+function capabilityLabel(capability: ToolCapability): string {
+  if (capability === "read") return t("toolsPage.profiles.capability.read", { defaultValue: "Read-only" });
+  if (capability === "write") return t("toolsPage.profiles.capability.write", { defaultValue: "Makes changes" });
+  return t("toolsPage.profiles.capability.destructive", { defaultValue: "Destructive" });
+}
+
+function selectionLabel(group: AppGroup, selection: WizardSelections[string] | undefined): string {
+  const selected = selectedToolIds(group, selection).size;
+  if (selected === 0) return t("toolsPage.profiles.noneSelected", { defaultValue: "None selected" });
+  if (selection?.kind === "all" || (selection?.kind === "all_except" && selection.excluded.length === 0)) {
+    return t("toolsPage.profiles.allAppToolsSummary", { defaultValue: "All {{name}} tools ({{count}})", name: group.name, count: group.tools.length });
+  }
+  if (selection?.kind === "all_except") {
+    return t("toolsPage.profiles.allAppToolsExcept", { defaultValue: "All {{name}} except {{count}}", name: group.name, count: selection.excluded.length });
+  }
+  return t("toolsPage.profiles.selectedAppTools", {
+    defaultValue: "{{selected}} of {{total}} {{name}} tools",
+    selected,
+    total: group.tools.length,
+    name: group.name,
+  });
 }
 
 function AdvancedRules({
@@ -349,13 +385,12 @@ function AdvancedRules({
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="rounded-lg border border-border">
       <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-left">
-        <span className="text-sm font-medium text-foreground">Advanced rules</span>
+        <span className="text-sm font-medium text-foreground">{t("toolsPage.profiles.advancedRules", { defaultValue: "Advanced rules" })}</span>
         <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-3 border-t border-border px-4 py-3">
         <p className="text-xs text-muted-foreground">
-          Match tools by a name pattern, a risk level, or a specific tool ID. These run on top of the choices
-          above.
+          {t("toolsPage.profiles.advancedRulesDescription", { defaultValue: "Match tools by a name pattern, a risk level, or a specific tool ID. These run on top of the choices above." })}
         </p>
 
         {rules.length > 0 ? (
@@ -368,7 +403,7 @@ function AdvancedRules({
                 <span className="text-foreground">{ruleSummary(rule)}</span>
                 <button
                   type="button"
-                  aria-label="Remove rule"
+                  aria-label={t("toolsPage.profiles.removeRule", { defaultValue: "Remove rule" })}
                   onClick={() => onChange(rules.filter((r) => r.id !== rule.id))}
                   className="text-muted-foreground hover:text-destructive"
                 >
@@ -385,8 +420,8 @@ function AdvancedRules({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="include">Allow</SelectItem>
-              <SelectItem value="exclude">Block</SelectItem>
+              <SelectItem value="include">{t("toolsPage.profiles.allow", { defaultValue: "Allow" })}</SelectItem>
+              <SelectItem value="exclude">{t("toolsPage.profiles.block", { defaultValue: "Block" })}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={kind} onValueChange={(v) => setKind(v as AdvancedRuleKind)}>
@@ -407,22 +442,24 @@ function AdvancedRules({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="read">Read-only</SelectItem>
-                <SelectItem value="write">Makes changes</SelectItem>
-                <SelectItem value="destructive">Destructive</SelectItem>
+                <SelectItem value="read">{capabilityLabel("read")}</SelectItem>
+                <SelectItem value="write">{capabilityLabel("write")}</SelectItem>
+                <SelectItem value="destructive">{capabilityLabel("destructive")}</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder={kind === "tool_name" ? "e.g. gmail.send*" : "tool ID"}
+              placeholder={kind === "tool_name"
+                ? t("toolsPage.profiles.toolNamePatternPlaceholder", { defaultValue: "e.g. gmail.send*" })
+                : t("toolsPage.profiles.toolIdPlaceholder", { defaultValue: "tool ID" })}
               className="w-44"
             />
           )}
           <Button type="button" variant="outline" size="sm" onClick={addRule}>
             <Plus className="mr-1 h-3.5 w-3.5" />
-            Add rule
+            {t("toolsPage.profiles.addRule", { defaultValue: "Add rule" })}
           </Button>
         </div>
       </CollapsibleContent>

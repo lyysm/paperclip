@@ -631,6 +631,10 @@ describe("zh-CN page-body messages", () => {
 
     expect(entry(group("routines"), "title")).toBe("例行程序");
     expect(entry(group("projectWorkspace"), "workspaceName")).toBe("工作区名称");
+    const workspaceServices = group("workspaceServices");
+    expect(entry(workspaceServices, "servicesCount")).toContain("{{count}}");
+    expect(entry(workspaceServices, "runningOf")).toContain("{{running}}");
+    expect(entry(workspaceServices, "startingOnPort")).toContain("{{port}}");
     expect(entry(group("workspaceFiles"), "searchPlaceholder")).toContain("搜索文件");
     expect(entry(group("fileViewer"), "fileNotFoundBody")).toContain("工作区");
 

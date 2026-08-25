@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@/lib/router";
 import { useDialog } from "../context/DialogContext";
@@ -46,6 +47,7 @@ export function NewAgentDialog() {
   const { newAgentOpen, closeNewAgent, openNewIssue } = useDialog();
   const { selectedCompanyId } = useCompany();
   const { pushToast } = useToast();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [mode, setMode] = useState<NewAgentDialogMode>("choices");
@@ -121,8 +123,8 @@ export function NewAgentDialog() {
     closeNewAgent();
     openNewIssue({
       assigneeAgentId: ceoAgent?.id,
-      title: "Create a new agent",
-      description: "(type in what kind of agent you want here)",
+      title: t("newAgentDialog.createNewAgentIssueTitle"),
+      description: t("newAgentDialog.createNewAgentIssueDescription"),
     });
   }
 
@@ -146,7 +148,7 @@ export function NewAgentDialog() {
       return true;
     } catch {
       pushToast({
-        title: "Clipboard unavailable",
+        title: t("newAgentDialog.clipboardUnavailable"),
         body: unavailableBody,
         tone: "warn",
       });
@@ -193,19 +195,21 @@ export function NewAgentDialog() {
       setLatestAgentPrompt(prompt);
       setLatestAgentPromptCopied(false);
       setMode("prompt");
-      const copied = await copyText(prompt, "Copy the agent onboarding prompt manually from the field below.");
+      const copied = await copyText(prompt, t("newAgentDialog.copyPromptUnavailableBelow"));
 
       await queryClient.invalidateQueries({ queryKey: inviteHistoryQueryKey });
       pushToast({
-        title: "Agent invite created",
-        body: copied ? "Agent onboarding prompt ready below and copied to clipboard." : "Agent onboarding prompt ready below.",
+        title: t("newAgentDialog.inviteCreated"),
+        body: copied
+          ? t("newAgentDialog.promptReadyCopied")
+          : t("newAgentDialog.promptReady"),
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to create agent invite",
-        body: error instanceof Error ? error.message : "Unknown error",
+        title: t("newAgentDialog.inviteFailed"),
+        body: error instanceof Error ? error.message : t("newAgentDialog.unknownError"),
         tone: "error",
       });
     },
@@ -230,11 +234,12 @@ export function NewAgentDialog() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
-          <span className="text-sm text-muted-foreground">Add a new agent</span>
+          <span className="text-sm text-muted-foreground">{t("newAgentDialog.title")}</span>
           <Button
             variant="ghost"
             size="icon-xs"
             className="text-muted-foreground"
+            aria-label={t("newAgentDialog.close")}
             onClick={() => {
               resetDialogState();
               closeNewAgent();
@@ -253,28 +258,27 @@ export function NewAgentDialog() {
                   <Bot className="h-6 w-6 text-foreground" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Ask a leader to propose the hire, configure a runtime yourself,
-                  or send an onboarding prompt to an external agent.
+                  {t("newAgentDialog.choicesDescription")}
                 </p>
               </div>
 
               <Button className="w-full" size="lg" onClick={handleAskCeo}>
                 <Bot className="h-4 w-4 mr-2" />
-                Ask the CEO to create a new agent
+                {t("newAgentDialog.askCeo")}
               </Button>
 
               <div className="grid gap-2">
                 <Button variant="outline" className="w-full" onClick={handleAdvancedConfig}>
                   <Settings2 className="h-4 w-4 mr-2" />
-                  Configure a runtime manually
+                  {t("newAgentDialog.configureRuntime")}
                 </Button>
                 <div className="space-y-1">
                   <Button variant="outline" className="w-full" onClick={handleInviteExternalAgent}>
                     <MailPlus className="h-4 w-4 mr-2" />
-                    Invite an external agent
+                    {t("newAgentDialog.inviteExternal")}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
-                    (OpenClaw, Hermes, or any agent that can call the invite API.)
+                    {t("newAgentDialog.inviteExternalHint")}
                   </p>
                 </div>
               </div>
@@ -287,10 +291,10 @@ export function NewAgentDialog() {
                   onClick={() => setMode("choices")}
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Back
+                  {t("newAgentDialog.back")}
                 </button>
                 <p className="text-sm text-muted-foreground">
-                  Choose the runtime Paperclip should start or resume directly.
+                  {t("newAgentDialog.runtimeDescription")}
                 </p>
               </div>
 
@@ -310,7 +314,7 @@ export function NewAgentDialog() {
                   >
                     {opt.recommended && (
                       <Badge variant="ghost" className="absolute -top-1.5 right-1.5 bg-green-500 text-white text-(length:--text-nano) font-semibold px-1.5 leading-none">
-                        Recommended
+                        {t("newAgentDialog.recommended")}
                       </Badge>
                     )}
                     <opt.icon className="h-4 w-4" />
@@ -330,29 +334,29 @@ export function NewAgentDialog() {
                   onClick={() => setMode("choices")}
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Back
+                  {t("newAgentDialog.back")}
                 </button>
                 <div className="space-y-1">
-                  <h2 className="text-sm font-semibold">Invite an external agent</h2>
+                  <h2 className="text-sm font-semibold">{t("newAgentDialog.inviteExternal")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Generate a one-time onboarding prompt that any compatible agent can use to request access, wait for approval, and claim its Paperclip API key.
+                    {t("newAgentDialog.inviteDescription")}
                   </p>
                 </div>
               </div>
 
               <label className="block space-y-2">
-                <span className="text-sm font-medium">Optional message for the agent</span>
+                <span className="text-sm font-medium">{t("newAgentDialog.optionalMessage")}</span>
                 <Textarea
                   value={agentMessage}
                   onChange={(event) => setAgentMessage(event.target.value)}
                   className="min-h-24 resize-y"
-                  placeholder="Add onboarding context, expected role, or first instructions."
+                  placeholder={t("newAgentDialog.messagePlaceholder")}
                   maxLength={4000}
                 />
               </label>
 
               <div className="rounded-lg border border-border px-4 py-3 text-sm text-muted-foreground">
-                Agent invites create a join request first. A company admin still approves the request before the agent can claim its API key.
+                {t("newAgentDialog.inviteApprovalNote")}
               </div>
 
               <div>
@@ -360,7 +364,9 @@ export function NewAgentDialog() {
                   onClick={() => createAgentInviteMutation.mutate()}
                   disabled={!selectedCompanyId || createAgentInviteMutation.isPending}
                 >
-                  {createAgentInviteMutation.isPending ? "Generating…" : "Generate onboarding prompt"}
+                  {createAgentInviteMutation.isPending
+                    ? t("newAgentDialog.generatingPrompt")
+                    : t("newAgentDialog.generatePrompt")}
                 </Button>
               </div>
             </div>
@@ -372,20 +378,20 @@ export function NewAgentDialog() {
                   onClick={() => setMode("invite")}
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Back
+                  {t("newAgentDialog.back")}
                 </button>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between gap-3">
-                    <h2 className="text-sm font-semibold">Agent onboarding prompt</h2>
+                    <h2 className="text-sm font-semibold">{t("newAgentDialog.promptTitle")}</h2>
                     {latestAgentPromptCopied ? (
                       <div className="inline-flex items-center gap-1 text-xs font-medium text-foreground">
                         <Check className="h-3.5 w-3.5" />
-                        Copied
+                        {t("newAgentDialog.copied")}
                       </div>
                     ) : null}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Send this prompt to the external agent that should join this company.
+                    {t("newAgentDialog.promptDescription")}
                   </p>
                 </div>
               </div>
@@ -401,11 +407,13 @@ export function NewAgentDialog() {
                 disabled={!latestAgentPrompt}
                 onClick={async () => {
                   if (!latestAgentPrompt) return;
-                  const copied = await copyText(latestAgentPrompt, "Copy the agent onboarding prompt manually from the field above.");
+                  const copied = await copyText(latestAgentPrompt, t("newAgentDialog.copyPromptUnavailableAbove"));
                   setLatestAgentPromptCopied(copied);
                 }}
               >
-                {latestAgentPromptCopied ? "Copied prompt" : "Copy prompt"}
+                {latestAgentPromptCopied
+                  ? t("newAgentDialog.copiedPrompt")
+                  : t("newAgentDialog.copyPrompt")}
               </Button>
             </div>
           )}

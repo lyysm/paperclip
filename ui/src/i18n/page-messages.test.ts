@@ -132,6 +132,12 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(inbox, "blockedSortBy"), "urgency")).toBe("最紧急");
 
     expect(entry(group("approvals"), "pending")).toBe("待处理");
+
+    const newAgentDialog = group("newAgentDialog");
+    expect(entry(newAgentDialog, "title")).toBe("添加新智能体");
+    expect(entry(newAgentDialog, "createNewAgentIssueDescription")).toContain("智能体类型");
+    expect(entry(newAgentDialog, "inviteDescription")).toContain("Paperclip API");
+    expect(entry(newAgentDialog, "messagePlaceholder")).toContain("引导");
   });
 
   it("translates approval detail, what-needs-me, and decision queue pages", () => {

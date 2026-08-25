@@ -3781,6 +3781,37 @@
     "ultimatelyWaitingOn": "Ultimately waiting on",
     "waitingOnLiveWork": "Waiting on live work"
   },
+  "issueAssignedBacklog": {
+    "assignee": "the assignee",
+    "commentsDescription": "Comments still notify the assignee for questions or triage. Leave this parked only if the work is intentionally on hold.",
+    "parked": "Parked",
+    "parkedDescription": "will not be asked to work on this until status changes to To do or In progress.",
+    "resumeNow": "Resume now",
+    "resuming": "Resuming…"
+  },
+  "issueScheduledRetry": {
+    "alreadyPromoted": "Already promoted",
+    "alreadyPromotedRunStarting": "Already promoted — run starting",
+    "attempt": "Attempt {{attempt}}",
+    "automaticContinuation": "Automatic continuation",
+    "automaticRetry": "Automatic retry",
+    "automaticTitle": "{{action}} {{suffix}}",
+    "couldNotRetryNow": "Couldn't retry now",
+    "dueNow": "due now",
+    "lastAttemptFailed": "Last attempt failed: {{error}}. Paperclip will retry automatically.",
+    "pendingSchedule": "pending schedule",
+    "promoted": "Promoted",
+    "promotedRunStarting": "Promoted — run starting",
+    "promotingScheduledRetry": "Promoting scheduled retry",
+    "pullsContinuationForward": "Pulls continuation forward immediately",
+    "pullsRetryForward": "Pulls retry forward immediately",
+    "replacesRun": "Replaces run",
+    "retryNow": "Retry now",
+    "retryScheduled": "Retry scheduled",
+    "retrying": "Retrying…",
+    "continuationScheduled": "Continuation scheduled",
+    "tryAgain": "Try again"
+  },
   "issueDetail": {
     "acceptFailed": "Accept failed",
     "acceptedDraftsSkipped_one": "Accepted {{created}} draft and skipped {{skipped}}",

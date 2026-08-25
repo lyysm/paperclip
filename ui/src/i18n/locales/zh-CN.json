@@ -3781,6 +3781,37 @@
     "ultimatelyWaitingOn": "最终等待",
     "waitingOnLiveWork": "等待正在运行的工作"
   },
+  "issueAssignedBacklog": {
+    "assignee": "负责人",
+    "commentsDescription": "评论仍会通知负责人，以便提问或分诊。仅当工作确实有意暂停时，才应保持此状态。",
+    "parked": "已停放",
+    "parkedDescription": "在状态变更为“待处理”或“进行中”前，不会被要求处理此任务。",
+    "resumeNow": "立即恢复",
+    "resuming": "正在恢复…"
+  },
+  "issueScheduledRetry": {
+    "alreadyPromoted": "已推进",
+    "alreadyPromotedRunStarting": "已推进——运行即将开始",
+    "attempt": "第 {{attempt}} 次尝试",
+    "automaticContinuation": "自动继续运行",
+    "automaticRetry": "自动重试",
+    "automaticTitle": "{{action}}{{suffix}}",
+    "couldNotRetryNow": "无法立即重试",
+    "dueNow": "现在到期",
+    "lastAttemptFailed": "上次尝试失败：{{error}}。Paperclip 将自动重试。",
+    "pendingSchedule": "等待排期",
+    "promoted": "已推进",
+    "promotedRunStarting": "已推进——运行即将开始",
+    "promotingScheduledRetry": "正在推进已排期的重试",
+    "pullsContinuationForward": "立即提前继续运行",
+    "pullsRetryForward": "立即提前重试",
+    "replacesRun": "替代运行",
+    "retryNow": "立即重试",
+    "retryScheduled": "已排期重试",
+    "retrying": "正在重试…",
+    "continuationScheduled": "已排期继续运行",
+    "tryAgain": "再试一次"
+  },
   "issueDetail": {
     "acceptFailed": "接受失败",
     "acceptedDraftsSkipped_one": "已接受 {{created}} 个草稿并跳过 {{skipped}} 个",

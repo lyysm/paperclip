@@ -395,6 +395,21 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueBlockedNotice, "stillBlockedByOther_other")).toContain("{{count}}");
   });
 
+  it("translates the assigned backlog notice", () => {
+    const issueAssignedBacklog = group("issueAssignedBacklog");
+    expect(entry(issueAssignedBacklog, "parked")).toBe("已停放");
+    expect(entry(issueAssignedBacklog, "parkedDescription")).toContain("进行中");
+    expect(entry(issueAssignedBacklog, "resumeNow")).toBe("立即恢复");
+  });
+
+  it("translates scheduled retry controls", () => {
+    const issueScheduledRetry = group("issueScheduledRetry");
+    expect(entry(issueScheduledRetry, "retryScheduled")).toBe("已排期重试");
+    expect(entry(issueScheduledRetry, "automaticTitle")).toContain("{{action}}");
+    expect(entry(issueScheduledRetry, "attempt")).toContain("{{attempt}}");
+    expect(entry(issueScheduledRetry, "lastAttemptFailed")).toContain("{{error}}");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

@@ -29,7 +29,7 @@ export function ReusableExecutionWorkspaceSelect<TWorkspace extends ReusableExec
   value,
   workspaces,
   onValueChange,
-  placeholder = "Choose an existing workspace",
+  placeholder,
   loading = false,
   error = false,
   disabled = false,
@@ -62,7 +62,11 @@ export function ReusableExecutionWorkspaceSelect<TWorkspace extends ReusableExec
         <span className="flex min-w-0 flex-col">
           <span className={cn("truncate", selected && "font-medium")}>{option.label}</span>
           <span className="truncate text-(length:--text-micro) text-muted-foreground">
-            {option.workspace.status ? `${option.workspace.status} - ` : ""}
+            {option.workspace.status
+              ? `${t(`issueWorkspaceCard.status.${option.workspace.status}`, {
+                defaultValue: option.workspace.status,
+              })} - `
+              : ""}
             {option.description}
           </span>
         </span>

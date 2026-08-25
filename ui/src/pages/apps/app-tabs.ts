@@ -1,4 +1,5 @@
 import { Activity, Beaker, Inbox, Settings2, ShieldCheck, Wrench } from "lucide-react";
+import { t } from "@/i18n";
 
 export const APP_TABS = [
   { key: "setup", label: "Setup", icon: Settings2 },
@@ -10,6 +11,15 @@ export const APP_TABS = [
 ] as const;
 
 export type AppTabKey = (typeof APP_TABS)[number]["key"];
+
+const APP_TAB_I18N_KEYS: Record<AppTabKey, string> = {
+  setup: "appsPage.tabs.setup",
+  review: "appsPage.tabs.review",
+  permissions: "appsPage.tabs.permissions",
+  activity: "appsPage.tabs.activity",
+  test: "appsPage.tabs.test",
+  advanced: "appsPage.tabs.advanced",
+};
 
 /**
  * Tabs hidden for an application that has no live connection (the
@@ -31,5 +41,6 @@ export function isAppTabKey(value: string | undefined): value is AppTabKey {
 }
 
 export function appTabLabel(tabKey: AppTabKey): string {
-  return APP_TABS.find((tab) => tab.key === tabKey)?.label ?? "Setup";
+  const tab = APP_TABS.find((candidate) => candidate.key === tabKey);
+  return t(APP_TAB_I18N_KEYS[tabKey], { defaultValue: tab?.label ?? "Setup" });
 }

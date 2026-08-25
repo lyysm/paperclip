@@ -1,3 +1,4 @@
+import { t, useTranslation } from "@/i18n";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
 
@@ -9,14 +10,24 @@ const ITEMS: { key: SubNavKey; label: string; href: string }[] = [
   { key: "activity", label: "Activity", href: "/activity" },
 ];
 
+const ITEM_I18N_KEYS: Record<SubNavKey, string> = {
+  connected: "appsPage.gateways.subNav.connected",
+  gateways: "appsPage.gateways.subNav.gateways",
+  activity: "appsPage.gateways.subNav.activity",
+};
+
 /**
  * Shared Apps section sub-navigation (Connected · Gateways · Activity). Keeps
  * the Gateways surface reachable as a first-class Apps tab per the PAP-11178
  * design of record, rather than buried under the Advanced developer door.
  */
 export function AppsSubNav({ active }: { active: SubNavKey }) {
+  const { t } = useTranslation();
   return (
-    <nav className="flex items-center gap-6 border-b border-border text-sm" aria-label="Apps sections">
+    <nav
+      className="flex items-center gap-6 border-b border-border text-sm"
+      aria-label={t("appsPage.gateways.subNav.sectionsAriaLabel", { defaultValue: "Apps sections" })}
+    >
       {ITEMS.map((item) => {
         const isActive = item.key === active;
         return (
@@ -31,7 +42,7 @@ export function AppsSubNav({ active }: { active: SubNavKey }) {
             )}
             aria-current={isActive ? "page" : undefined}
           >
-            {item.label}
+            {t(ITEM_I18N_KEYS[item.key], { defaultValue: item.label })}
           </Link>
         );
       })}

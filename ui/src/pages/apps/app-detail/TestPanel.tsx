@@ -40,6 +40,7 @@ import {
   type JsonSchemaNode,
 } from "@/components/JsonSchemaForm";
 import { cn, relativeTime } from "@/lib/utils";
+import { t, useTranslation } from "@/i18n";
 import { appTabHref } from "../app-tabs";
 
 // ---------------------------------------------------------------------------
@@ -85,6 +86,12 @@ const DECISION_META: Record<ToolConnectionTestDecision, DecisionMeta> = {
   },
 };
 
+function decisionLabel(decision: ToolConnectionTestDecision): string {
+  return t(`appsPage.detail.test.decision.${decision}`, {
+    defaultValue: DECISION_META[decision].label,
+  });
+}
+
 function DecisionBadge({ decision }: { decision: ToolConnectionTestDecision }) {
   const meta = DECISION_META[decision];
   return (
@@ -94,21 +101,26 @@ function DecisionBadge({ decision }: { decision: ToolConnectionTestDecision }) {
         meta.className,
       )}
     >
-      {meta.label}
+      {decisionLabel(decision)}
     </span>
   );
 }
 
 /** "Allowed for 1 action · Ask first for 2 · Off for 1" — singular gets " action". */
 function summaryCount(label: string, n: number): string {
-  return `${label} ${n}${n === 1 ? " action" : ""}`;
+  return t("appsPage.detail.test.summaryCount", {
+    defaultValue: "{{label}} {{count}}{{unit}}",
+    label,
+    count: n,
+    unit: n === 1 ? t("appsPage.detail.test.actionSingular", { defaultValue: " action" }) : "",
+  });
 }
 
 function accessSummaryLine(summary: ToolConnectionAccessSummary): string {
   return [
-    summaryCount("Allowed for", summary.allowedCount),
-    summaryCount("Ask first for", summary.askFirstCount),
-    summaryCount("Off for", summary.offCount),
+    summaryCount(t("appsPage.detail.test.allowedFor", { defaultValue: "Allowed for" }), summary.allowedCount),
+    summaryCount(t("appsPage.detail.test.askFirstFor", { defaultValue: "Ask first for" }), summary.askFirstCount),
+    summaryCount(t("appsPage.detail.test.offFor", { defaultValue: "Off for" }), summary.offCount),
   ].join(" · ");
 }
 
@@ -129,6 +141,7 @@ export function TestPanel({
   /** New, not-yet-reviewed actions — shown as Off so they're reachable to test. */
   quarantined?: ToolCatalogEntry[];
 }) {
+  const { t } = useTranslation();
   const testAgentsQuery = useQuery({
     queryKey: queryKeys.tools.testAgents(connectionId),
     queryFn: () => toolsApi.listTestAgents(connectionId),
@@ -213,13 +226,18 @@ export function TestPanel({
   if (agents.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-card p-6 text-center">
-        <p className="text-sm font-medium text-foreground">No agents to test as</p>
+        <p className="text-sm font-medium text-foreground">
+          {t("appsPage.detail.test.noAgentsTitle", { defaultValue: "No agents to test as" })}
+        </p>
         <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-          Only agents you can assign tasks to can preview {appName}. Give an agent access in{" "}
+          {t("appsPage.detail.test.noAgentsBody", {
+            defaultValue: "Only agents you can assign tasks to can preview {{name}}. Give an agent access in",
+            name: appName,
+          })}{" "}
           <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-            Permissions
+            {t("appsPage.detail.test.permissions", { defaultValue: "Permissions" })}
           </Link>{" "}
-          to test it here.
+          {t("appsPage.detail.test.noAgentsBodySuffix", { defaultValue: "to test it here." })}
         </p>
       </div>
     );
@@ -251,29 +269,34 @@ export function TestPanel({
           <div className="relative min-w-(--sz-12rem) flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              aria-label="Find an action"
-              placeholder="Find an action…"
+              aria-label={t("appsPage.detail.test.findAction", { defaultValue: "Find an action" })}
+              placeholder={t("appsPage.detail.test.findActionPlaceholder", { defaultValue: "Find an action…" })}
               className="pl-9"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
           </div>
-          <FilterChip label={`All ${active.length + quarantinedActions.length}`} active={kindFilter === "all"} onClick={() => setKindFilter("all")} />
-          <FilterChip label={`Read ${readActions.length}`} active={kindFilter === "read"} onClick={() => setKindFilter("read")} />
-          <FilterChip label={`Write ${writeActions.length}`} active={kindFilter === "write"} onClick={() => setKindFilter("write")} />
+          <FilterChip label={t("appsPage.detail.test.filterAll", { defaultValue: "All {{count}}", count: active.length + quarantinedActions.length })} active={kindFilter === "all"} onClick={() => setKindFilter("all")} />
+          <FilterChip label={t("appsPage.detail.test.filterRead", { defaultValue: "Read {{count}}", count: readActions.length })} active={kindFilter === "read"} onClick={() => setKindFilter("read")} />
+          <FilterChip label={t("appsPage.detail.test.filterWrite", { defaultValue: "Write {{count}}", count: writeActions.length })} active={kindFilter === "write"} onClick={() => setKindFilter("write")} />
         </div>
-        <p className="text-xs text-muted-foreground">{visibleCount} matches · sorted A–Z</p>
+        <p className="text-xs text-muted-foreground">
+          {t("appsPage.detail.test.matchesSorted", { defaultValue: "{{count}} matches · sorted A–Z", count: visibleCount })}
+        </p>
       </div>
 
       {visibleCount === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          No actions match “{query}”. Clear the search to see them all.
+          {t("appsPage.detail.test.noActionsMatch", {
+            defaultValue: "No actions match “{{query}}”. Clear the search to see them all.",
+            query,
+          })}
         </div>
       ) : (
         <div className="space-y-6">
           {visibleRead.length > 0 && selectedAgent && (
             <ActionGroup
-              heading={`Read (${visibleRead.length})`}
+              heading={t("appsPage.detail.test.readHeading", { defaultValue: "Read ({{count}})", count: visibleRead.length })}
               entries={visibleRead}
               decisionFor={decisionFor}
               agent={selectedAgent}
@@ -282,7 +305,7 @@ export function TestPanel({
           )}
           {visibleWrite.length > 0 && selectedAgent && (
             <ActionGroup
-              heading={`Write (${visibleWrite.length})`}
+              heading={t("appsPage.detail.test.writeHeading", { defaultValue: "Write ({{count}})", count: visibleWrite.length })}
               entries={visibleWrite}
               decisionFor={decisionFor}
               agent={selectedAgent}
@@ -291,8 +314,8 @@ export function TestPanel({
           )}
           {visibleQuarantined.length > 0 && selectedAgent && (
             <ActionGroup
-              heading={`New (${visibleQuarantined.length})`}
-              subheading="New actions wait, switched off, until you turn them on."
+              heading={t("appsPage.detail.test.newHeading", { defaultValue: "New ({{count}})", count: visibleQuarantined.length })}
+              subheading={t("appsPage.detail.test.newSubheading", { defaultValue: "New actions wait, switched off, until you turn them on." })}
               entries={visibleQuarantined}
               decisionFor={() => "off" as const}
               agent={selectedAgent}
@@ -310,14 +333,20 @@ export function TestPanel({
 // ---------------------------------------------------------------------------
 
 function EmptyState({ connectionId, appName }: { connectionId: string; appName: string }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-lg border border-border bg-card p-8 text-center">
-      <p className="text-base font-bold text-foreground">Nothing to test yet</p>
+      <p className="text-base font-bold text-foreground">
+        {t("appsPage.detail.test.emptyTitle", { defaultValue: "Nothing to test yet" })}
+      </p>
       <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
-        Once {appName} is connected, the actions it offers will show up here so you can try them out.
+        {t("appsPage.detail.test.emptyBody", {
+          defaultValue: "Once {{name}} is connected, the actions it offers will show up here so you can try them out.",
+          name: appName,
+        })}
       </p>
       <Button asChild className="mt-4" variant="outline">
-        <Link to={appTabHref(connectionId, "setup")}>Go to Setup</Link>
+        <Link to={appTabHref(connectionId, "setup")}>{t("appsPage.detail.test.goToSetup", { defaultValue: "Go to Setup" })}</Link>
       </Button>
     </div>
   );
@@ -342,11 +371,12 @@ function TestAsHeader({
   connectionId: string;
   compact: boolean;
 }) {
+  const { t } = useTranslation();
   if (compact) {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
         <p className="text-sm text-muted-foreground">
-          Testing as{" "}
+          {t("appsPage.detail.test.testingAs", { defaultValue: "Testing as" })}{" "}
           <AgentPicker
             agents={agents}
             selectedAgent={selectedAgent}
@@ -364,7 +394,9 @@ function TestAsHeader({
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Test as</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t("appsPage.detail.test.testAs", { defaultValue: "Test as" })}
+          </p>
           <AgentPicker
             agents={agents}
             selectedAgent={selectedAgent}
@@ -376,7 +408,10 @@ function TestAsHeader({
         <p className="text-sm text-muted-foreground">{accessSummaryLine(selectedAgent.effectiveAccess)}</p>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Runs real actions in {appName}, exactly as this agent would.
+        {t("appsPage.detail.test.runsAsAgent", {
+          defaultValue: "Runs real actions in {{name}}, exactly as this agent would.",
+          name: appName,
+        })}
       </p>
     </div>
   );
@@ -397,6 +432,7 @@ function AgentPicker({
   appName: string;
   inline?: boolean;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -413,7 +449,7 @@ function AgentPicker({
             "items-center gap-1.5 text-foreground outline-none hover:text-primary focus-visible:text-primary",
             inline ? "inline-flex font-semibold underline-offset-2 hover:underline" : "mt-0.5 flex text-lg font-bold",
           )}
-          aria-label="Choose which agent to test as"
+          aria-label={t("appsPage.detail.test.chooseAgent", { defaultValue: "Choose which agent to test as" })}
         >
           {selectedAgent.name}
           <ChevronsUpDown className={cn("text-muted-foreground", inline ? "h-3.5 w-3.5" : "h-4 w-4")} />
@@ -424,8 +460,8 @@ function AgentPicker({
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              aria-label="Search agents"
-              placeholder="Search agents…"
+              aria-label={t("appsPage.detail.test.searchAgents", { defaultValue: "Search agents" })}
+              placeholder={t("appsPage.detail.test.searchAgentsPlaceholder", { defaultValue: "Search agents…" })}
               className="h-8 pl-8 text-sm"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -435,7 +471,9 @@ function AgentPicker({
         </div>
         <div className="max-h-60 overflow-y-auto p-1">
           {filtered.length === 0 ? (
-            <p className="px-3 py-4 text-center text-xs text-muted-foreground">No agents match.</p>
+            <p className="px-3 py-4 text-center text-xs text-muted-foreground">
+              {t("appsPage.detail.test.noAgentsMatch", { defaultValue: "No agents match." })}
+            </p>
           ) : (
             filtered.map((agent) => {
               const summary = agent.effectiveAccess;
@@ -464,8 +502,13 @@ function AgentPicker({
                     <span className="block truncate text-sm font-medium text-foreground">{agent.name}</span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {noAccess
-                        ? "No access — not allowed for any action"
-                        : `Allowed ${summary.allowedCount} · Ask first ${summary.askFirstCount} · Off ${summary.offCount}`}
+                        ? t("appsPage.detail.test.noAccess", { defaultValue: "No access — not allowed for any action" })
+                        : t("appsPage.detail.test.agentAccessSummary", {
+                            defaultValue: "Allowed {{allowed}} · Ask first {{askFirst}} · Off {{off}}",
+                            allowed: summary.allowedCount,
+                            askFirst: summary.askFirstCount,
+                            off: summary.offCount,
+                          })}
                     </span>
                   </span>
                 </button>
@@ -474,23 +517,31 @@ function AgentPicker({
           )}
         </div>
         <div className="border-t border-border px-3 py-2 text-(length:--text-micro) text-muted-foreground">
-          <p>Only agents you can assign tasks to are listed.</p>
-          <p>Pick one to preview what they'd see in {appName}.</p>
+          <p>{t("appsPage.detail.test.assignableAgentsOnly", { defaultValue: "Only agents you can assign tasks to are listed." })}</p>
+          <p>{t("appsPage.detail.test.previewAgent", { defaultValue: "Pick one to preview what they'd see in {{name}}.", name: appName })}</p>
         </div>
         <div className="border-t border-border p-3">
-          <p className="text-xs font-semibold text-foreground">What the badges mean</p>
+          <p className="text-xs font-semibold text-foreground">
+            {t("appsPage.detail.test.badgesMeaning", { defaultValue: "What the badges mean" })}
+          </p>
           <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-            <li><span className="font-medium text-foreground">Allowed</span> — runs immediately when you press Run.</li>
-            <li><span className="font-medium text-foreground">Ask first</span> — Run is parked in Review for your OK.</li>
             <li>
-              <span className="font-medium text-foreground">Off</span> — won't run. Change it in{" "}
+              <span className="font-medium text-foreground">{decisionLabel("allowed")}</span> — {t("appsPage.detail.test.allowedBadgeHint", { defaultValue: "runs immediately when you press Run." })}
+            </li>
+            <li>
+              <span className="font-medium text-foreground">{decisionLabel("ask_first")}</span> — {t("appsPage.detail.test.askFirstBadgeHint", { defaultValue: "Run is parked in Review for your OK." })}
+            </li>
+            <li>
+              <span className="font-medium text-foreground">{decisionLabel("off")}</span> — {t("appsPage.detail.test.offBadgeHint", { defaultValue: "won't run. Change it in" })}{" "}
               <Link className="text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-                Permissions
+                {t("appsPage.detail.test.permissions", { defaultValue: "Permissions" })}
               </Link>.
             </li>
           </ul>
           <p className="mt-2 text-(length:--text-micro) text-muted-foreground">
-            Badges reflect this agent's current settings, not yours. Swap agents to see how an action would behave for each.
+            {t("appsPage.detail.test.badgesCurrentSettings", {
+              defaultValue: "Badges reflect this agent's current settings, not yours. Swap agents to see how an action would behave for each.",
+            })}
           </p>
         </div>
       </PopoverContent>
@@ -674,9 +725,18 @@ function splitRequiredOptional(schema: JsonSchemaNode): JsonSchemaNode {
 }
 
 const GUT_CHECK: Record<ToolConnectionTestDecision, (app: string, agent: string) => string> = {
-  allowed: (app, agent) => `This runs a real call against ${app} as ${agent}.`,
-  ask_first: () => `Waiting for your OK before this call leaves Paperclip.`,
-  off: (_app, agent) => `No call will be made — this action is off for ${agent}.`,
+  allowed: (app, agent) => t("appsPage.detail.test.gutCheckAllowed", {
+    defaultValue: "This runs a real call against {{app}} as {{agent}}.",
+    app,
+    agent,
+  }),
+  ask_first: () => t("appsPage.detail.test.gutCheckAskFirst", {
+    defaultValue: "Waiting for your OK before this call leaves Paperclip.",
+  }),
+  off: (_app, agent) => t("appsPage.detail.test.gutCheckOff", {
+    defaultValue: "No call will be made — this action is off for {{agent}}.",
+    agent,
+  }),
 };
 
 function ActionTester({
@@ -693,6 +753,7 @@ function ActionTester({
   decision: ToolConnectionTestDecision;
   agent: ToolConnectionTestAgent;
 } & RowSharedProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { selectedCompanyId } = useCompany();
   const rawSchema = (entry.inputSchema ?? { type: "object", properties: {} }) as JsonSchemaNode;
@@ -802,10 +863,12 @@ function ActionTester({
           onChange={setValues}
           errors={errors}
           disabled={running}
-          advancedLabel="More options"
+          advancedLabel={t("appsPage.detail.test.moreOptions", { defaultValue: "More options" })}
         />
       ) : (
-        <p className="text-xs text-muted-foreground">This action takes no inputs.</p>
+        <p className="text-xs text-muted-foreground">
+          {t("appsPage.detail.test.noInputs", { defaultValue: "This action takes no inputs." })}
+        </p>
       )}
 
       <p className="text-xs text-muted-foreground">{GUT_CHECK[decision](appName, agent.name)}</p>
@@ -814,16 +877,18 @@ function ActionTester({
         <Button onClick={onRun} disabled={running} size="sm">
           {running ? (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Running…
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("appsPage.detail.test.running", { defaultValue: "Running…" })}
             </>
           ) : (
             <>
-              <Play className="h-3.5 w-3.5" /> {outcome ? "Run again" : "Run"}
+              <Play className="h-3.5 w-3.5" /> {outcome
+                ? t("appsPage.detail.test.runAgain", { defaultValue: "Run again" })
+                : t("appsPage.detail.test.run", { defaultValue: "Run" })}
             </>
           )}
         </Button>
         <Button onClick={onReset} disabled={running} size="sm" variant="ghost">
-          Reset
+          {t("appsPage.detail.test.reset", { defaultValue: "Reset" })}
         </Button>
       </div>
 
@@ -833,7 +898,12 @@ function ActionTester({
 
       {run.isError && !running && (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          Couldn't reach {agent.name}. {run.error instanceof Error ? run.error.message : "Please try again."}
+          {t("appsPage.detail.test.couldntReach", {
+            defaultValue: "Couldn't reach {{name}}.",
+            name: agent.name,
+          })}{" "}{run.error instanceof Error
+            ? run.error.message
+            : t("appsPage.detail.test.pleaseTryAgain", { defaultValue: "Please try again." })}
         </div>
       )}
 
@@ -861,20 +931,32 @@ function RunningCard({
   elapsedMs: number;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const verb = entry.isReadOnly ? "Reading from" : entry.isWrite ? "Writing to" : "Calling";
   return (
     <div className="rounded-md border border-border bg-muted/30 p-4">
       <div className="flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        <span className="text-sm font-medium text-foreground">Running…</span>
+        <span className="text-sm font-medium text-foreground">
+          {t("appsPage.detail.test.running", { defaultValue: "Running…" })}
+        </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {verb} {appName} as {agentName}.
+        {t(`appsPage.detail.test.verb.${entry.isReadOnly ? "read" : entry.isWrite ? "write" : "call"}`, {
+          defaultValue: `${verb} {{app}} as {{agent}}.`,
+          app: appName,
+          agent: agentName,
+        })}
       </p>
       <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Started {seconds(elapsedMs)} ago · Press cancel to stop</span>
+        <span className="text-xs text-muted-foreground">
+          {t("appsPage.detail.test.startedCancelHint", {
+            defaultValue: "Started {{time}} ago · Press cancel to stop",
+            time: seconds(elapsedMs),
+          })}
+        </span>
         <Button onClick={onCancel} size="sm" variant="outline">
-          Cancel
+          {t("appsPage.detail.test.cancel", { defaultValue: "Cancel" })}
         </Button>
       </div>
     </div>
@@ -896,6 +978,7 @@ function ResultPanel({
   appName: string;
   connectionId: string;
 }) {
+  const { t } = useTranslation();
   const { result } = outcome;
   if (result.decision === "ask_first") {
     return <AskFirstResult outcome={outcome} entry={entry} appName={appName} connectionId={connectionId} />;
@@ -903,7 +986,7 @@ function ResultPanel({
   if (result.decision === "off") {
     return (
       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-        {result.error?.message ?? "This action is off and won't run."}
+        {result.error?.message ?? t("appsPage.detail.test.offResult", { defaultValue: "This action is off and won't run." })}
       </div>
     );
   }
@@ -934,7 +1017,7 @@ function mcpToolError(value: unknown): { message: string; reasonCode: string | n
   const message =
     (typeof envelope.content === "string" && envelope.content.trim() !== "" && envelope.content)
     || (typeof envelope.error === "string" && envelope.error.trim() !== "" && envelope.error)
-    || "The app returned an error result.";
+    || t("appsPage.detail.test.appErrorResult", { defaultValue: "The app returned an error result." });
   return { message, reasonCode: "tool_error" };
 }
 
@@ -972,11 +1055,27 @@ function writeVerb(entry: ToolCatalogEntry): string | null {
 
 function successHeadline(value: unknown, entry: ToolCatalogEntry, appName: string): string {
   const verb = writeVerb(entry);
-  if (!entry.isReadOnly && verb) return `Worked. Row ${verb}.`;
+  if (!entry.isReadOnly && verb) {
+    return t("appsPage.detail.test.workedRow", {
+      defaultValue: "Worked. Row {{verb}}.",
+      verb: t(`appsPage.detail.test.rowVerb.${verb}`, { defaultValue: verb }),
+    });
+  }
   const rows = asRows(value);
-  if (rows) return `Worked. ${rows.length} ${rows.length === 1 ? "row" : "rows"} came back.`;
-  if (isEmptyResult(value)) return "Worked. No data to show.";
-  return `Worked. ${appName} sent back the result.`;
+  if (rows) {
+    return t("appsPage.detail.test.workedRows", {
+      defaultValue: "Worked. {{count}} {{unit}} came back.",
+      count: rows.length,
+      unit: t(rows.length === 1 ? "appsPage.detail.test.rowSingular" : "appsPage.detail.test.rowPlural", {
+        defaultValue: rows.length === 1 ? "row" : "rows",
+      }),
+    });
+  }
+  if (isEmptyResult(value)) return t("appsPage.detail.test.workedNoData", { defaultValue: "Worked. No data to show." });
+  return t("appsPage.detail.test.workedResult", {
+    defaultValue: "Worked. {{name}} sent back the result.",
+    name: appName,
+  });
 }
 
 function AllowedResult({
@@ -990,6 +1089,7 @@ function AllowedResult({
   appName: string;
   connectionId: string;
 }) {
+  const { t } = useTranslation();
   const value = outcome.result.result;
   return (
     <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-4">
@@ -1004,7 +1104,9 @@ function AllowedResult({
 
       {!isEmptyResult(value) && (
         <div className="mt-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t("appsPage.detail.test.preview", { defaultValue: "Preview" })}
+          </p>
           <div className="mt-1.5">
             <PrettyPreview value={value} />
           </div>
@@ -1014,19 +1116,25 @@ function AllowedResult({
       <RawResponseDisclosure value={value} />
 
       <p className="mt-3 text-xs text-muted-foreground">
-        This call is in the{" "}
+        {t("appsPage.detail.test.callIn", { defaultValue: "This call is in the" })}{" "}
         <Link className="text-primary hover:underline" to={appTabHref(connectionId, "activity")}>
-          Activity tab
+          {t("appsPage.detail.test.activityTab", { defaultValue: "Activity tab" })}
         </Link>
         .
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">Last run finished in {seconds(outcome.durationMs)}.</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {t("appsPage.detail.test.lastRunFinished", {
+          defaultValue: "Last run finished in {{time}}.",
+          time: seconds(outcome.durationMs),
+        })}
+      </p>
     </div>
   );
 }
 
 /** Pretty preview: table for row arrays, depth-limited JSON otherwise, plain text for strings. */
 function PrettyPreview({ value }: { value: unknown }) {
+  const { t } = useTranslation();
   const rows = asRows(value);
   if (rows) {
     const columns = Array.from(new Set(rows.flatMap((r) => Object.keys(r)))).slice(0, 6);
@@ -1052,7 +1160,9 @@ function PrettyPreview({ value }: { value: unknown }) {
           </tbody>
         </table>
         {rows.length > shown.length && (
-          <p className="px-2.5 py-1.5 text-(length:--text-micro) text-muted-foreground">… {rows.length - shown.length} more rows</p>
+          <p className="px-2.5 py-1.5 text-(length:--text-micro) text-muted-foreground">
+            {t("appsPage.detail.test.moreRows", { defaultValue: "… {{count}} more rows", count: rows.length - shown.length })}
+          </p>
         )}
       </div>
     );
@@ -1086,6 +1196,7 @@ function collapseDeep(value: unknown, maxDepth: number, depth = 0): unknown {
 }
 
 function RawResponseDisclosure({ value }: { value: unknown }) {
+  const { t } = useTranslation();
   const [showRaw, setShowRaw] = useState(false);
   if (value === undefined || value === null) return null;
   return (
@@ -1095,7 +1206,9 @@ function RawResponseDisclosure({ value }: { value: unknown }) {
         onClick={() => setShowRaw((prev) => !prev)}
         className="text-xs font-semibold uppercase tracking-wide text-primary hover:underline"
       >
-        {showRaw ? "Hide raw response" : "Show raw response"}
+        {showRaw
+          ? t("appsPage.detail.test.hideRawResponse", { defaultValue: "Hide raw response" })
+          : t("appsPage.detail.test.showRawResponse", { defaultValue: "Show raw response" })}
       </button>
       {showRaw && (
         <pre className="mt-2 max-h-64 overflow-auto rounded-md border border-border bg-background p-3 text-xs text-foreground">
@@ -1119,35 +1232,53 @@ function ErrorResult({
   connectionId: string;
   error: { message: string; reasonCode: string | null };
 }) {
+  const { t } = useTranslation();
   const hints = errorHints(error.message, error.reasonCode);
   return (
     <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-4">
       <div className="flex items-center gap-2">
         <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-        <span className="text-sm font-medium text-foreground">It didn't work.</span>
+        <span className="text-sm font-medium text-foreground">
+          {t("appsPage.detail.test.didntWork", { defaultValue: "It didn't work." })}
+        </span>
       </div>
       <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
         <Clock className="h-3 w-3" />
-        Tried as {outcome.agentName} · {seconds(outcome.durationMs)} · {relTime(outcome.ranAt)}
+        {t("appsPage.detail.test.triedAs", {
+          defaultValue: "Tried as {{agent}} · {{duration}} · {{time}}",
+          agent: outcome.agentName,
+          duration: seconds(outcome.durationMs),
+          time: relTime(outcome.ranAt),
+        })}
       </p>
       <div className="mt-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">What {appName} said</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("appsPage.detail.test.whatAppSaid", { defaultValue: "What {{name}} said", name: appName })}
+        </p>
         <p className="mt-1 break-words text-sm text-foreground">{error.message}</p>
-        {error.reasonCode && <p className="mt-0.5 text-xs text-muted-foreground">code: {error.reasonCode}</p>}
+        {error.reasonCode && (
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {t("appsPage.detail.test.errorCode", { defaultValue: "code: {{code}}", code: error.reasonCode })}
+          </p>
+        )}
       </div>
       <div className="mt-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">What to try</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("appsPage.detail.test.whatToTry", { defaultValue: "What to try" })}
+        </p>
         <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-foreground">
           {hints.map((hint) => (
             <li key={hint}>{hint}</li>
           ))}
         </ul>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">Adjust the input above and try again.</p>
+      <p className="mt-3 text-xs text-muted-foreground">
+        {t("appsPage.detail.test.adjustAndRetry", { defaultValue: "Adjust the input above and try again." })}
+      </p>
       <p className="mt-1 text-xs text-muted-foreground">
-        Also visible in the{" "}
+        {t("appsPage.detail.test.alsoVisibleIn", { defaultValue: "Also visible in the" })}{" "}
         <Link className="text-primary hover:underline" to={appTabHref(connectionId, "activity")}>
-          Activity tab
+          {t("appsPage.detail.test.activityTab", { defaultValue: "Activity tab" })}
         </Link>
         .
       </p>
@@ -1189,6 +1320,7 @@ function AskFirstResult({
   appName: string;
   connectionId: string;
 }) {
+  const { t } = useTranslation();
   const { selectedCompanyId } = useCompany();
   const queryClient = useQueryClient();
   const actionRequestId = outcome.result.actionRequestId;
@@ -1245,37 +1377,53 @@ function AskFirstResult({
   const where = formatWhere(status?.parameters);
   const statusLabel =
     phase === "running"
-      ? "Approved · running"
+      ? t("appsPage.detail.test.statusApprovedRunning", { defaultValue: "Approved · running" })
       : phase === "denied"
-        ? "Denied — see Review for why"
+        ? t("appsPage.detail.test.statusDenied", { defaultValue: "Denied — see Review for why" })
         : phase === "cancelled"
-          ? "Cancelled"
+          ? t("appsPage.detail.test.statusCancelled", { defaultValue: "Cancelled" })
           : phase === "expired"
-            ? "Expired — send it again"
-            : `Waiting · ${relTime(requestedAt)}`;
+            ? t("appsPage.detail.test.statusExpired", { defaultValue: "Expired — send it again" })
+            : t("appsPage.detail.test.statusWaiting", {
+                defaultValue: "Waiting · {{time}}",
+                time: relTime(requestedAt),
+              });
   const settled = phase === "denied" || phase === "cancelled" || phase === "expired";
 
   return (
     <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-4">
       <div className="flex items-center gap-2">
         <ShieldQuestion className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-        <span className="text-sm font-medium text-foreground">Sent for your OK.</span>
+        <span className="text-sm font-medium text-foreground">
+          {t("appsPage.detail.test.sentForApproval", { defaultValue: "Sent for your OK." })}
+        </span>
       </div>
-      <p className="mt-0.5 text-xs text-muted-foreground">{outcome.agentName} needs your approval before this runs.</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">
+        {t("appsPage.detail.test.needsApproval", {
+          defaultValue: "{{agent}} needs your approval before this runs.",
+          agent: outcome.agentName,
+        })}
+      </p>
 
       <dl className="mt-3 space-y-1.5 text-sm">
         <div className="flex gap-3">
-          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Action</dt>
+          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t("appsPage.detail.test.actionLabel", { defaultValue: "Action" })}
+          </dt>
           <dd className="text-foreground">{entry.title ?? entry.toolName}</dd>
         </div>
         {where && (
           <div className="flex gap-3">
-            <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Where</dt>
+            <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("appsPage.detail.test.whereLabel", { defaultValue: "Where" })}
+            </dt>
             <dd className="break-words text-foreground">{where}</dd>
           </div>
         )}
         <div className="flex gap-3">
-          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</dt>
+          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t("appsPage.detail.test.statusLabel", { defaultValue: "Status" })}
+          </dt>
           <dd className={cn("flex items-center gap-1.5 text-foreground", settled && "text-muted-foreground")}>
             {phase === "running" && <Loader2 className="h-3 w-3 animate-spin" />}
             {statusLabel}
@@ -1285,21 +1433,25 @@ function AskFirstResult({
 
       {!settled && (
         <p className="mt-3 text-sm text-foreground">
-          Approve it in the{" "}
+          {t("appsPage.detail.test.approveIn", { defaultValue: "Approve it in the" })}{" "}
           <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "review")}>
-            Review tab
+            {t("appsPage.detail.test.reviewTab", { defaultValue: "Review tab" })}
           </Link>{" "}
-          to finish the test. You can also cancel the request.
+          {t("appsPage.detail.test.finishOrCancel", { defaultValue: "to finish the test. You can also cancel the request." })}
         </p>
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button asChild size="sm" variant="outline">
-          <Link to={appTabHref(connectionId, "review")}>Open Review tab</Link>
+          <Link to={appTabHref(connectionId, "review")}>
+            {t("appsPage.detail.test.openReviewTab", { defaultValue: "Open Review tab" })}
+          </Link>
         </Button>
         {phase === "waiting" && actionRequestId && selectedCompanyId && (
           <Button size="sm" variant="ghost" onClick={() => cancel.mutate()} disabled={cancel.isPending}>
-            {cancel.isPending ? "Cancelling…" : "Cancel this request"}
+            {cancel.isPending
+              ? t("appsPage.detail.test.cancelling", { defaultValue: "Cancelling…" })
+              : t("appsPage.detail.test.cancelRequest", { defaultValue: "Cancel this request" })}
           </Button>
         )}
       </div>
@@ -1324,6 +1476,7 @@ function OffExplanation({
   allAgents: ToolConnectionTestAgent[];
   onSelectAgent: (agentId: string) => void;
 }) {
+  const { t } = useTranslation();
   const title = entry.title ?? entry.toolName;
   const permHref = `${appTabHref(connectionId, "permissions")}?focus=${encodeURIComponent(entry.id)}`;
 
@@ -1338,10 +1491,13 @@ function OffExplanation({
   const allOff = allAgents.every((a) => decisionOf(a) === "off");
 
   const whyBody = entry.status === "quarantined"
-    ? "This action is new and hasn't been turned on yet."
+    ? t("appsPage.detail.test.offWhyNew", { defaultValue: "This action is new and hasn't been turned on yet." })
     : allOff
-      ? "An admin set it to Off for all agents using this app."
-      : `${agent.name}'s access profile sets this action to Off.`;
+      ? t("appsPage.detail.test.offWhyAll", { defaultValue: "An admin set it to Off for all agents using this app." })
+      : t("appsPage.detail.test.offWhyAgent", {
+          defaultValue: "{{name}}'s access profile sets this action to Off.",
+          name: agent.name,
+        });
 
   // "Last changed by {Actor} · {relativeTime}" — only the access config carries
   // this; a quarantined action has never been configured, so there's nothing to
@@ -1349,7 +1505,11 @@ function OffExplanation({
   const { lastChangedAt, lastChangedByName } = agent.effectiveAccess;
   const auditHint =
     entry.status !== "quarantined" && lastChangedAt
-      ? `Last changed${lastChangedByName ? ` by ${lastChangedByName}` : ""} · ${relTime(new Date(lastChangedAt))}`
+      ? t("appsPage.detail.test.lastChanged", {
+          defaultValue: "Last changed{{by}} · {{time}}",
+          by: lastChangedByName ? ` by ${lastChangedByName}` : "",
+          time: relTime(new Date(lastChangedAt)),
+        })
       : null;
 
   const otherSettings = others.map((a) => ({ name: a.name, decision: decisionOf(a) }));
@@ -1361,34 +1521,42 @@ function OffExplanation({
         <div className="flex items-start gap-2 rounded-md border border-border bg-muted/40 p-3">
           <Ban className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
           <div className="text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">{title} is off for {agent.name}.</p>
-            <p className="mt-0.5">It won't run here, and it won't run from a task either.</p>
+            <p className="font-medium text-foreground">
+              {t("appsPage.detail.test.offTitle", { defaultValue: "{{title}} is off for {{agent}}.", title, agent: agent.name })}
+            </p>
+            <p className="mt-0.5">{t("appsPage.detail.test.offBody", { defaultValue: "It won't run here, and it won't run from a task either." })}</p>
             <p className="mt-2">
-              Want to test it? Turn it on for {agent.name} in{" "}
+              {t("appsPage.detail.test.turnOnToTest", { defaultValue: "Want to test it? Turn it on for {{agent}} in", agent: agent.name })}{" "}
               <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-                Permissions
+                {t("appsPage.detail.test.permissions", { defaultValue: "Permissions" })}
               </Link>{" "}
-              — set it to Allowed or Ask first.
+              {t("appsPage.detail.test.setAllowedOrAsk", { defaultValue: "— set it to Allowed or Ask first." })}
             </p>
           </div>
         </div>
         <Button asChild size="sm">
-          <Link to={permHref}>Open Permissions →</Link>
+          <Link to={permHref}>{t("appsPage.detail.test.openPermissions", { defaultValue: "Open Permissions →" })}</Link>
         </Button>
-        <p className="text-xs text-muted-foreground">No call will be made — this action is off for {agent.name}.</p>
+        <p className="text-xs text-muted-foreground">
+          {t("appsPage.detail.test.noCallOff", { defaultValue: "No call will be made — this action is off for {{agent}}.", agent: agent.name })}
+        </p>
       </div>
 
       <aside className="rounded-md border border-border bg-card p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Why this is off</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("appsPage.detail.test.whyOff", { defaultValue: "Why this is off" })}
+        </p>
         <p className="mt-1.5 text-xs text-muted-foreground">{whyBody}</p>
         {auditHint && <p className="mt-1.5 text-(length:--text-micro) text-muted-foreground">{auditHint}</p>}
         {otherSettings.length > 0 && (
           <div className="mt-3">
-            <p className="text-(length:--text-micro) font-medium text-muted-foreground">Other agents using {appName}:</p>
+            <p className="text-(length:--text-micro) font-medium text-muted-foreground">
+              {t("appsPage.detail.test.otherAgents", { defaultValue: "Other agents using {{name}}:", name: appName })}
+            </p>
             <ul className="mt-1 space-y-0.5 text-(length:--text-micro) text-muted-foreground">
               {otherSettings.map((s) => (
                 <li key={s.name}>
-                  {s.name}: <span className="text-foreground">{DECISION_META[s.decision].label}</span>
+                  {s.name}: <span className="text-foreground">{decisionLabel(s.decision)}</span>
                 </li>
               ))}
             </ul>
@@ -1396,7 +1564,9 @@ function OffExplanation({
         )}
         {tryAgents.length > 0 && (
           <div className="mt-3">
-            <p className="text-(length:--text-micro) font-medium text-muted-foreground">Try as a different agent:</p>
+            <p className="text-(length:--text-micro) font-medium text-muted-foreground">
+              {t("appsPage.detail.test.tryDifferentAgent", { defaultValue: "Try as a different agent:" })}
+            </p>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {tryAgents.slice(0, 4).map((other) => (
                 <button
@@ -1437,25 +1607,25 @@ export function errorHints(message: string, reasonCode: string | null | undefine
   const haystack = `${reasonCode ?? ""} ${message}`.toUpperCase();
   if (haystack.includes("NOT_FOUND")) {
     return [
-      "Double-check the ID or name you entered — pick it from a dropdown if one is offered.",
-      "Make sure this agent has access to that resource in the connected account.",
+      t("appsPage.detail.test.errorHintNotFoundId", { defaultValue: "Double-check the ID or name you entered — pick it from a dropdown if one is offered." }),
+      t("appsPage.detail.test.errorHintNotFoundAccess", { defaultValue: "Make sure this agent has access to that resource in the connected account." }),
     ];
   }
   if (haystack.includes("PERMISSION") || haystack.includes("FORBIDDEN") || haystack.includes("UNAUTHORIZED")) {
     return [
-      "The connected account may not have permission for this action.",
-      "Reconnect the app from Setup if its access was recently changed.",
+      t("appsPage.detail.test.errorHintPermission", { defaultValue: "The connected account may not have permission for this action." }),
+      t("appsPage.detail.test.errorHintReconnect", { defaultValue: "Reconnect the app from Setup if its access was recently changed." }),
     ];
   }
   if (haystack.includes("INVALID_ARGUMENT") || haystack.includes("INVALID") || haystack.includes("BAD_REQUEST")) {
     return [
-      "Check the field formats above — a value may be the wrong type or shape.",
-      "Open “More options” to confirm any advanced fields are filled in correctly.",
+      t("appsPage.detail.test.errorHintFields", { defaultValue: "Check the field formats above — a value may be the wrong type or shape." }),
+      t("appsPage.detail.test.errorHintAdvanced", { defaultValue: "Open “More options” to confirm any advanced fields are filled in correctly." }),
     ];
   }
   if (haystack.includes("RATE_LIMIT") || haystack.includes("RESOURCE_EXHAUSTED") || haystack.includes("429")) {
-    return ["The app is rate-limiting calls right now — wait a moment and run it again."];
+    return [t("appsPage.detail.test.errorHintRateLimit", { defaultValue: "The app is rate-limiting calls right now — wait a moment and run it again." })];
   }
   // Locked generic fallback (copy-spec decision #2).
-  return ["Check the inputs above and try again."];
+  return [t("appsPage.detail.test.errorHintGeneric", { defaultValue: "Check the inputs above and try again." })];
 }

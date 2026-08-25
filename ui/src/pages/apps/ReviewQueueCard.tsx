@@ -10,6 +10,7 @@ import { timeAgo } from "@/lib/timeAgo";
 import { toolsApi } from "@/api/tools";
 import { Button } from "@/components/ui/button";
 import { MarkdownBody } from "@/components/MarkdownBody";
+import { t, useTranslation } from "@/i18n";
 
 /**
  * "Ask first" review queue (M1b float / M9 card, PAP-10859).
@@ -25,12 +26,13 @@ import { MarkdownBody } from "@/components/MarkdownBody";
 export function ReviewQueueCard({
   connectionId,
   emptyState = "hidden",
-  heading = "Waiting for your OK",
+  heading = t("appsPage.review.waitingForYourOk", { defaultValue: "Waiting for your OK" }),
 }: {
   connectionId?: string;
   emptyState?: "hidden" | "reassure";
   heading?: string;
 }) {
+  const { t } = useTranslation();
   const { selectedCompanyId } = useCompany();
 
   const query = useQuery({
@@ -52,7 +54,7 @@ export function ReviewQueueCard({
     if (emptyState === "hidden") return null;
     return (
       <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
-        Nothing is waiting for your OK right now.
+        {t("appsPage.review.nothingWaiting", { defaultValue: "Nothing is waiting for your OK right now." })}
       </div>
     );
   }
@@ -76,6 +78,7 @@ export function ReviewQueueCard({
 }
 
 function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionRequestListItem }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { pushToast } = useToast();
   const [resolving, setResolving] = useState<null | "allow" | "always" | "decline">(null);
@@ -89,7 +92,7 @@ function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionReq
     mutationFn: () => toolsApi.approveActionRequest(companyId, item.request.id),
     onMutate: () => setResolving("allow"),
     onSuccess: () => {
-      pushToast({ title: "Allowed once", body: `${actionLabel(item)} can run this time.`, tone: "success" });
+      pushToast({ title: t("appsPage.review.allowedOnce", { defaultValue: "Allowed once" }), body: t("appsPage.review.canRunThisTime", { defaultValue: "{{action}} can run this time.", action: actionLabel(item) }), tone: "success" });
       invalidate();
     },
     onError: (error) => {
@@ -108,8 +111,8 @@ function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionReq
     onMutate: () => setResolving("always"),
     onSuccess: () => {
       pushToast({
-        title: "Always allowed",
-        body: `${actionLabel(item)} won’t ask again.`,
+        title: t("appsPage.review.alwaysAllowed", { defaultValue: "Always allowed" }),
+        body: t("appsPage.review.wontAskAgain", { defaultValue: "{{action}} won’t ask again.", action: actionLabel(item) }),
         tone: "success",
       });
       invalidate();
@@ -126,7 +129,7 @@ function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionReq
     mutationFn: () => toolsApi.declineActionRequest(companyId, item.request.id),
     onMutate: () => setResolving("decline"),
     onSuccess: () => {
-      pushToast({ title: "Declined", body: `${actionLabel(item)} won’t run.`, tone: "info" });
+      pushToast({ title: t("appsPage.review.declined", { defaultValue: "Declined" }), body: t("appsPage.review.wontRun", { defaultValue: "{{action}} won’t run.", action: actionLabel(item) }), tone: "info" });
       invalidate();
     },
     onError: (error) => {
@@ -145,10 +148,10 @@ function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionReq
         <span className="font-bold text-foreground">{actionLabel(item)}</span>
         {item.applicationName && (
           <span className="text-muted-foreground">
-            in {humanizeConnectionDisplayName(item.applicationName)}
+            {t("appsPage.review.inApp", { defaultValue: "in {{app}}", app: humanizeConnectionDisplayName(item.applicationName) })}
           </span>
         )}
-        <span className="text-xs text-muted-foreground">· asked {timeAgo(item.request.createdAt)}</span>
+        <span className="text-xs text-muted-foreground">{t("appsPage.review.askedAgo", { defaultValue: "· asked {{time}}", time: timeAgo(item.request.createdAt) })}</span>
       </div>
 
       {preview ? (
@@ -157,22 +160,22 @@ function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionReq
         </div>
       ) : (
         <p className="mt-1 text-sm text-muted-foreground">
-          An agent wants to run this action. It can change something, so we’re checking with you first.
+          {t("appsPage.review.agentWantsToRun", { defaultValue: "An agent wants to run this action. It can change something, so we’re checking with you first." })}
         </p>
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button size="sm" onClick={() => allowOnce.mutate()} disabled={busy}>
           {resolving === "allow" ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Check className="mr-1.5 h-3.5 w-3.5" />}
-          Allow once
+          {t("appsPage.review.allowOnce", { defaultValue: "Allow once" })}
         </Button>
         <Button size="sm" variant="outline" onClick={() => alwaysAllow.mutate()} disabled={busy}>
           {resolving === "always" ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
-          Always allow
+          {t("appsPage.review.alwaysAllow", { defaultValue: "Always allow" })}
         </Button>
         <Button size="sm" variant="ghost" onClick={() => decline.mutate()} disabled={busy}>
           {resolving === "decline" ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <X className="mr-1.5 h-3.5 w-3.5" />}
-          Decline
+          {t("appsPage.review.decline", { defaultValue: "Decline" })}
         </Button>
       </div>
     </div>
@@ -180,7 +183,7 @@ function ReviewRow({ companyId, item }: { companyId: string; item: ToolActionReq
 }
 
 function actionLabel(item: ToolActionRequestListItem): string {
-  if (!item.toolTitle && !item.toolName) return "This action";
+  if (!item.toolTitle && !item.toolName) return t("appsPage.review.thisAction", { defaultValue: "This action" });
   return humanizeConnectionDisplayName(item.toolName ?? "", { title: item.toolTitle });
 }
 
@@ -189,8 +192,8 @@ function failToast(
   error: unknown,
 ) {
   pushToast({
-    title: "Couldn’t save that",
-    body: error instanceof Error ? error.message : "Please try again.",
+    title: t("appsPage.review.couldntSave", { defaultValue: "Couldn’t save that" }),
+    body: error instanceof Error ? error.message : t("appsPage.review.pleaseTryAgain", { defaultValue: "Please try again." }),
     tone: "error",
   });
 }

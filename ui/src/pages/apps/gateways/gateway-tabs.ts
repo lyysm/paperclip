@@ -1,4 +1,5 @@
 import { Activity, LayoutGrid, KeyRound, Wrench, Boxes } from "lucide-react";
+import { t } from "@/i18n";
 
 /**
  * Gateway detail tabs (PAP-11200). Terminology is locked by the approved
@@ -13,6 +14,14 @@ export const GATEWAY_TABS = [
   { key: "advanced", label: "Advanced", icon: Wrench },
 ] as const;
 
+const GATEWAY_TAB_I18N_KEYS: Record<GatewayTabKey, string> = {
+  overview: "appsPage.gateways.tabs.overview",
+  apps: "appsPage.gateways.tabs.appsAndTools",
+  tokens: "appsPage.gateways.tabs.tokens",
+  activity: "appsPage.gateways.tabs.activity",
+  advanced: "appsPage.gateways.tabs.advanced",
+};
+
 export type GatewayTabKey = (typeof GATEWAY_TABS)[number]["key"];
 
 export function gatewayTabHref(gatewayId: string, tab: GatewayTabKey): string {
@@ -24,5 +33,6 @@ export function isGatewayTabKey(value: string | undefined): value is GatewayTabK
 }
 
 export function gatewayTabLabel(tabKey: GatewayTabKey): string {
-  return GATEWAY_TABS.find((tab) => tab.key === tabKey)?.label ?? "Overview";
+  const tab = GATEWAY_TABS.find((candidate) => candidate.key === tabKey);
+  return t(GATEWAY_TAB_I18N_KEYS[tabKey], { defaultValue: tab?.label ?? "Overview" });
 }

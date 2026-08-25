@@ -9,17 +9,18 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ApiError } from "@/api/client";
+import { t } from "@/i18n";
 
 /** Risk classification badge for a catalog tool. */
 export function RiskBadge({ risk }: { risk: ToolRiskLevel | null | undefined }) {
-  if (!risk) return <Badge variant="outline">unknown</Badge>;
+  if (!risk) return <Badge variant="outline">{t("toolsShared.risk.unknown", { defaultValue: "unknown" })}</Badge>;
   const variant =
     risk === "high" || risk === "critical"
       ? "destructive"
       : risk === "medium"
         ? "secondary"
         : "outline";
-  return <Badge variant={variant}>{risk}</Badge>;
+  return <Badge variant={variant}>{t(`toolsShared.risk.${risk}`, { defaultValue: risk })}</Badge>;
 }
 
 /** Read/Write/Destructive capability chips. */
@@ -34,9 +35,9 @@ export function CapabilityBadges({
 }) {
   return (
     <span className="inline-flex flex-wrap gap-1">
-      {isReadOnly ? <Badge variant="outline">read-only</Badge> : null}
-      {isWrite ? <Badge variant="secondary">write</Badge> : null}
-      {isDestructive ? <Badge variant="destructive">destructive</Badge> : null}
+      {isReadOnly ? <Badge variant="outline">{t("toolsShared.capability.readOnly", { defaultValue: "read-only" })}</Badge> : null}
+      {isWrite ? <Badge variant="secondary">{t("toolsShared.capability.write", { defaultValue: "write" })}</Badge> : null}
+      {isDestructive ? <Badge variant="destructive">{t("toolsShared.capability.destructive", { defaultValue: "destructive" })}</Badge> : null}
     </span>
   );
 }
@@ -83,25 +84,25 @@ function decisionToStatusKey(decision: string): { key: string; label: string } {
   switch (decision) {
     case "allow":
     case "allowed":
-      return { key: "allowed", label: "allowed" };
+      return { key: "allowed", label: t("toolsShared.decision.allowed", { defaultValue: "allowed" }) };
     case "deny":
     case "denied":
-      return { key: "denied", label: "denied" };
+      return { key: "denied", label: t("toolsShared.decision.denied", { defaultValue: "denied" }) };
     case "block":
-      return { key: "block", label: "block" };
+      return { key: "block", label: t("toolsShared.decision.block", { defaultValue: "block" }) };
     case "require_approval":
     case "requires_approval":
-      return { key: "require-approval", label: "require approval" };
+      return { key: "require-approval", label: t("toolsShared.decision.requireApproval", { defaultValue: "require approval" }) };
     case "redact":
     case "redacted":
-      return { key: "redacted", label: "redacted" };
+      return { key: "redacted", label: t("toolsShared.decision.redacted", { defaultValue: "redacted" }) };
     case "rate_limited":
-      return { key: "rate-limit", label: "rate limited" };
+      return { key: "rate-limit", label: t("toolsShared.decision.rateLimited", { defaultValue: "rate limited" }) };
     case "defer":
     case "deferred":
-      return { key: "deferred", label: "deferred" };
+      return { key: "deferred", label: t("toolsShared.decision.deferred", { defaultValue: "deferred" }) };
     case "hidden":
-      return { key: "hidden", label: "hidden" };
+      return { key: "hidden", label: t("toolsShared.decision.hidden", { defaultValue: "hidden" }) };
     default:
       return { key: decision, label: decision };
   }
@@ -116,7 +117,7 @@ export function DecisionBadge({ decision }: { decision: ToolPolicyDecision | str
 
 /** Compact relative time, falling back to absolute. */
 export function RelativeTime({ value }: { value: Date | string | null | undefined }) {
-  if (!value) return <span className="text-muted-foreground">never</span>;
+  if (!value) return <span className="text-muted-foreground">{t("toolsShared.relativeTime.never", { defaultValue: "never" })}</span>;
   const date = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return <span className="text-muted-foreground">—</span>;
   const diffMs = Date.now() - date.getTime();
@@ -124,11 +125,13 @@ export function RelativeTime({ value }: { value: Date | string | null | undefine
   const mins = Math.round(abs / 60000);
   const isFuture = diffMs < 0;
   let text: string;
-  if (mins < 1) text = "just now";
+  if (mins < 1) text = t("toolsShared.relativeTime.justNow", { defaultValue: "just now" });
   else {
-    const value =
-      mins < 60 ? `${mins}m` : mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`;
-    text = isFuture ? `in ${value}` : `${value} ago`;
+    const amount = mins < 60 ? mins : mins < 1440 ? Math.round(mins / 60) : Math.round(mins / 1440);
+    const unit = mins < 60 ? "m" : mins < 1440 ? "h" : "d";
+    text = isFuture
+      ? t("toolsShared.relativeTime.in", { defaultValue: "in {{amount}}{{unit}}", amount, unit })
+      : t("toolsShared.relativeTime.ago", { defaultValue: "{{amount}}{{unit}} ago", amount, unit });
   }
   return (
     <span title={date.toLocaleString()} className="text-muted-foreground">
@@ -157,7 +160,7 @@ export function ToolsPageHeader({
   );
 }
 
-export function LoadingState({ label = "Loading…" }: { label?: string }) {
+export function LoadingState({ label = t("toolsShared.loading", { defaultValue: "Loading…" }) }: { label?: string }) {
   return (
     <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
       <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
@@ -171,17 +174,17 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
   let message: string;
   if (error instanceof ApiError) {
     if (error.status === 403) {
-      message = "You do not have permission to view this. Tools & Access requires board/admin access.";
+      message = t("toolsShared.errors.forbidden", { defaultValue: "You do not have permission to view this. Tools & Access requires board/admin access." });
     } else if (error.status === 404 || /route not found/i.test(error.message)) {
       // Snapshot-skew window: the route exists in this build but not on the live server snapshot yet.
-      message = "Tools & Access isn't available on this server yet — try refreshing after the next deployment.";
+      message = t("toolsShared.errors.notAvailable", { defaultValue: "Tools & Access isn't available on this server yet — try refreshing after the next deployment." });
     } else {
       message = error.message;
     }
   } else if (error instanceof Error) {
     message = error.message;
   } else {
-    message = "Something went wrong.";
+    message = t("toolsShared.errors.generic", { defaultValue: "Something went wrong." });
   }
   return (
     <Card className="border-destructive/40">
@@ -189,7 +192,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
         <div className="flex items-start gap-2 text-sm text-destructive">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
-            <p className="font-medium">Could not load this view</p>
+            <p className="font-medium">{t("toolsShared.errors.loadFailed", { defaultValue: "Could not load this view" })}</p>
             <p className="text-destructive/80">{message}</p>
           </div>
         </div>
@@ -199,7 +202,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
             onClick={onRetry}
             className="self-start rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent"
           >
-            Retry
+            {t("toolsShared.retry", { defaultValue: "Retry" })}
           </button>
         ) : null}
       </CardContent>
@@ -231,7 +234,7 @@ export function PendingBackendNotice({
         <p className="max-w-2xl text-sm text-muted-foreground">{body}</p>
         {issue ? (
           <a href={issue.href} className="text-sm font-medium text-primary hover:underline">
-            Tracked in {issue.identifier} →
+            {t("toolsShared.trackedIn", { defaultValue: "Tracked in {{identifier}} →", identifier: issue.identifier })}
           </a>
         ) : null}
       </CardContent>

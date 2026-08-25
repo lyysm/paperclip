@@ -4,6 +4,7 @@ import { Link2, Search } from "lucide-react";
 import { useNavigate } from "@/lib/router";
 import { useCompany } from "@/context/CompanyContext";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
+import { useTranslation } from "@/i18n";
 import { queryKeys } from "@/lib/queryKeys";
 import { toolsApi } from "@/api/tools";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +42,7 @@ function connectHrefFor(entry: AppGalleryDisplayEntry): string | null {
  * OAuth, while Zapier and bring-your-own MCP servers use the URL flow.
  */
 export function Browse() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { selectedCompany, selectedCompanyId } = useCompany();
   const { setBreadcrumbs } = useBreadcrumbs();
@@ -48,8 +50,8 @@ export function Browse() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: selectedCompany?.name ?? "Company", href: "/dashboard" },
-      { label: "Apps" },
+      { label: selectedCompany?.name ?? t("appsPage.browse.companyFallback", { defaultValue: "Company" }), href: "/dashboard" },
+      { label: t("appsPage.browse.breadcrumbApps", { defaultValue: "Apps" }) },
     ]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs, selectedCompany?.name]);
@@ -115,7 +117,7 @@ export function Browse() {
   }, [applicationsQuery.data, connectionsQuery.data]);
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select a company to browse apps.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{t("appsPage.browse.selectCompany", { defaultValue: "Select a company to browse apps." })}</div>;
   }
 
   const loading = galleryQuery.isLoading || applicationsQuery.isLoading || connectionsQuery.isLoading;
@@ -136,9 +138,9 @@ export function Browse() {
   return (
     <div className="max-w-5xl space-y-8 pb-12">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">Browse</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("appsPage.browse.title", { defaultValue: "Browse" })}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Choose an app or connect your own MCP server.
+          {t("appsPage.browse.subtitle", { defaultValue: "Choose an app or connect your own MCP server." })}
         </p>
       </header>
 
@@ -148,8 +150,8 @@ export function Browse() {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search apps…"
-          aria-label="Search apps"
+          placeholder={t("appsPage.browse.searchPlaceholder", { defaultValue: "Search apps…" })}
+          aria-label={t("appsPage.browse.searchAriaLabel", { defaultValue: "Search apps" })}
           className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground/30"
         />
       </div>
@@ -165,7 +167,7 @@ export function Browse() {
           {!trimmed && popular.length > 0 && (
             <section className="space-y-3">
               <div className="text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-                Popular
+                {t("appsPage.browse.popular", { defaultValue: "Popular" })}
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 {popular.map((entry) => (
@@ -182,12 +184,12 @@ export function Browse() {
 
           <section className="space-y-3">
             <div className="text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-              {trimmed ? `Results (${filtered.length})` : "All apps"}
+              {trimmed ? t("appsPage.browse.resultsCount", { defaultValue: "Results ({{count}})", count: filtered.length }) : t("appsPage.browse.allApps", { defaultValue: "All apps" })}
             </div>
             {filtered.length === 0 ? (
               <p className="flex items-center gap-1.5 rounded-xl border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
                 <Link2 className="h-4 w-4" />
-                No planned apps match “{query.trim()}”.
+                {t("appsPage.browse.noMatches", { defaultValue: "No planned apps match “{{query}}”.", query: query.trim() })}
               </p>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -224,12 +226,13 @@ function AppTile({
   connectedCount: number;
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
   const disabled = !onOpen;
   const actionLabel = connectedCount > 0
-    ? `${connectedCount} connected already`
+    ? t("appsPage.browse.connectedAlready", { defaultValue: "{{count}} connected already", count: connectedCount })
     : disabled
-      ? "Coming soon"
-      : "Connect →";
+      ? t("appsPage.browse.comingSoon", { defaultValue: "Coming soon" })
+      : t("appsPage.browse.connectArrow", { defaultValue: "Connect →" });
   if (compact) {
     return (
       <button

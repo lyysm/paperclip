@@ -2,18 +2,10 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { ToolMcpGatewayWithTokens } from "@paperclipai/shared";
 import { toolsApi, type ToolAuditOutcome, type ToolGatewayActivityEvent } from "@/api/tools";
+import { t, useTranslation } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState, RelativeTime } from "@/pages/tools/shared";
 import { cn } from "@/lib/utils";
-
-const OUTCOME_LABEL: Record<ToolAuditOutcome, string> = {
-  allowed: "Allowed",
-  blocked: "Blocked",
-  asked_first: "Ask first",
-  waiting: "Waiting",
-  failed: "Failed",
-  unknown: "—",
-};
 
 const OUTCOME_CLASS: Record<ToolAuditOutcome, string> = {
   allowed: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
@@ -40,6 +32,16 @@ export function GatewayActivityPanel({
   companyId: string;
   gateway: ToolMcpGatewayWithTokens;
 }) {
+  const { t } = useTranslation();
+  const outcomeLabel: Record<ToolAuditOutcome, string> = {
+    allowed: t("appsPage.gateways.activity.outcomeAllowed", { defaultValue: "Allowed" }),
+    blocked: t("appsPage.gateways.activity.outcomeBlocked", { defaultValue: "Blocked" }),
+    asked_first: t("appsPage.gateways.activity.outcomeAskFirst", { defaultValue: "Ask first" }),
+    waiting: t("appsPage.gateways.activity.outcomeWaiting", { defaultValue: "Waiting" }),
+    failed: t("appsPage.gateways.activity.outcomeFailed", { defaultValue: "Failed" }),
+    unknown: t("appsPage.gateways.activity.outcomeUnknown", { defaultValue: "—" }),
+  };
+
   const activityQuery = useQuery({
     queryKey: ["tools", "gateway-activity", companyId, gateway.id],
     queryFn: () => toolsApi.listActivity(companyId, { window: "7d", limit: 100 }),
@@ -66,19 +68,31 @@ export function GatewayActivityPanel({
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        Every call through this gateway in the last 7 days, with why it was allowed, blocked, or paused.
+        {t("appsPage.gateways.activity.intro", {
+          defaultValue:
+            "Every call through this gateway in the last 7 days, with why it was allowed, blocked, or paused.",
+        })}
       </p>
       {events.length === 0 ? (
         <div className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          No calls have gone through this gateway yet.
+          {t("appsPage.gateways.activity.empty", {
+            defaultValue: "No calls have gone through this gateway yet.",
+          })}
         </div>
       ) : (
         <ul className="divide-y divide-border rounded-lg border border-border">
           {events.map((event) => {
             const outcome = event.normalizedOutcome;
-            const tool = event.toolDisplayName ?? "tool";
-            const app = event.appDisplayName ?? event.applicationDisplayName ?? "app";
-            const actor = event.agentDisplayName ?? "Client";
+            const tool =
+              event.toolDisplayName ??
+              t("appsPage.gateways.activity.fallbackTool", { defaultValue: "tool" });
+            const app =
+              event.appDisplayName ??
+              event.applicationDisplayName ??
+              t("appsPage.gateways.activity.fallbackApp", { defaultValue: "app" });
+            const actor =
+              event.agentDisplayName ??
+              t("appsPage.gateways.activity.fallbackClient", { defaultValue: "Client" });
             return (
               <li key={event.id} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
@@ -93,7 +107,7 @@ export function GatewayActivityPanel({
                     OUTCOME_CLASS[outcome],
                   )}
                 >
-                  {OUTCOME_LABEL[outcome]}
+                  {outcomeLabel[outcome]}
                 </span>
               </li>
             );

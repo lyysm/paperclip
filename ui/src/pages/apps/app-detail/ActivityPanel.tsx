@@ -8,6 +8,7 @@ import {
 import { Link } from "@/lib/router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { t, useTranslation } from "@/i18n";
 import { timeAgo } from "@/lib/timeAgo";
 import { appTabHref } from "../app-tabs";
 import type { ActivityPanelProps } from "./types";
@@ -38,6 +39,7 @@ function RecentActivity({
   appName,
   userLabelById,
 }: ActivityPanelProps) {
+  const { t } = useTranslation();
   const nameById = useMemo(() => new Map(agents.map((a) => [a.id, a.name])), [agents]);
 
   const rows = useMemo<TimelineRow[]>(() => {
@@ -76,7 +78,9 @@ function RecentActivity({
   return (
     <section className="space-y-2">
       <div>
-        <h2 className="text-sm font-bold text-foreground">Recent activity</h2>
+        <h2 className="text-sm font-bold text-foreground">
+          {t("appsPage.detail.activity.recentActivity", { defaultValue: "Recent activity" })}
+        </h2>
       </div>
       {loading ? (
         <div className="space-y-2 py-4">
@@ -84,7 +88,9 @@ function RecentActivity({
           <Skeleton className="h-4 w-2/3" />
         </div>
       ) : rows.length === 0 ? (
-        <p className="py-5 text-sm text-muted-foreground">No activity yet.</p>
+        <p className="py-5 text-sm text-muted-foreground">
+          {t("appsPage.detail.activity.noActivityYet", { defaultValue: "No activity yet." })}
+        </p>
       ) : (
         <ul className="divide-y divide-border">
           {rows.map((row) => (
@@ -95,7 +101,7 @@ function RecentActivity({
                 <span className="block truncate text-xs text-muted-foreground">
                   {row.issue ? (
                     <>
-                      while working on{" "}
+                      {t("appsPage.detail.activity.whileWorkingOn", { defaultValue: "while working on" })}{" "}
                       <Link
                         to={`/issues/${row.issue.identifier}`}
                         className="font-medium text-muted-foreground hover:text-foreground hover:underline"
@@ -151,9 +157,11 @@ export function resolveActorLabel(
   if (actorId) {
     const label = userLabelById?.get(actorId);
     if (label) return label;
-    if (actorId === "local-board") return "Board";
+    if (actorId === "local-board") {
+      return t("appsPage.detail.activity.board", { defaultValue: "Board" });
+    }
   }
-  return "Someone";
+  return t("appsPage.detail.activity.someone", { defaultValue: "Someone" });
 }
 
 export function humanizeEvent(
@@ -166,32 +174,63 @@ export function humanizeEvent(
   // For Test-tab calls, surface "<User> tested as <Agent>" so prosumer test runs are
   // distinguishable from real heartbeat agent activity in the audit trail (PAP-11415).
   const who = testRunnerLabel
-    ? `${testRunnerLabel} tested as ${agentName ?? "an agent"}`
-    : agentName ?? "An agent";
+    ? t("appsPage.detail.activity.testedAs", {
+        defaultValue: "{{user}} tested as {{agent}}",
+        user: testRunnerLabel,
+        agent: agentName ?? t("appsPage.detail.activity.anAgentLower", { defaultValue: "an agent" }),
+      })
+    : agentName ?? t("appsPage.detail.activity.anAgent", { defaultValue: "An agent" });
   // The raw gateway tool name is prefixed (e.g. `mcp.app-gallery-link-…:kv-set`);
   // humanize it to "Kv Set" to match the cross-app Activity view (PAP-11105).
-  const action = event.toolName ? humanizeConnectionDisplayName(event.toolName) : "an action";
+  const action = event.toolName
+    ? humanizeConnectionDisplayName(event.toolName)
+    : t("appsPage.detail.activity.anAction", { defaultValue: "an action" });
   switch (event.eventType) {
     case "call_completed":
       return {
         primary: event.outcome === "success"
-          ? `${who} used ${action}`
-          : `${who} ran ${action}, but it didn't finish`,
+          ? t("appsPage.detail.activity.usedAction", { defaultValue: "{{who}} used {{action}}", who, action })
+          : t("appsPage.detail.activity.ranActionNotFinish", {
+              defaultValue: "{{who}} ran {{action}}, but it didn't finish",
+              who,
+              action,
+            }),
       };
     case "call_failed":
-      return { primary: `${action} didn't work for ${lower(who)}` };
+      return {
+        primary: t("appsPage.detail.activity.didntWorkFor", {
+          defaultValue: "{{action}} didn't work for {{who}}",
+          action,
+          who: lower(who),
+        }),
+      };
     case "call_denied":
       return {
         primary: testRunnerLabel
-          ? `${who} - ${action} is turned off`
-          : `Blocked ${action} - it isn't turned on`,
+          ? t("appsPage.detail.activity.testedTurnedOff", {
+              defaultValue: "{{who}} - {{action}} is turned off",
+              who,
+              action,
+            })
+          : t("appsPage.detail.activity.blockedNotTurnedOn", {
+              defaultValue: "Blocked {{action}} - it isn't turned on",
+              action,
+            }),
       };
     case "approval_requested":
-      return { primary: `${who} asked before running ${action}` };
+      return {
+        primary: t("appsPage.detail.activity.askedBeforeRunning", {
+          defaultValue: "{{who}} asked before running {{action}}",
+          who,
+          action,
+        }),
+      };
     case "approval_resolved":
       return { primary: humanizeApprovalResolved(action, actionRequest) };
     default:
-      return { primary: `${who} used ${action}` };
+      return {
+        primary: t("appsPage.detail.activity.usedAction", { defaultValue: "{{who}} used {{action}}", who, action }),
+      };
   }
 }
 
@@ -199,10 +238,27 @@ function humanizeApprovalResolved(
   action: string,
   actionRequest?: ActivityPanelProps["actionRequests"][string],
 ): string {
-  const resolver = actionRequest?.resolverDisplayName ?? "Someone";
-  if (actionRequest?.status === "approved") return `${resolver} approved ${action}`;
-  if (actionRequest?.status === "rejected") return `${resolver} said no to ${action}`;
-  return `${resolver} reviewed ${action}`;
+  const resolver = actionRequest?.resolverDisplayName ??
+    t("appsPage.detail.activity.someone", { defaultValue: "Someone" });
+  if (actionRequest?.status === "approved") {
+    return t("appsPage.detail.activity.approvedAction", {
+      defaultValue: "{{who}} approved {{action}}",
+      who: resolver,
+      action,
+    });
+  }
+  if (actionRequest?.status === "rejected") {
+    return t("appsPage.detail.activity.saidNoToAction", {
+      defaultValue: "{{who}} said no to {{action}}",
+      who: resolver,
+      action,
+    });
+  }
+  return t("appsPage.detail.activity.reviewedAction", {
+    defaultValue: "{{who}} reviewed {{action}}",
+    who: resolver,
+    action,
+  });
 }
 
 /** Humanize a connection lifecycle event into a prosumer sentence (PAP-11284). */
@@ -211,26 +267,43 @@ function humanizeLifecycleEvent(
   appName: string,
   agentName: string | null,
 ): string {
-  const who = event.actorDisplayName ?? agentName ?? "Someone";
+  const who = event.actorDisplayName ??
+    agentName ??
+    t("appsPage.detail.activity.someone", { defaultValue: "Someone" });
   switch (event.type) {
     case "app_connected":
-      return `${who} connected ${appName}`;
+      return t("appsPage.detail.activity.connectedApp", {
+        defaultValue: "{{who}} connected {{app}}",
+        who,
+        app: appName,
+      });
     case "app_paused":
-      return `${who} paused this app`;
+      return t("appsPage.detail.activity.pausedApp", { defaultValue: "{{who}} paused this app", who });
     case "app_resumed":
-      return `${who} resumed this app`;
+      return t("appsPage.detail.activity.resumedApp", { defaultValue: "{{who}} resumed this app", who });
     case "reconnected":
-      return `${who} reconnected ${appName}`;
+      return t("appsPage.detail.activity.reconnectedApp", {
+        defaultValue: "{{who}} reconnected {{app}}",
+        who,
+        app: appName,
+      });
     case "disconnected":
-      return `${who} disconnected ${appName}`;
+      return t("appsPage.detail.activity.disconnectedApp", {
+        defaultValue: "{{who}} disconnected {{app}}",
+        who,
+        app: appName,
+      });
     case "allowlist_changed":
       return humanizeAllowlistChange(who, event.details);
     case "actions_quarantined": {
       const count = numberFrom(event.details?.count);
-      return `${count} new ${count === 1 ? "action" : "actions"} need review`;
+      return t("appsPage.detail.activity.quarantinedNeedReview", {
+        defaultValue: "{{count}} new actions need review",
+        count,
+      });
     }
     default:
-      return `${who} updated this app`;
+      return t("appsPage.detail.activity.updatedApp", { defaultValue: "{{who}} updated this app", who });
   }
 }
 
@@ -238,19 +311,37 @@ function humanizeAllowlistChange(who: string, details: Record<string, unknown> |
   const added = numberFrom(details?.added);
   const removed = numberFrom(details?.removed);
   if (added > 0 && removed === 0) {
-    return `${who} added ${added} ${added === 1 ? "sheet" : "sheets"} to the allowlist`;
+    return t(added === 1 ? "appsPage.detail.activity.addedSheetToAllowlist" : "appsPage.detail.activity.addedSheetsToAllowlist", {
+      defaultValue: added === 1 ? "{{who}} added {{count}} sheet to the allowlist" : "{{who}} added {{count}} sheets to the allowlist",
+      who,
+      count: added,
+    });
   }
   if (removed > 0 && added === 0) {
-    return `${who} removed ${removed} ${removed === 1 ? "sheet" : "sheets"} from the allowlist`;
+    return t(removed === 1 ? "appsPage.detail.activity.removedSheetFromAllowlist" : "appsPage.detail.activity.removedSheetsFromAllowlist", {
+      defaultValue: removed === 1 ? "{{who}} removed {{count}} sheet from the allowlist" : "{{who}} removed {{count}} sheets from the allowlist",
+      who,
+      count: removed,
+    });
   }
   if (added > 0 && removed > 0) {
-    return `${who} updated the allowlist (added ${added}, removed ${removed})`;
+    return t("appsPage.detail.activity.updatedAllowlistAddedRemoved", {
+      defaultValue: "{{who}} updated the allowlist (added {{added}}, removed {{removed}})",
+      who,
+      added,
+      removed,
+    });
   }
-  return `${who} updated the allowlist`;
+  return t("appsPage.detail.activity.updatedAllowlist", {
+    defaultValue: "{{who}} updated the allowlist",
+    who,
+  });
 }
 
 function lifecycleLinkLabel(event: ToolConnectionLifecycleEvent): string {
-  return event.type === "actions_quarantined" ? "Review in Setup" : "View in Setup";
+  return event.type === "actions_quarantined"
+    ? t("appsPage.detail.activity.reviewInSetup", { defaultValue: "Review in Setup" })
+    : t("appsPage.detail.activity.viewInSetup", { defaultValue: "View in Setup" });
 }
 
 function numberFrom(value: unknown): number {
@@ -259,7 +350,9 @@ function numberFrom(value: unknown): number {
 }
 
 function lower(who: string): string {
-  return who === "An agent" ? "an agent" : who;
+  return who === t("appsPage.detail.activity.anAgent", { defaultValue: "An agent" })
+    ? t("appsPage.detail.activity.anAgentLower", { defaultValue: "an agent" })
+    : who;
 }
 
 function dotColor(event: ToolCallEvent): string {

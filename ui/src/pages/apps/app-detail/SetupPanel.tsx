@@ -3,6 +3,7 @@ import type { ToolCatalogEntry, ToolConnection } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
+import { t, useTranslation } from "@/i18n";
 import { appDefinitionSlug } from "../app-definition-display";
 import type { AppDetailSectionProps } from "./types";
 import { googleSheetsConfigWithAllowlist, parseGoogleSheetIds } from "../google-sheets";
@@ -67,21 +68,39 @@ function OAuthConnectionSection({
   disabled: boolean;
   onStart: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <section className="rounded-xl border border-border bg-card px-5 py-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-sm font-bold text-foreground">
-            {connected ? `${providerName} connected` : `Connect with ${providerName}`}
+            {connected
+              ? t("appsPage.detail.setup.providerConnected", {
+                  defaultValue: "{{provider}} connected",
+                  provider: providerName,
+                })
+              : t("appsPage.detail.setup.connectWith", {
+                  defaultValue: "Connect with {{provider}}",
+                  provider: providerName,
+                })}
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {connected
-              ? "Your workspace authorization is active. Reconnect any time to replace it."
-              : "Open the provider's consent page to finish connecting this app."}
+              ? t("appsPage.detail.setup.connectedHint", {
+                  defaultValue: "Your workspace authorization is active. Reconnect any time to replace it.",
+                })
+              : t("appsPage.detail.setup.notConnectedHint", {
+                  defaultValue: "Open the provider's consent page to finish connecting this app.",
+                })}
           </p>
         </div>
         <Button type="button" disabled={disabled} onClick={onStart}>
-          {connected ? "Reconnect" : `Connect with ${providerName}`}
+          {connected
+            ? t("appsPage.detail.setup.reconnect", { defaultValue: "Reconnect" })
+            : t("appsPage.detail.setup.connectWith", {
+                defaultValue: "Connect with {{provider}}",
+                provider: providerName,
+              })}
         </Button>
       </div>
     </section>
@@ -106,6 +125,7 @@ function GoogleSheetsAllowlistSection({
   disabled: boolean;
   onUpdateConfig: (config: Record<string, unknown>) => void;
 }) {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const ids = currentSpreadsheetIds(connection);
@@ -115,15 +135,21 @@ function GoogleSheetsAllowlistSection({
   return (
     <section className="rounded-xl border border-border bg-card px-5 py-4">
       <div>
-        <h2 className="text-sm font-bold text-foreground">Sheets agents can use</h2>
+        <h2 className="text-sm font-bold text-foreground">
+          {t("appsPage.detail.setup.sheetsAgentsCanUse", { defaultValue: "Sheets agents can use" })}
+        </h2>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          Agents can only use the sheets listed here.
+          {t("appsPage.detail.setup.sheetsAllowlistHint", {
+            defaultValue: "Agents can only use the sheets listed here.",
+          })}
         </p>
       </div>
 
       <div className="mt-4 space-y-2">
         {ids.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No sheets are connected yet.</div>
+          <div className="text-sm text-muted-foreground">
+            {t("appsPage.detail.setup.noSheetsConnected", { defaultValue: "No sheets are connected yet." })}
+          </div>
         ) : (
           ids.map((id) => {
             const sheetUrl = googleSheetsUrlForId(id);
@@ -135,12 +161,14 @@ function GoogleSheetsAllowlistSection({
                   rel="noreferrer"
                   className="min-w-0 flex-1 text-sm font-medium text-foreground underline-offset-2 hover:underline"
                 >
-                  <span className="block truncate">Open sheet</span>
+                  <span className="block truncate">
+                    {t("appsPage.detail.setup.openSheet", { defaultValue: "Open sheet" })}
+                  </span>
                   <span className="block truncate font-mono text-xs font-normal text-muted-foreground">
                     {sheetUrl}
                   </span>
                   <span className="block truncate font-mono text-(length:--text-micro) font-normal text-muted-foreground/80">
-                    ID: {id}
+                    {t("appsPage.detail.setup.sheetId", { defaultValue: "ID: {{id}}", id })}
                   </span>
                 </a>
                 <Button
@@ -148,10 +176,16 @@ function GoogleSheetsAllowlistSection({
                   size="sm"
                   variant="outline"
                   disabled={disabled || ids.length <= 1}
-                  title={ids.length <= 1 ? "Add another sheet before removing this one." : undefined}
+                  title={
+                    ids.length <= 1
+                      ? t("appsPage.detail.setup.addAnotherSheetFirst", {
+                          defaultValue: "Add another sheet before removing this one.",
+                        })
+                      : undefined
+                  }
                   onClick={() => saveIds(ids.filter((current) => current !== id))}
                 >
-                  Remove
+                  {t("appsPage.detail.setup.remove", { defaultValue: "Remove" })}
                 </Button>
               </div>
             );
@@ -176,18 +210,22 @@ function GoogleSheetsAllowlistSection({
           onClick={() => {
             const parsed = parseGoogleSheetIds(draft);
             if (parsed.ids.length === 0) {
-              setError("Paste a Google Sheets link.");
+              setError(t("appsPage.detail.setup.pasteSheetsLinkError", { defaultValue: "Paste a Google Sheets link." }));
               return;
             }
             if (parsed.invalidCount > 0) {
-              setError("That doesn't look like a Google Sheets link.");
+              setError(
+                t("appsPage.detail.setup.invalidSheetsLinkError", {
+                  defaultValue: "That doesn't look like a Google Sheets link.",
+                }),
+              );
               return;
             }
             saveIds(Array.from(new Set([...ids, ...parsed.ids])));
             setDraft("");
           }}
         >
-          Add sheet
+          {t("appsPage.detail.setup.addSheet", { defaultValue: "Add sheet" })}
         </Button>
       </div>
       {error && <div className="mt-2 text-xs text-destructive">{error}</div>}
@@ -204,22 +242,33 @@ export function AppLifecycleSection({
   disabled: boolean;
   onToggle: () => void;
 }) {
+  const { t } = useTranslation();
   const enabled = connection.enabled !== false && connection.status !== "disabled";
   return (
     <section className="rounded-xl border border-border bg-card px-5 py-4">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-sm font-bold text-foreground">
-            {enabled ? "Agents can use this app" : "This app is paused"}
+            {enabled
+              ? t("appsPage.detail.setup.agentsCanUseThisApp", { defaultValue: "Agents can use this app" })
+              : t("appsPage.detail.setup.thisAppIsPaused", { defaultValue: "This app is paused" })}
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {enabled
-              ? "Pause it to stop every agent from using its actions."
-              : "Resume it when agents should be able to use its actions again."}
+              ? t("appsPage.detail.setup.pauseHint", {
+                  defaultValue: "Pause it to stop every agent from using its actions.",
+                })
+              : t("appsPage.detail.setup.resumeHint", {
+                  defaultValue: "Resume it when agents should be able to use its actions again.",
+                })}
           </p>
         </div>
         <ToggleSwitch
-          aria-label={enabled ? "Pause this app" : "Resume this app"}
+          aria-label={
+            enabled
+              ? t("appsPage.detail.setup.pauseThisApp", { defaultValue: "Pause this app" })
+              : t("appsPage.detail.setup.resumeThisApp", { defaultValue: "Resume this app" })
+          }
           checked={enabled}
           disabled={disabled}
           onCheckedChange={onToggle}
@@ -239,6 +288,7 @@ export function QuarantinedActionsReview({
   disabled: boolean;
   onSubmit: (enabledIds: string[]) => void;
 }) {
+  const { t } = useTranslation();
   const [enabledIds, setEnabledIds] = useState<Set<string>>(new Set());
   const count = entries.length;
   const selectedIds = entries.filter((entry) => enabledIds.has(entry.id)).map((entry) => entry.id);
@@ -247,10 +297,15 @@ export function QuarantinedActionsReview({
       <div className="flex flex-wrap items-start justify-between gap-3 px-4 py-3">
         <div>
           <div className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-            Review {count} new {count === 1 ? "action" : "actions"}
+            {t(count === 1 ? "appsPage.detail.setup.reviewNewAction" : "appsPage.detail.setup.reviewNewActions", {
+              defaultValue: count === 1 ? "Review {{count}} new action" : "Review {{count}} new actions",
+              count,
+            })}
           </div>
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-            Turn on the actions agents may use. Anything left off stays blocked when you save.
+            {t("appsPage.detail.setup.reviewHint", {
+              defaultValue: "Turn on the actions agents may use. Anything left off stays blocked when you save.",
+            })}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -260,7 +315,7 @@ export function QuarantinedActionsReview({
             disabled={disabled}
             onClick={() => setEnabledIds(new Set(entries.map((entry) => entry.id)))}
           >
-            Turn all on
+            {t("appsPage.detail.setup.turnAllOn", { defaultValue: "Turn all on" })}
           </button>
           <button
             type="button"
@@ -268,7 +323,7 @@ export function QuarantinedActionsReview({
             disabled={disabled}
             onClick={() => setEnabledIds(new Set())}
           >
-            Turn all off
+            {t("appsPage.detail.setup.turnAllOff", { defaultValue: "Turn all off" })}
           </button>
         </div>
       </div>
@@ -285,7 +340,10 @@ export function QuarantinedActionsReview({
                 )}
               </div>
               <ToggleSwitch
-                aria-label={`${label} allowed`}
+                aria-label={t("appsPage.detail.setup.allowedLabel", {
+                  defaultValue: "{{name}} allowed",
+                  name: label,
+                })}
                 checked={enabled}
                 disabled={disabled}
                 onCheckedChange={(next) => {
@@ -303,10 +361,16 @@ export function QuarantinedActionsReview({
       </div>
       <div className="flex items-center justify-between gap-3 px-4 py-3">
         <span className="text-xs text-amber-700 dark:text-amber-300">
-          {selectedIds.length} of {count} will be on
+          {t("appsPage.detail.setup.selectedWillBeOn", {
+            defaultValue: "{{selected}} of {{total}} will be on",
+            selected: selectedIds.length,
+            total: count,
+          })}
         </span>
         <Button size="sm" disabled={disabled} onClick={() => onSubmit(selectedIds)}>
-          {disabled ? "Saving…" : "Save choices"}
+          {disabled
+            ? t("appsPage.detail.setup.saving", { defaultValue: "Saving…" })
+            : t("appsPage.detail.setup.saveChoices", { defaultValue: "Save choices" })}
         </Button>
       </div>
     </section>

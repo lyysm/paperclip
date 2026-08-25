@@ -8,6 +8,7 @@ import {
   Shield,
   TerminalSquare,
 } from "lucide-react";
+import { t } from "@/i18n";
 
 /**
  * The Advanced door is mounted under `/apps/advanced` (PAP-10862, plan D8).
@@ -44,6 +45,22 @@ export const DEVELOPER_TABS = [
 export const TOOL_TABS = [...ADVANCED_TABS, ...DEVELOPER_TABS] as const;
 
 export type ToolTabKey = (typeof TOOL_TABS)[number]["key"];
+
+const TOOL_TAB_I18N_KEYS: Record<ToolTabKey, string> = {
+  "run-your-own": "toolsPage.tabs.runYourOwn",
+  "paste-config": "toolsPage.tabs.pasteConfig",
+  gateways: "toolsPage.tabs.gateways",
+  profiles: "toolsPage.tabs.profiles",
+  policies: "toolsPage.tabs.rules",
+  runtime: "toolsPage.tabs.health",
+  audit: "toolsPage.tabs.activity",
+  "smoke-lab": "toolsPage.tabs.smokeLab",
+};
+
+export function toolTabLabel(key: ToolTabKey): string {
+  const tab = TOOL_TABS.find((item) => item.key === key);
+  return t(TOOL_TAB_I18N_KEYS[key], { defaultValue: tab?.label ?? key });
+}
 
 export function isAdvancedSetupTab(tab: ToolTabKey): boolean {
   return ADVANCED_TABS.some((t) => t.key === tab);

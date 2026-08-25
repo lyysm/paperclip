@@ -111,6 +111,13 @@ describe("zh-CN page-body messages", () => {
     expect(entry(boardChat, "hiringPlanPrompt")).toContain("{{company}}");
     expect(entry(boardChat, "introPitchPrompt")).toContain("{{company}}");
 
+    const summarySlot = group("summarySlot");
+    expect(entry(summarySlot, "generateSummary")).toBe("生成摘要");
+    expect(entry(summarySlot, "latestRevisionOption")).toContain("{{revision}}");
+    expect(entry(summarySlot, "latestRevisionOption")).toContain("{{time}}");
+    expect(entry(summarySlot, "updated")).toContain("{{time}}");
+    expect(entry(summarySlot, "workingWith")).toContain("{{tool}}");
+
     const searchPage = group("searchPage");
     expect(entry(searchPage, "initialTitle")).toContain("搜索");
     expect(entry(searchPage, "noMatchInScope")).toContain("{{scope}}");

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentProps, type ReactNode } from "react";
+import { useTranslation } from "@/i18n";
 import { ChevronRight } from "lucide-react";
 import { AgentIcon } from "@/components/AgentIconPicker";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,8 @@ export function AgentSelect({
   agents,
   value,
   onChange,
-  placeholder = "Select agent…",
-  emptyMessage = "No agents yet.",
+  placeholder,
+  emptyMessage,
   disabled = false,
   triggerClassName,
   id,
@@ -34,6 +35,7 @@ export function AgentSelect({
   triggerClassName?: string;
   id?: string;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
   const selectedAgent = agents.find((agent) => agent.id === value);
@@ -45,6 +47,8 @@ export function AgentSelect({
         .sort((a, b) => a.name.localeCompare(b.name)),
     [agents, normalizedFilter],
   );
+  const placeholderText = placeholder ?? t("agentMultiSelect.selectAgent");
+  const emptyMessageText = emptyMessage ?? t("agentMultiSelect.noAgentsYet");
 
   return (
     <Popover
@@ -64,7 +68,7 @@ export function AgentSelect({
           disabled={disabled}
         >
           <span className={cn("min-w-0 truncate", !selectedAgent && "text-muted-foreground")}>
-            {selectedAgent?.name ?? placeholder}
+            {selectedAgent?.name ?? placeholderText}
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
         </Button>
@@ -74,13 +78,13 @@ export function AgentSelect({
           <Input
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter agents"
+            placeholder={t("agentMultiSelect.filterAgents")}
             className="h-8"
             autoFocus
           />
         </div>
         {agents.length === 0 ? (
-          <div className="px-3 py-4 text-sm text-muted-foreground">{emptyMessage}</div>
+          <div className="px-3 py-4 text-sm text-muted-foreground">{emptyMessageText}</div>
         ) : (
           <div className="max-h-60 overflow-y-auto py-1">
             {filteredAgents.map((agent) => (
@@ -88,7 +92,7 @@ export function AgentSelect({
                 key={agent.id}
                 type="button"
                 className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-accent/30"
-                aria-label={`Select ${agent.name}`}
+                aria-label={t("agentMultiSelect.selectAgentAria", { name: agent.name })}
                 onClick={() => {
                   onChange(agent.id);
                   setOpen(false);
@@ -102,7 +106,9 @@ export function AgentSelect({
               </button>
             ))}
             {filteredAgents.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground">No matches.</div>
+              <div className="px-3 py-4 text-sm text-muted-foreground">
+                {t("agentMultiSelect.noMatches")}
+              </div>
             ) : null}
           </div>
         )}
@@ -156,6 +162,7 @@ export function AgentMultiSelect({
   showSelectionPreview?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
   const [draftAgentIds, setDraftAgentIds] = useState<Set<string>>(new Set(selectedAgentIds));
@@ -212,8 +219,8 @@ export function AgentMultiSelect({
               {triggerIcon}
               <span className="truncate">
                 {triggerLabel ?? (selectedCount === 0
-                  ? "Select agents"
-                  : `${selectedCount} ${selectedCount === 1 ? "agent" : "agents"} selected`)}
+                  ? t("agentMultiSelect.selectAgents")
+                  : t("agentMultiSelect.selectedCount", { count: selectedCount }))}
               </span>
             </span>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -224,7 +231,7 @@ export function AgentMultiSelect({
           <Input
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter agents"
+            placeholder={t("agentMultiSelect.filterAgents")}
             className="h-8"
             autoFocus
           />
@@ -236,7 +243,9 @@ export function AgentMultiSelect({
             <Skeleton className="h-6 w-full" />
           </div>
         ) : agents.length === 0 ? (
-          <div className="px-3 py-4 text-sm text-muted-foreground">{emptyMessage}</div>
+          <div className="px-3 py-4 text-sm text-muted-foreground">
+            {emptyMessage ?? t("agentMultiSelect.noAgentsYet")}
+          </div>
         ) : (
           <div className="max-h-60 overflow-y-auto py-1">
             {filteredAgents.map((agent) => {
@@ -253,7 +262,7 @@ export function AgentMultiSelect({
                   <Checkbox
                     checked={workingAgentIds.has(agent.id)}
                     disabled={optionDisabled}
-                    aria-label={`Allow ${agent.name}`}
+                    aria-label={t("agentMultiSelect.allowAgent", { name: agent.name })}
                     onCheckedChange={(checked) => {
                       const next = new Set(workingAgentIds);
                       if (checked) next.add(agent.id);
@@ -273,18 +282,22 @@ export function AgentMultiSelect({
               );
             })}
             {filteredAgents.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground">No matches.</div>
+              <div className="px-3 py-4 text-sm text-muted-foreground">
+                {t("agentMultiSelect.noMatches")}
+              </div>
             ) : null}
           </div>
         )}
           <div className="flex items-center justify-between border-t border-border px-3 py-2">
             <span className="text-xs text-muted-foreground">
-              {workingAgentIds.size === 0 ? "No agents selected" : `${workingAgentIds.size} selected`}
+              {workingAgentIds.size === 0
+                ? t("agentMultiSelect.noAgentsSelected")
+                : t("agentMultiSelect.selectedCountPlain", { count: workingAgentIds.size })}
             </span>
             <div className="flex items-center gap-2">
               {staged ? (
                 <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={pending}>
-                  Cancel
+                  {t("agentMultiSelect.cancel")}
                 </Button>
               ) : null}
               <Button
@@ -296,7 +309,11 @@ export function AgentMultiSelect({
                 }}
                 disabled={pending}
               >
-                {staged ? (pending ? "Saving…" : "Save") : "Done"}
+                {staged
+                  ? pending
+                    ? t("agentMultiSelect.saving")
+                    : t("agentMultiSelect.save")
+                  : t("agentMultiSelect.done")}
               </Button>
             </div>
           </div>
@@ -311,7 +328,9 @@ export function AgentMultiSelect({
             </div>
           ))}
           {selectedAgents.length > 3 ? (
-            <p className="px-1.5 pt-0.5 text-xs text-muted-foreground">and {selectedAgents.length - 3} more</p>
+            <p className="px-1.5 pt-0.5 text-xs text-muted-foreground">
+              {t("agentMultiSelect.andMore", { count: selectedAgents.length - 3 })}
+            </p>
           ) : null}
         </div>
       ) : null}

@@ -1247,6 +1247,25 @@
     "title": "添加新智能体",
     "unknownError": "未知错误"
   },
+  "agentMultiSelect": {
+    "allowAgent": "允许 {{name}}",
+    "andMore": "以及另外 {{count}} 个",
+    "cancel": "取消",
+    "done": "完成",
+    "filterAgents": "筛选智能体",
+    "noAgentsSelected": "未选择智能体",
+    "noAgentsYet": "还没有智能体。",
+    "noMatches": "没有匹配项。",
+    "save": "保存",
+    "saving": "正在保存…",
+    "selectAgent": "选择智能体…",
+    "selectAgentAria": "选择 {{name}}",
+    "selectAgents": "选择智能体",
+    "selectedCount_one": "已选择 {{count}} 个智能体",
+    "selectedCount_other": "已选择 {{count}} 个智能体",
+    "selectedCountPlain_one": "已选择 {{count}} 个",
+    "selectedCountPlain_other": "已选择 {{count}} 个"
+  },
   "casesPage": {
     "statusDraft": "草稿",
     "statusApproved": "已批准",

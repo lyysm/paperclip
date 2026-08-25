@@ -1247,6 +1247,25 @@
     "title": "Add a new agent",
     "unknownError": "Unknown error"
   },
+  "agentMultiSelect": {
+    "allowAgent": "Allow {{name}}",
+    "andMore": "and {{count}} more",
+    "cancel": "Cancel",
+    "done": "Done",
+    "filterAgents": "Filter agents",
+    "noAgentsSelected": "No agents selected",
+    "noAgentsYet": "No agents yet.",
+    "noMatches": "No matches.",
+    "save": "Save",
+    "saving": "Saving…",
+    "selectAgent": "Select agent…",
+    "selectAgentAria": "Select {{name}}",
+    "selectAgents": "Select agents",
+    "selectedCount_one": "{{count}} agent selected",
+    "selectedCount_other": "{{count}} agents selected",
+    "selectedCountPlain_one": "{{count}} selected",
+    "selectedCountPlain_other": "{{count}} selected"
+  },
   "casesPage": {
     "statusDraft": "Draft",
     "statusApproved": "Approved",

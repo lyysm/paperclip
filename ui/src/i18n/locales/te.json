@@ -4226,6 +4226,51 @@
     "claiming": "Claiming…",
     "claimOwnership": "Claim ownership"
   },
+  "artifacts": {
+    "title": "Artifacts",
+    "selectCompany": "Select a company to view artifacts.",
+    "searchPlaceholder": "Search artifacts...",
+    "searchAria": "Search artifacts",
+    "clearSearch": "Clear artifact search",
+    "groupControlAria": "Group artifacts (currently {{group}})",
+    "groupControlTitle": "Group artifacts",
+    "groupByLabel": "Group by",
+    "filterByTypeAria": "Filter artifacts by type",
+    "kind": {
+      "all": "All",
+      "image": "Images",
+      "video": "Videos",
+      "document": "Documents",
+      "text": "Text",
+      "file": "Files"
+    },
+    "groupBy": {
+      "none": "None",
+      "task": "Task",
+      "parent_task": "Parent task"
+    },
+    "allStacks": "All stacks",
+    "noStacksMatch": "No artifact stacks match this search.",
+    "noStacksYet": "No artifact stacks yet.",
+    "noArtifactsMatch": "No artifacts match this search.",
+    "noStackArtifactsMatch": "No artifacts in this stack match the current filters.",
+    "noArtifactsYet": "No artifacts yet. Outputs attached to issues will appear here.",
+    "noArtifactsOfType": "No artifacts of this type yet.",
+    "loadingMore": "Loading more artifacts...",
+    "updating": "Updating artifacts...",
+    "media": {
+      "image": "Image",
+      "document": "Document",
+      "text": "Text",
+      "file": "File"
+    },
+    "openFile": "Open file in new tab",
+    "downloadFile": "Download file",
+    "lastEdited": "Last edited {{date}}",
+    "updated": "Updated {{date}}",
+    "countSingular": "{{count}} artifact",
+    "countPlural": "{{count}} artifacts"
+  },
   "statusCards": {
     "breadcrumb": "Status",
     "experimental": "Experimental",

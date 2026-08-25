@@ -489,6 +489,16 @@ describe("zh-CN page-body messages", () => {
     expect(entry(boardClaim, "claiming")).toContain("认领");
   });
 
+  it("translates the artifacts page filters and card metadata", () => {
+    const artifacts = group("artifacts");
+    expect(entry(artifacts, "title")).toBe("产物");
+    expect(entry(nested(artifacts, "kind"), "image")).toBe("图片");
+    expect(entry(nested(artifacts, "groupBy"), "parent_task")).toBe("父任务");
+    expect(entry(artifacts, "groupControlAria")).toContain("{{group}}");
+    expect(entry(artifacts, "lastEdited")).toContain("{{date}}");
+    expect(entry(artifacts, "countPlural")).toContain("{{count}}");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

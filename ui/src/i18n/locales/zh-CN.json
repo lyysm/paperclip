@@ -4159,6 +4159,51 @@
     "claiming": "认领中…",
     "claimOwnership": "认领所有权"
   },
+  "artifacts": {
+    "title": "产物",
+    "selectCompany": "选择公司以查看产物。",
+    "searchPlaceholder": "搜索产物...",
+    "searchAria": "搜索产物",
+    "clearSearch": "清除产物搜索",
+    "groupControlAria": "分组产物（当前：{{group}}）",
+    "groupControlTitle": "分组产物",
+    "groupByLabel": "分组依据",
+    "filterByTypeAria": "按类型筛选产物",
+    "kind": {
+      "all": "全部",
+      "image": "图片",
+      "video": "视频",
+      "document": "文档",
+      "text": "文本",
+      "file": "文件"
+    },
+    "groupBy": {
+      "none": "不分组",
+      "task": "任务",
+      "parent_task": "父任务"
+    },
+    "allStacks": "全部产物堆",
+    "noStacksMatch": "没有产物堆符合此搜索条件。",
+    "noStacksYet": "还没有产物堆。",
+    "noArtifactsMatch": "没有产物符合此搜索条件。",
+    "noStackArtifactsMatch": "此产物堆中没有产物符合当前筛选条件。",
+    "noArtifactsYet": "还没有产物。附加到任务的输出会显示在这里。",
+    "noArtifactsOfType": "还没有此类型的产物。",
+    "loadingMore": "正在加载更多产物…",
+    "updating": "正在更新产物…",
+    "media": {
+      "image": "图片",
+      "document": "文档",
+      "text": "文本",
+      "file": "文件"
+    },
+    "openFile": "在新标签页中打开文件",
+    "downloadFile": "下载文件",
+    "lastEdited": "最后编辑于 {{date}}",
+    "updated": "更新于 {{date}}",
+    "countSingular": "{{count}} 个产物",
+    "countPlural": "{{count}} 个产物"
+  },
   "statusCards": {
     "breadcrumb": "状态",
     "experimental": "实验性",

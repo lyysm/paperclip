@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from "@/lib/router";
+import { useTranslation } from "@/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { accessApi } from "@/api/access";
 import { ApiError } from "@/api/client";
@@ -10,16 +11,17 @@ import { PaperclipLoading } from "@/components/AnimatedPaperclipIcon";
 import { Card } from "@/components/ui/card";
 
 function NoBoardAccessPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="mx-auto max-w-xl py-10">
       <Card className="block p-6">
-        <h1 className="text-xl font-semibold">No company access</h1>
+        <h1 className="text-xl font-semibold">{t("accessGate.noCompanyAccess")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This account is signed in, but it does not have an active company membership or instance-admin access on
-          this Paperclip instance.
+          {t("accessGate.noCompanyAccessDescription")}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Use a company invite or sign in with an account that already belongs to this org.
+          {t("accessGate.noCompanyAccessInvite")}
         </p>
       </Card>
     </div>
@@ -29,6 +31,7 @@ function NoBoardAccessPage() {
 export function CloudAccessGate() {
   const location = useLocation();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const healthQuery = useQuery({
     queryKey: queryKeys.health,
     queryFn: () => healthApi.get(),
@@ -85,7 +88,7 @@ export function CloudAccessGate() {
           ? healthQuery.error.message
           : boardAccessQuery.error instanceof Error
             ? boardAccessQuery.error.message
-            : "Failed to load app state"}
+            : t("accessGate.loadAppStateFailed")}
       </div>
     );
   }

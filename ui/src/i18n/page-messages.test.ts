@@ -133,6 +133,11 @@ describe("zh-CN page-body messages", () => {
 
     expect(entry(group("approvals"), "pending")).toBe("待处理");
 
+    const accessGate = group("accessGate");
+    expect(entry(accessGate, "noCompanyAccess")).toBe("没有公司访问权限");
+    expect(entry(accessGate, "finishSetup")).toContain("完成");
+    expect(entry(accessGate, "alreadyClaimedBody")).toContain("设置");
+
     const newAgentDialog = group("newAgentDialog");
     expect(entry(newAgentDialog, "title")).toBe("添加新智能体");
     expect(entry(newAgentDialog, "createNewAgentIssueDescription")).toContain("智能体类型");

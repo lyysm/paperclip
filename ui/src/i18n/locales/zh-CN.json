@@ -4239,6 +4239,14 @@
     "unstarResource": "取消收藏 {{name}}",
     "saveRetry": "保存失败——重试"
   },
+  "pluginPage": {
+    "plugins": "插件",
+    "selectCompany": "选择公司以查看此页面。",
+    "loading": "加载中…",
+    "duplicateRouteBefore": "多个插件声明了路由",
+    "duplicateRouteAfter": "。请先使用插件 ID 路由，直到冲突解决。",
+    "back": "返回"
+  },
   "statusCards": {
     "breadcrumb": "状态",
     "experimental": "实验性",

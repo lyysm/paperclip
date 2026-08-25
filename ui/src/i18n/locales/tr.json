@@ -4306,6 +4306,14 @@
     "unstarResource": "Unstar {{name}}",
     "saveRetry": "Couldn't save — retry"
   },
+  "pluginPage": {
+    "plugins": "Plugins",
+    "selectCompany": "Select a company to view this page.",
+    "loading": "Loading…",
+    "duplicateRouteBefore": "Multiple plugins declare the route",
+    "duplicateRouteAfter": ". Use the plugin-id route until the conflict is resolved.",
+    "back": "Back"
+  },
   "statusCards": {
     "breadcrumb": "Status",
     "experimental": "Experimental",

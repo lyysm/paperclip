@@ -508,6 +508,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(group("starToggle"), "unstarResource")).toContain("取消收藏");
   });
 
+  it("translates the plugin page navigation and recovery copy", () => {
+    const pluginPage = group("pluginPage");
+    expect(entry(pluginPage, "plugins")).toBe("插件");
+    expect(entry(pluginPage, "selectCompany")).toContain("选择公司");
+    expect(entry(pluginPage, "duplicateRouteBefore")).toContain("多个插件");
+    expect(entry(pluginPage, "back")).toBe("返回");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

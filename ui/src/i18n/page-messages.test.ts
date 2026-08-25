@@ -387,6 +387,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueRelatedWork, "retry")).toBe("重试");
   });
 
+  it("translates the blocked notice", () => {
+    const issueBlockedNotice = group("issueBlockedNotice");
+    expect(entry(issueBlockedNotice, "nextStepRequired")).toBe("此任务仍需要选择下一步。");
+    expect(entry(issueBlockedNotice, "queuedBehind_one")).toContain("{{count}}");
+    expect(entry(issueBlockedNotice, "askedAssignee")).toContain("{{name}}");
+    expect(entry(issueBlockedNotice, "stillBlockedByOther_other")).toContain("{{count}}");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

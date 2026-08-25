@@ -472,9 +472,31 @@ describe("zh-CN page-body messages", () => {
   it("translates the audit feed controls and empty states", () => {
     const auditFeed = group("auditFeed");
     expect(entry(auditFeed, "title")).toBe("活动");
+    expect(entry(auditFeed, "selectCompany")).toContain("活动");
     expect(entry(auditFeed, "allActivity")).toBe("全部活动");
     expect(entry(auditFeed, "onBehalfOf")).toContain("{{name}}");
     expect(entry(auditFeed, "filteredEmptyDescription")).toContain("筛选");
+  });
+
+  it("translates user-secret settings and value dialogs", () => {
+    const secretsPage = group("secretsPage");
+    const mySecrets = nested(secretsPage, "mySecrets");
+    expect(entry(mySecrets, "credentialsNote")).toContain("凭证");
+    expect(entry(mySecrets, "requiredMissing_other")).toContain("{{count}}");
+    expect(entry(mySecrets, "clearValue")).toBe("清除我的值");
+
+    const setMyValueDialog = nested(secretsPage, "setMyValueDialog");
+    expect(entry(setMyValueDialog, "titleSet")).toBe("设置你的值");
+    expect(entry(setMyValueDialog, "description")).toContain("{{key}}");
+    expect(entry(setMyValueDialog, "externalReferenceHint")).toContain("提供方");
+
+    const definitions = nested(secretsPage, "userSecretDefinitions");
+    expect(entry(definitions, "new")).toBe("新建用户密钥");
+    expect(entry(definitions, "adminIntro")).toContain("每位成员");
+    expect(entry(definitions, "removeDescription")).toContain("{{key}}");
+    expect(entry(definitions, "missing_other")).toContain("{{count}}");
+    expect(entry(secretsPage, "valueSet")).toBe("值已设置");
+    expect(entry(secretsPage, "notSet")).toBe("未设置");
   });
 
   it("translates CLI authorization and board claim entry points", () => {

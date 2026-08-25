@@ -5,6 +5,7 @@ import { useCompany } from "../../context/CompanyContext";
 import { useBreadcrumbs } from "../../context/BreadcrumbContext";
 import { EmptyState } from "../../components/EmptyState";
 import { AuditFeed, type AuditFeedMode } from "./AuditFeed";
+import { useTranslation } from "@/i18n";
 
 /**
  * Company activity page — the single merged surface for `/:company/activity`
@@ -15,14 +16,15 @@ import { AuditFeed, type AuditFeedMode } from "./AuditFeed";
  * links stay shareable. The server enforces both tiers regardless.
  */
 export function CompanyActivity() {
+  const { t } = useTranslation();
   const { selectedCompanyId } = useCompany();
   const { setBreadcrumbs } = useBreadcrumbs();
   const [searchParams, setSearchParams] = useSearchParams();
   const mode: AuditFeedMode = searchParams.get("mode") === "agents" ? "agents" : "all";
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Activity" }]);
-  }, [setBreadcrumbs]);
+    setBreadcrumbs([{ label: t("auditFeed.title", { defaultValue: "Activity" }) }]);
+  }, [setBreadcrumbs, t]);
 
   const handleModeChange = useCallback(
     (next: AuditFeedMode) => {
@@ -42,7 +44,12 @@ export function CompanyActivity() {
   );
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={History} message="Select a company to view activity." />;
+    return (
+      <EmptyState
+        icon={History}
+        message={t("auditFeed.selectCompany", { defaultValue: "Select a company to view activity." })}
+      />
+    );
   }
 
   return <AuditFeed companyId={selectedCompanyId} mode={mode} onModeChange={handleModeChange} />;

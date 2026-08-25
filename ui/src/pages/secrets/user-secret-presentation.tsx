@@ -68,11 +68,11 @@ export function myValueTone(state: MyValueState): string {
 export function myValueLabel(state: MyValueState): string {
   switch (state) {
     case "set":
-      return "Value set";
+      return t("secretsPage.valueSet", { defaultValue: "Value set" });
     case "not_set":
-      return "Not set";
+      return t("secretsPage.notSet", { defaultValue: "Not set" });
     case "inactive":
-      return "Disabled";
+      return t("secretsPage.statusLabel.disabled", { defaultValue: "Disabled" });
   }
 }
 

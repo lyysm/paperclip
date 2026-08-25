@@ -434,6 +434,11 @@ describe("zh-CN page-body messages", () => {
     expect(entry(executionWorkspace, "notScheduled")).toBe("未安排");
     expect(entry(executionWorkspace, "backToTasks")).toBe("返回任务");
     expect(entry(executionWorkspace, "lastRunAt")).toContain("{{time}}");
+    expect(entry(executionWorkspace, "runtimeProvisioningFailed")).toBe("预置失败");
+    expect(entry(executionWorkspace, "portConflictWarning")).toContain("{{services}}");
+    expect(entry(executionWorkspace, "settingsDescription")).toContain("执行工作区");
+    expect(entry(executionWorkspace, "noUnsavedChanges")).toBe("没有未保存的更改。");
+    expect(entry(executionWorkspace, "loadingOperations")).toContain("加载");
   });
 
   it("translates the status cards board and detail surfaces", () => {

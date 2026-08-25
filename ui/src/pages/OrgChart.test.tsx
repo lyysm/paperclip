@@ -117,6 +117,14 @@ function createTouchEvent(type: string, touches: Array<{ clientX: number; client
   return event;
 }
 
+function createWheelEvent(deltaY: number, clientX: number, clientY: number) {
+  const event = new Event("wheel", { bubbles: true, cancelable: true });
+  Object.defineProperty(event, "deltaY", { value: deltaY });
+  Object.defineProperty(event, "clientX", { value: clientX });
+  Object.defineProperty(event, "clientY", { value: clientY });
+  return event;
+}
+
 async function flushReact() {
   await act(async () => {
     await Promise.resolve();
@@ -261,5 +269,25 @@ describe("OrgChart mobile gestures", () => {
     });
 
     expect(layer.style.transform).toBe("translate(-45px, 40px) scale(1.5)");
+  });
+
+  it("zooms toward the cursor on wheel and cancels the default scroll", async () => {
+    const { viewport, layer } = await renderOrgChart();
+    const event = createWheelEvent(-100, 180, 260);
+
+    await act(async () => {
+      viewport.dispatchEvent(event);
+    });
+
+    expect(event.defaultPrevented).toBe(true);
+    // Initial fit places the chart at pan (20, 60) with zoom 1; zooming to
+    // 1.1 toward (180, 260) moves the pan to (4, 40).
+    const transform = layer.style.transform.match(
+      /^translate\(([-\d.]+)px, ([-\d.]+)px\) scale\(([\d.]+)\)$/,
+    );
+    expect(transform).not.toBeNull();
+    expect(Number(transform![1])).toBeCloseTo(4);
+    expect(Number(transform![2])).toBeCloseTo(40);
+    expect(Number(transform![3])).toBeCloseTo(1.1);
   });
 });

@@ -287,7 +287,7 @@ export function OrgChart() {
     setDragging(false);
   }, []);
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
+  const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
     const container = containerRef.current;
     if (!container) return;
@@ -307,6 +307,27 @@ export function OrgChart() {
     });
     setZoom(newZoom);
   }, [zoom, pan]);
+
+  // React attaches `wheel` as a passive listener at the root, so
+  // `preventDefault()` inside an `onWheel` prop is ignored and logs the
+  // "Unable to preventDefault inside passive event listener" warning.
+  // Attach a native non-passive listener to the viewport instead, and keep
+  // the latest pan/zoom closure in a ref so the listener isn't re-registered
+  // on every pan/zoom update.
+  const handleWheelRef = useRef(handleWheel);
+  useEffect(() => {
+    handleWheelRef.current = handleWheel;
+  }, [handleWheel]);
+
+  useEffect(() => {
+    const viewport = containerRef.current;
+    if (!viewport) return;
+    const onWheel = (e: WheelEvent) => handleWheelRef.current(e);
+    viewport.addEventListener("wheel", onWheel, { passive: false });
+    return () => viewport.removeEventListener("wheel", onWheel);
+    // The viewport is absent while the loading/empty early returns render;
+    // re-run when chart data mounts it.
+  }, [allNodes]);
 
   const zoomTowardPoint = useCallback((newZoom: number, point: Point) => {
     const clampedZoom = clampZoom(newZoom);
@@ -472,7 +493,6 @@ export function OrgChart() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

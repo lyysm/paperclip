@@ -510,6 +510,19 @@ describe("zh-CN page-body messages", () => {
     expect(entry(proposals, "rejectDescriptionAfter")).toContain("依赖");
   });
 
+  it("translates the AWS secret import flow", () => {
+    const importVault = nested(group("secretsPage"), "importVault");
+    expect(entry(importVault, "title")).toContain("AWS Secrets Manager");
+    expect(entry(importVault, "noVaults")).toContain("AWS");
+    expect(entry(importVault, "continueReview")).toContain("复核");
+    expect(entry(importVault, "selectedNotVisible")).toContain("{{selected}}");
+    expect(entry(importVault, "selectedNotVisible")).toContain("{{hidden}}");
+    expect(entry(importVault, "importSummary")).toContain("{{imported}}");
+    expect(entry(importVault, "importSummary")).toContain("{{failed}}");
+    expect(entry(importVault, "awsPermissionDetail")).toContain("secretsmanager:ListSecrets");
+    expect(entry(importVault, "discardPending_other")).toContain("{{count}}");
+  });
+
   it("translates CLI authorization and board claim entry points", () => {
     const cliAuth = group("cliAuth");
     expect(entry(cliAuth, "approvedTitle")).toBe("CLI 访问已批准");

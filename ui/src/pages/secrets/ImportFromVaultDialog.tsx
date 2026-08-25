@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/select";
 import { EmptyState } from "../../components/EmptyState";
 import { cn } from "../../lib/utils";
+import { t, useTranslation } from "@/i18n";
 
 type Step = "select" | "review" | "result";
 
@@ -115,12 +116,12 @@ function statusToneClasses(status: RemoteSecretImportCandidate["status"]) {
 function statusBadgeLabel(status: RemoteSecretImportCandidate["status"]) {
   switch (status) {
     case "duplicate":
-      return "Imported";
+      return t("secretsPage.importVault.statusImported", { defaultValue: "Imported" });
     case "conflict":
-      return "Conflict";
+      return t("secretsPage.importVault.statusConflict", { defaultValue: "Conflict" });
     case "ready":
     default:
-      return "Ready";
+      return t("secretsPage.importVault.statusReady", { defaultValue: "Ready" });
   }
 }
 
@@ -144,6 +145,7 @@ function StatusBadge({
 }
 
 function RowResultBadge({ status }: { status: RemoteSecretImportRowResult["status"] }) {
+  const { t } = useTranslation();
   switch (status) {
     case "imported":
       return (
@@ -151,7 +153,8 @@ function RowResultBadge({ status }: { status: RemoteSecretImportRowResult["statu
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-emerald-600 border-emerald-500/40 dark:text-emerald-400"
         >
-          <CheckCircle2 className="h-3 w-3" /> Created
+          <CheckCircle2 className="h-3 w-3" />
+          {t("secretsPage.importVault.created", { defaultValue: "Created" })}
         </Badge>
       );
     case "skipped":
@@ -160,7 +163,8 @@ function RowResultBadge({ status }: { status: RemoteSecretImportRowResult["statu
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-muted-foreground border-border/60"
         >
-          <Link2 className="h-3 w-3" /> Skipped
+          <Link2 className="h-3 w-3" />
+          {t("secretsPage.importVault.skipped", { defaultValue: "Skipped" })}
         </Badge>
       );
     case "error":
@@ -170,7 +174,8 @@ function RowResultBadge({ status }: { status: RemoteSecretImportRowResult["statu
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-destructive border-destructive/40"
         >
-          <XCircle className="h-3 w-3" /> Failed
+          <XCircle className="h-3 w-3" />
+          {t("secretsPage.importVault.failed", { defaultValue: "Failed" })}
         </Badge>
       );
   }
@@ -190,22 +195,31 @@ function formatRelativeShort(value: string | null | undefined): string {
   const diff = Date.now() - date.getTime();
   if (diff < 0) return date.toLocaleDateString();
   const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 60) {
+    return t("secretsPage.importVault.secondsAgo", { count: seconds, defaultValue: "{{count}}s ago" });
+  }
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) {
+    return t("secretsPage.importVault.minutesAgo", { count: minutes, defaultValue: "{{count}}m ago" });
+  }
   const hours = Math.floor(minutes / 60);
-  if (hours < 48) return `${hours}h ago`;
+  if (hours < 48) {
+    return t("secretsPage.importVault.hoursAgo", { count: hours, defaultValue: "{{count}}h ago" });
+  }
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) {
+    return t("secretsPage.importVault.daysAgo", { count: days, defaultValue: "{{count}}d ago" });
+  }
   return date.toLocaleDateString();
 }
 
 function readableErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
-    return error.message || `Request failed: ${error.status}`;
+    return error.message
+      || t("secretsPage.requestFailed", { defaultValue: "Request failed: {{status}}", status: error.status });
   }
   if (error instanceof Error) return error.message;
-  return "Unexpected error";
+  return t("secretsPage.unexpectedError", { defaultValue: "Unexpected error" });
 }
 
 function apiErrorCode(error: ApiError): string | null {
@@ -270,34 +284,52 @@ function validateDraftRow(
   existing: CompanySecret[],
   otherDrafts: DraftSelection[],
 ): string | null {
-  if (!draft.name.trim()) return "Name is required.";
-  if (draft.name.length > 160) return "Name must be 160 characters or fewer.";
-  if (!draft.key.trim()) return "Key is required.";
-  if (!KEY_PATTERN.test(draft.key)) {
-    return "Key may only contain lowercase letters, numbers, dot, underscore, or hyphen.";
+  if (!draft.name.trim()) return t("secretsPage.importVault.nameRequired", { defaultValue: "Name is required." });
+  if (draft.name.length > 160) {
+    return t("secretsPage.importVault.nameTooLong", { defaultValue: "Name must be 160 characters or fewer." });
   }
-  if (draft.key.length > 120) return "Key must be 120 characters or fewer.";
-  if (draft.description.length > 500) return "Description must be 500 characters or fewer.";
+  if (!draft.key.trim()) return t("secretsPage.importVault.keyRequired", { defaultValue: "Key is required." });
+  if (!KEY_PATTERN.test(draft.key)) {
+    return t("secretsPage.importVault.keyPattern", {
+      defaultValue: "Key may only contain lowercase letters, numbers, dot, underscore, or hyphen.",
+    });
+  }
+  if (draft.key.length > 120) {
+    return t("secretsPage.importVault.keyTooLong", { defaultValue: "Key must be 120 characters or fewer." });
+  }
+  if (draft.description.length > 500) {
+    return t("secretsPage.importVault.descriptionTooLong", {
+      defaultValue: "Description must be 500 characters or fewer.",
+    });
+  }
 
   const lowerName = draft.name.trim().toLowerCase();
   const lowerKey = draft.key.trim().toLowerCase();
 
   for (const existingSecret of existing) {
     if (existingSecret.name.trim().toLowerCase() === lowerName) {
-      return "A Paperclip secret already uses this name.";
+      return t("secretsPage.importVault.existingName", {
+        defaultValue: "A Paperclip secret already uses this name.",
+      });
     }
     if (existingSecret.key.trim().toLowerCase() === lowerKey) {
-      return "A Paperclip secret already uses this key.";
+      return t("secretsPage.importVault.existingKey", {
+        defaultValue: "A Paperclip secret already uses this key.",
+      });
     }
   }
 
   for (const other of otherDrafts) {
     if (other === draft) continue;
     if (other.name.trim().toLowerCase() === lowerName) {
-      return "Another row in this batch already uses this name.";
+      return t("secretsPage.importVault.batchName", {
+        defaultValue: "Another row in this batch already uses this name.",
+      });
     }
     if (other.key.trim().toLowerCase() === lowerKey) {
-      return "Another row in this batch already uses this key.";
+      return t("secretsPage.importVault.batchKey", {
+        defaultValue: "Another row in this batch already uses this key.",
+      });
     }
   }
 
@@ -338,6 +370,7 @@ export function ImportFromVaultDialog({
   onImportComplete,
   onManageVaults,
 }: ImportFromVaultDialogProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const toast = useToastActions();
   const awsVaults = useMemo(() => awsVaultOptions(providerConfigs), [providerConfigs]);
@@ -474,24 +507,36 @@ export function ImportFromVaultDialog({
       queryClient.invalidateQueries({ queryKey: queryKeys.secrets.list(companyId) });
       onImportComplete?.(result);
       const vaultName =
-        awsVaults.find((vault) => vault.id === vaultId)?.displayName ?? "AWS";
+        awsVaults.find((vault) => vault.id === vaultId)?.displayName
+        ?? t("secretsPage.importVault.aws", { defaultValue: "AWS" });
       if (result.errorCount === draftList.length && result.errorCount > 0) {
         toast.pushToast({
-          title: "Import failed",
-          body: `No secrets were imported from ${vaultName}.`,
+          title: t("secretsPage.importVault.importFailed", { defaultValue: "Import failed" }),
+          body: t("secretsPage.importVault.noneImported", {
+            defaultValue: "No secrets were imported from {{vault}}.",
+            vault: vaultName,
+          }),
           tone: "error",
         });
       } else {
         toast.pushToast({
-          title: result.errorCount > 0 ? "Import completed with errors" : "Import complete",
-          body: `${result.importedCount} created · ${result.skippedCount} skipped · ${result.errorCount} failed`,
+          title:
+            result.errorCount > 0
+              ? t("secretsPage.importVault.importWithErrors", { defaultValue: "Import completed with errors" })
+              : t("secretsPage.importVault.importComplete", { defaultValue: "Import complete" }),
+          body: t("secretsPage.importVault.importSummary", {
+            defaultValue: "{{imported}} created · {{skipped}} skipped · {{failed}} failed",
+            imported: result.importedCount,
+            skipped: result.skippedCount,
+            failed: result.errorCount,
+          }),
           tone: result.errorCount > 0 ? "warn" : "success",
         });
       }
     },
     onError: (error) => {
       toast.pushToast({
-        title: "Import failed",
+        title: t("secretsPage.importVault.importFailed", { defaultValue: "Import failed" }),
         body: readableErrorMessage(error),
         tone: "error",
       });
@@ -552,7 +597,7 @@ export function ImportFromVaultDialog({
       })
       .catch((error) => {
         toast.pushToast({
-          title: "Could not load more results",
+          title: t("secretsPage.importVault.loadMoreFailed", { defaultValue: "Could not load more results" }),
           body: readableErrorMessage(error),
           tone: "error",
         });
@@ -614,7 +659,13 @@ export function ImportFromVaultDialog({
     if (importMutation.isPending) return;
     if (!force && step !== "result" && selection.size > 0 && !importResult) {
       const ok = window.confirm(
-        `Discard ${selection.size} pending import${selection.size === 1 ? "" : "s"}?`,
+        t("secretsPage.importVault.discardPending", {
+          count: selection.size,
+          defaultValue:
+            selection.size === 1
+              ? "Discard {{count}} pending import?"
+              : "Discard {{count}} pending imports?",
+        }),
       );
       if (!ok) return;
     }
@@ -655,10 +706,12 @@ export function ImportFromVaultDialog({
         <header className="flex items-start justify-between gap-3 border-b border-border/60 px-5 py-4">
           <div className="flex flex-col gap-1">
             <DialogTitle className="text-base font-semibold">
-              Import from AWS Secrets Manager
+              {t("secretsPage.importVault.title", { defaultValue: "Import from AWS Secrets Manager" })}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Bring AWS-managed secrets into Paperclip as external references.
+              {t("secretsPage.importVault.description", {
+                defaultValue: "Bring AWS-managed secrets into Paperclip as external references.",
+              })}
             </DialogDescription>
             <Stepper step={step} />
           </div>
@@ -666,7 +719,7 @@ export function ImportFromVaultDialog({
             type="button"
             className="rounded-sm text-muted-foreground transition-opacity hover:opacity-100 opacity-70"
             onClick={() => handleClose()}
-            aria-label="Close import dialog"
+            aria-label={t("secretsPage.importVault.close", { defaultValue: "Close import dialog" })}
           >
             <X className="h-4 w-4" />
           </button>
@@ -730,7 +783,7 @@ export function ImportFromVaultDialog({
           <div className="flex items-center gap-2">
             {step !== "result" && (
               <Button variant="ghost" size="sm" onClick={() => handleClose()}>
-                Cancel
+                {t("common.cancel", { defaultValue: "Cancel" })}
               </Button>
             )}
             {step === "review" && (
@@ -740,7 +793,7 @@ export function ImportFromVaultDialog({
                 onClick={() => setStep("select")}
                 disabled={importMutation.isPending}
               >
-                Back
+                {t("secretsPage.importVault.back", { defaultValue: "Back" })}
               </Button>
             )}
             {step === "select" && (
@@ -749,7 +802,7 @@ export function ImportFromVaultDialog({
                 onClick={() => setStep("review")}
                 disabled={totalSelected === 0}
               >
-                Continue → Review
+                {t("secretsPage.importVault.continueReview", { defaultValue: "Continue → Review" })}
               </Button>
             )}
             {step === "review" && (
@@ -764,16 +817,20 @@ export function ImportFromVaultDialog({
               >
                 {importMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Importing…
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />{" "}
+                    {t("secretsPage.importVault.importing", { defaultValue: "Importing…" })}
                   </>
                 ) : (
-                  `Import ${draftList.length}`
+                  t("secretsPage.importVault.importCount", {
+                    defaultValue: "Import {{count}}",
+                    count: draftList.length,
+                  })
                 )}
               </Button>
             )}
             {step === "result" && (
               <Button size="sm" onClick={() => handleClose(true)}>
-                Done
+                {t("common.done", { defaultValue: "Done" })}
               </Button>
             )}
           </div>
@@ -784,10 +841,11 @@ export function ImportFromVaultDialog({
 }
 
 function Stepper({ step }: { step: Step }) {
+  const { t } = useTranslation();
   const steps: { id: Step; label: string }[] = [
-    { id: "select", label: "Select" },
-    { id: "review", label: "Review" },
-    { id: "result", label: "Result" },
+    { id: "select", label: t("secretsPage.importVault.stepSelect", { defaultValue: "Select" }) },
+    { id: "review", label: t("secretsPage.importVault.stepReview", { defaultValue: "Review" }) },
+    { id: "result", label: t("secretsPage.importVault.stepResult", { defaultValue: "Result" }) },
   ];
   const activeIndex = steps.findIndex((s) => s.id === step);
   return (
@@ -878,14 +936,21 @@ function SelectStep(props: SelectStepProps) {
     noEligibleVaults,
     onManageVaults,
   } = props;
+  const { t } = useTranslation();
 
   if (noEligibleVaults) {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center p-6" data-testid="select-empty-vaults">
         <EmptyState
           icon={Cloud}
-          message="No AWS provider vault configured. Add one to import secrets."
-          action={onManageVaults ? "Manage vaults" : undefined}
+          message={t("secretsPage.importVault.noVaults", {
+            defaultValue: "No AWS provider vault configured. Add one to import secrets.",
+          })}
+          action={
+            onManageVaults
+              ? t("secretsPage.importVault.manageVaults", { defaultValue: "Manage vaults" })
+              : undefined
+          }
           onAction={onManageVaults}
         />
       </div>
@@ -897,7 +962,9 @@ function SelectStep(props: SelectStepProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-5 py-3">
-        <label className="text-xs uppercase tracking-wide text-muted-foreground">Vault</label>
+        <label className="text-xs uppercase tracking-wide text-muted-foreground">
+          {t("secretsPage.importVault.vault", { defaultValue: "Vault" })}
+        </label>
         {awsVaults.length === 1 && eligible.length === 1 ? (
           <span className="text-xs font-medium" data-testid="vault-static-label">
             {eligible[0].displayName}
@@ -907,8 +974,16 @@ function SelectStep(props: SelectStepProps) {
             value={vaultId ?? undefined}
             onValueChange={onVaultChange}
           >
-            <SelectTrigger size="sm" className="text-xs" aria-label="Select AWS vault">
-              <SelectValue placeholder="Select an AWS vault" />
+            <SelectTrigger
+              size="sm"
+              className="text-xs"
+              aria-label={t("secretsPage.importVault.selectVault", { defaultValue: "Select AWS vault" })}
+            >
+              <SelectValue
+                placeholder={t("secretsPage.importVault.selectVaultPlaceholder", {
+                  defaultValue: "Select an AWS vault",
+                })}
+              />
             </SelectTrigger>
             <SelectContent>
               {awsVaults.map((vault) => {
@@ -923,14 +998,24 @@ function SelectStep(props: SelectStepProps) {
                     <span className="flex items-center gap-2">
                       <span>{vault.displayName}</span>
                       {vault.isDefault && (
-                        <Badge variant="outline" className="px-1 py-0 text-(length:--text-nano)">default</Badge>
+                        <Badge variant="outline" className="px-1 py-0 text-(length:--text-nano)">
+                          {t("secretsPage.defaultLabel", { defaultValue: "Default" })}
+                        </Badge>
                       )}
                       {vault.status === "warning" && (
-                        <Badge variant="outline" className="px-1 py-0 text-(length:--text-nano) text-amber-500 border-amber-500/40">warning</Badge>
+                        <Badge
+                          variant="outline"
+                          className="px-1 py-0 text-(length:--text-nano) text-amber-500 border-amber-500/40"
+                        >
+                          {t("secretsPage.vaultStatus.warning", { defaultValue: "Warning" })}
+                        </Badge>
                       )}
                       {blocked && (
-                        <Badge variant="outline" className="px-1 py-0 text-(length:--text-nano) text-muted-foreground">
-                          {vault.status === "coming_soon" ? "coming soon" : vault.status}
+                        <Badge
+                          variant="outline"
+                          className="px-1 py-0 text-(length:--text-nano) text-muted-foreground"
+                        >
+                          {t(`secretsPage.vaultStatus.${vault.status}`, { defaultValue: vault.status })}
                         </Badge>
                       )}
                     </span>
@@ -946,9 +1031,11 @@ function SelectStep(props: SelectStepProps) {
           <Input
             value={searchInput}
             onChange={(event) => onSearchInput(event.target.value)}
-            placeholder="Search by name, ARN, tag"
+            placeholder={t("secretsPage.importVault.searchPlaceholder", {
+              defaultValue: "Search by name, ARN, tag",
+            })}
             className="pl-7 pr-7 text-xs"
-            aria-label="Search remote secrets"
+            aria-label={t("secretsPage.importVault.searchAria", { defaultValue: "Search remote secrets" })}
             data-testid="vault-search"
           />
           {showSearchSpinner && (
@@ -961,7 +1048,7 @@ function SelectStep(props: SelectStepProps) {
           size="sm"
           onClick={onRefresh}
           disabled={previewLoading || !vaultId}
-          aria-label="Refresh remote secrets"
+          aria-label={t("secretsPage.importVault.refreshAria", { defaultValue: "Refresh remote secrets" })}
         >
           <RefreshCw className={cn("h-3.5 w-3.5", previewLoading && "animate-spin")} />
         </Button>
@@ -970,7 +1057,11 @@ function SelectStep(props: SelectStepProps) {
       {selectedNotVisible > 0 && (
         <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-5 py-1.5 text-xs text-muted-foreground">
           <span>
-            {selection.size} selected · {selectedNotVisible} not visible with current search
+            {t("secretsPage.importVault.selectedNotVisible", {
+              defaultValue: "{{selected}} selected · {{hidden}} not visible with current search",
+              selected: selection.size,
+              hidden: selectedNotVisible,
+            })}
           </span>
           <Button
             variant="ghost"
@@ -978,7 +1069,9 @@ function SelectStep(props: SelectStepProps) {
             className="h-6 px-2 text-xs"
             onClick={() => onShowOnlySelectedChange(!showOnlySelected)}
           >
-            {showOnlySelected ? "Show all" : "Show selected"}
+            {showOnlySelected
+              ? t("secretsPage.importVault.showAll", { defaultValue: "Show all" })
+              : t("secretsPage.importVault.showSelected", { defaultValue: "Show selected" })}
           </Button>
         </div>
       )}
@@ -998,15 +1091,28 @@ function SelectStep(props: SelectStepProps) {
                   <Checkbox
                     checked={headerCheckboxState}
                     onCheckedChange={() => toggleAllLoaded()}
-                    aria-label={`Select all loaded (${selectableInLoaded.length})`}
+                    aria-label={t("secretsPage.importVault.selectAllLoaded", {
+                      defaultValue: "Select all loaded ({{count}})",
+                      count: selectableInLoaded.length,
+                    })}
                     disabled={selectableInLoaded.length === 0}
                   />
                 </th>
-                <th className="px-2 py-2 text-left font-medium">Remote name</th>
-                <th className="px-2 py-2 text-left font-medium">Reference</th>
-                <th className="px-2 py-2 text-left font-medium">Last changed</th>
-                <th className="px-2 py-2 text-left font-medium">Suggested name</th>
-                <th className="px-2 py-2 text-left font-medium">State</th>
+                <th className="px-2 py-2 text-left font-medium">
+                  {t("secretsPage.importVault.remoteName", { defaultValue: "Remote name" })}
+                </th>
+                <th className="px-2 py-2 text-left font-medium">
+                  {t("secretsPage.importVault.reference", { defaultValue: "Reference" })}
+                </th>
+                <th className="px-2 py-2 text-left font-medium">
+                  {t("secretsPage.importVault.lastChanged", { defaultValue: "Last changed" })}
+                </th>
+                <th className="px-2 py-2 text-left font-medium">
+                  {t("secretsPage.importVault.suggestedName", { defaultValue: "Suggested name" })}
+                </th>
+                <th className="px-2 py-2 text-left font-medium">
+                  {t("secretsPage.importVault.state", { defaultValue: "State" })}
+                </th>
               </tr>
             </thead>
             <tbody data-testid="vault-table-body">
@@ -1038,7 +1144,10 @@ function SelectStep(props: SelectStepProps) {
                         checked={isSelected}
                         onCheckedChange={() => toggleRow(candidate)}
                         disabled={!candidate.importable}
-                        aria-label={`Select ${candidate.remoteName}`}
+                        aria-label={t("secretsPage.importVault.selectRemoteName", {
+                          defaultValue: "Select {{name}}",
+                          name: candidate.remoteName,
+                        })}
                       />
                     </td>
                     <td className="px-2 py-2.5">
@@ -1062,7 +1171,7 @@ function SelectStep(props: SelectStepProps) {
                         {candidate.status === "duplicate" &&
                           candidate.conflicts.find((c) => c.type === "exact_reference")?.existingSecretId && (
                             <span className="text-(length:--text-micro) text-muted-foreground">
-                              Already imported
+                              {t("secretsPage.importVault.alreadyImported", { defaultValue: "Already imported" })}
                             </span>
                           )}
                       </div>
@@ -1089,9 +1198,17 @@ function SelectStep(props: SelectStepProps) {
         {hasNextPage && !previewError && (
           <div className="flex items-center justify-between border-t border-border/60 px-5 py-2 text-xs text-muted-foreground">
             <span>
-              {candidates.length} loaded
+              {t("secretsPage.importVault.loadedCount", {
+                defaultValue: "{{count}} loaded",
+                count: candidates.length,
+              })}
               {selectableInLoaded.length > 0 && (
-                <span> · {selectableInLoaded.length} selectable</span>
+                <span>
+                  {t("secretsPage.importVault.selectableCount", {
+                    defaultValue: " · {{count}} selectable",
+                    count: selectableInLoaded.length,
+                  })}
+                </span>
               )}
             </span>
             <Button
@@ -1103,10 +1220,14 @@ function SelectStep(props: SelectStepProps) {
             >
               {pageLoading ? (
                 <>
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Loading…
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />{" "}
+                  {t("secretsPage.importVault.loading", { defaultValue: "Loading…" })}
                 </>
               ) : (
-                `Load ${PAGE_SIZE} more`
+                t("secretsPage.importVault.loadMore", {
+                  defaultValue: "Load {{count}} more",
+                  count: PAGE_SIZE,
+                })
               )}
             </Button>
           </div>
@@ -1117,6 +1238,7 @@ function SelectStep(props: SelectStepProps) {
 }
 
 function PreviewErrorBanner({ error, onRetry }: { error: unknown; onRetry: () => void }) {
+  const { t } = useTranslation();
   const isPermission = isPermissionError(error);
   const isThrottling = isThrottlingError(error);
   const message = readableErrorMessage(error);
@@ -1130,19 +1252,23 @@ function PreviewErrorBanner({ error, onRetry }: { error: unknown; onRetry: () =>
       <div className="flex-1">
         <div className="font-medium">
           {isPermission
-            ? "AWS denied list access"
+            ? t("secretsPage.importVault.awsDeniedList", { defaultValue: "AWS denied list access" })
             : isThrottling
-              ? "AWS throttled the listing request"
-              : "Could not load remote secrets"}
+              ? t("secretsPage.importVault.awsThrottled", { defaultValue: "AWS throttled the listing request" })
+              : t("secretsPage.importVault.loadRemoteFailed", { defaultValue: "Could not load remote secrets" })}
         </div>
         <div className="mt-1 text-xs leading-relaxed text-destructive/80">
           {isPermission
-            ? "The AWS principal behind this vault is missing secretsmanager:ListSecrets. Update IAM and try again."
+            ? t("secretsPage.importVault.awsPermissionDetail", {
+                defaultValue:
+                  "The AWS principal behind this vault is missing secretsmanager:ListSecrets. Update IAM and try again.",
+              })
             : message}
         </div>
         <div className="mt-2 flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onRetry}>
-            <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Retry
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />{" "}
+            {t("secretsPage.importVault.retry", { defaultValue: "Retry" })}
           </Button>
           {isPermission && (
             <a
@@ -1151,7 +1277,8 @@ function PreviewErrorBanner({ error, onRetry }: { error: unknown; onRetry: () =>
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-xs font-medium underline"
             >
-              IAM reference <ExternalLink className="h-3 w-3" />
+              {t("secretsPage.importVault.iamReference", { defaultValue: "IAM reference" })}{" "}
+              <ExternalLink className="h-3 w-3" />
             </a>
           )}
         </div>
@@ -1171,18 +1298,24 @@ function SkeletonRows({ rows }: { rows: number }) {
 }
 
 function EmptyCandidates({ query }: { query: string }) {
+  const { t } = useTranslation();
   if (query) {
     return (
       <EmptyState
         icon={Search}
-        message={`No remote secrets match "${query}".`}
+        message={t("secretsPage.importVault.noSearchMatches", {
+          defaultValue: "No remote secrets match \"{{query}}\".",
+          query,
+        })}
       />
     );
   }
   return (
     <EmptyState
       icon={Database}
-      message="No secrets visible to this vault."
+      message={t("secretsPage.importVault.noVisibleSecrets", {
+        defaultValue: "No secrets visible to this vault.",
+      })}
     />
   );
 }
@@ -1196,12 +1329,15 @@ interface ReviewStepProps {
 }
 
 function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing }: ReviewStepProps) {
+  const { t } = useTranslation();
   if (drafts.length === 0) {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center p-6">
         <EmptyState
           icon={Info}
-          message="No secrets selected. Go back to pick remote secrets to import."
+          message={t("secretsPage.importVault.noSecretsSelected", {
+            defaultValue: "No secrets selected. Go back to pick remote secrets to import.",
+          })}
         />
       </div>
     );
@@ -1213,10 +1349,18 @@ function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center gap-3 border-b border-border/60 bg-muted/20 px-5 py-3 text-xs">
-        <span className="font-medium">{ready} secrets ready to import</span>
+        <span className="font-medium">
+          {t("secretsPage.importVault.readyCount", {
+            defaultValue: "{{count}} secrets ready to import",
+            count: ready,
+          })}
+        </span>
         {blocked > 0 && (
           <span className="text-amber-600 dark:text-amber-400">
-            {blocked} need attention before import
+            {t("secretsPage.importVault.blockedCount", {
+              defaultValue: "{{count}} need attention before import",
+              count: blocked,
+            })}
           </span>
         )}
       </div>
@@ -1245,7 +1389,9 @@ function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing 
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <label className="flex flex-col gap-1 text-xs">
-                      <span className="text-muted-foreground">Paperclip name</span>
+                      <span className="text-muted-foreground">
+                        {t("secretsPage.importVault.paperclipName", { defaultValue: "Paperclip name" })}
+                      </span>
                       <Input
                         value={draft.name}
                         onChange={(e) =>
@@ -1258,7 +1404,9 @@ function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing 
                       />
                     </label>
                     <label className="flex flex-col gap-1 text-xs">
-                      <span className="text-muted-foreground">Key</span>
+                      <span className="text-muted-foreground">
+                        {t("secretsPage.keyLabel", { defaultValue: "Key" })}
+                      </span>
                       <Input
                         value={draft.key}
                         onChange={(e) =>
@@ -1276,7 +1424,11 @@ function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing 
                       />
                     </label>
                     <label className="flex flex-col gap-1 text-xs">
-                      <span className="text-muted-foreground">Description (optional)</span>
+                      <span className="text-muted-foreground">
+                        {t("secretsPage.importVault.descriptionOptional", {
+                          defaultValue: "Description (optional)",
+                        })}
+                      </span>
                       <Input
                         value={draft.description}
                         onChange={(e) =>
@@ -1305,7 +1457,10 @@ function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing 
                   variant="ghost"
                   size="icon"
                   onClick={() => removeDraft(draft.candidate.externalRef)}
-                  aria-label={`Remove ${draft.candidate.remoteName}`}
+                  aria-label={t("secretsPage.importVault.removeRemote", {
+                    defaultValue: "Remove {{name}}",
+                    name: draft.candidate.remoteName,
+                  })}
                   className="h-7 w-7"
                   disabled={importing}
                 >
@@ -1326,6 +1481,7 @@ interface ResultStepProps {
 }
 
 function ResultStep({ result, draftList }: ResultStepProps) {
+  const { t } = useTranslation();
   const grouped = useMemo(() => {
     const created: RemoteSecretImportRowResult[] = [];
     const skipped: RemoteSecretImportRowResult[] = [];
@@ -1346,30 +1502,60 @@ function ResultStep({ result, draftList }: ResultStepProps) {
 
   const heading =
     result.errorCount === result.results.length && result.errorCount > 0
-      ? "Import failed"
+      ? t("secretsPage.importVault.importFailed", { defaultValue: "Import failed" })
       : result.errorCount === 0 && result.skippedCount === 0
-        ? `All ${result.importedCount} secrets imported`
-        : "Import complete";
+        ? t("secretsPage.importVault.allImported", {
+            defaultValue: "All {{count}} secrets imported",
+            count: result.importedCount,
+          })
+        : t("secretsPage.importVault.importComplete", { defaultValue: "Import complete" });
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="border-b border-border/60 px-5 py-3" data-testid="result-summary">
         <h3 className="text-sm font-semibold">{heading}</h3>
         <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-          <span className="text-emerald-600 dark:text-emerald-400">✓ {result.importedCount} created</span>
-          <span>⊘ {result.skippedCount} skipped</span>
-          <span className="text-destructive">⨯ {result.errorCount} failed</span>
+          <span className="text-emerald-600 dark:text-emerald-400">
+            {t("secretsPage.importVault.createdCount", {
+              defaultValue: "✓ {{count}} created",
+              count: result.importedCount,
+            })}
+          </span>
+          <span>
+            {t("secretsPage.importVault.skippedCount", {
+              defaultValue: "⊘ {{count}} skipped",
+              count: result.skippedCount,
+            })}
+          </span>
+          <span className="text-destructive">
+            {t("secretsPage.importVault.failedCount", {
+              defaultValue: "⨯ {{count}} failed",
+              count: result.errorCount,
+            })}
+          </span>
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         {grouped.created.length > 0 && (
-          <ResultGroup label="Created" rows={grouped.created} draftLookup={draftLookup} />
+          <ResultGroup
+            label={t("secretsPage.importVault.created", { defaultValue: "Created" })}
+            rows={grouped.created}
+            draftLookup={draftLookup}
+          />
         )}
         {grouped.skipped.length > 0 && (
-          <ResultGroup label="Skipped" rows={grouped.skipped} draftLookup={draftLookup} />
+          <ResultGroup
+            label={t("secretsPage.importVault.skipped", { defaultValue: "Skipped" })}
+            rows={grouped.skipped}
+            draftLookup={draftLookup}
+          />
         )}
         {grouped.failed.length > 0 && (
-          <ResultGroup label="Failed" rows={grouped.failed} draftLookup={draftLookup} />
+          <ResultGroup
+            label={t("secretsPage.importVault.failed", { defaultValue: "Failed" })}
+            rows={grouped.failed}
+            draftLookup={draftLookup}
+          />
         )}
       </div>
     </div>
@@ -1451,22 +1637,32 @@ function FooterStatus({
   blockedReviewCount,
   result,
 }: FooterStatusProps) {
+  const { t } = useTranslation();
   if (step === "select") {
     return (
       <div className="text-xs text-muted-foreground">
         {totalSelected === 0
-          ? "Select remote secrets to import"
-          : `${totalSelected} selected`}
+          ? t("secretsPage.importVault.selectRemote", { defaultValue: "Select remote secrets to import" })
+          : t("secretsPage.importVault.selectedCount", {
+              defaultValue: "{{count}} selected",
+              count: totalSelected,
+            })}
       </div>
     );
   }
   if (step === "review") {
     return (
       <div className="text-xs text-muted-foreground">
-        {readyReviewCount} ready
+        {t("secretsPage.importVault.readyShort", {
+          defaultValue: "{{count}} ready",
+          count: readyReviewCount,
+        })}
         {blockedReviewCount > 0 && (
           <span className="ml-2 text-amber-600 dark:text-amber-400">
-            · {blockedReviewCount} blocked
+            {t("secretsPage.importVault.blockedShort", {
+              defaultValue: "· {{count}} blocked",
+              count: blockedReviewCount,
+            })}
           </span>
         )}
       </div>
@@ -1475,9 +1671,24 @@ function FooterStatus({
   if (result) {
     return (
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span>{result.importedCount} created</span>
-        <span>{result.skippedCount} skipped</span>
-        <span>{result.errorCount} failed</span>
+        <span>
+          {t("secretsPage.importVault.createdCountPlain", {
+            defaultValue: "{{count}} created",
+            count: result.importedCount,
+          })}
+        </span>
+        <span>
+          {t("secretsPage.importVault.skippedCountPlain", {
+            defaultValue: "{{count}} skipped",
+            count: result.skippedCount,
+          })}
+        </span>
+        <span>
+          {t("secretsPage.importVault.failedCountPlain", {
+            defaultValue: "{{count}} failed",
+            count: result.errorCount,
+          })}
+        </span>
       </div>
     );
   }

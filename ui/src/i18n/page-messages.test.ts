@@ -204,6 +204,20 @@ describe("zh-CN page-body messages", () => {
     expect(entry(skillStudio, "openTestTask")).toContain("测试任务");
   });
 
+  it("translates the project skill import flow", () => {
+    const skillsImport = group("skillsImport");
+    expect(entry(skillsImport, "title")).toBe("从项目导入技能");
+    expect(entry(skillsImport, "description")).toContain("扫描");
+    expect(entry(skillsImport, "importCount_other")).toContain("{{count}}");
+    expect(entry(skillsImport, "importedBody_other")).toContain("{{project}}");
+    expect(entry(skillsImport, "noSkillsSearch")).toContain("{{folders}}");
+    expect(entry(skillsImport, "noSkillsSearch")).toContain("{{count}}");
+    expect(entry(skillsImport, "selectCandidate")).toContain("{{name}}");
+    expect(entry(skillsImport, "renameCandidate")).toContain("{{name}}");
+    expect(entry(skillsImport, "resultDescription")).toContain("Skill Studio");
+    expect(entry(nested(skillsImport, "workspaceKind"), "local")).toBe("本地");
+  });
+
   it("translates the company environments page", () => {
     const environmentsPage = group("environmentsPage");
     expect(entry(environmentsPage, "addEnvironmentTitle")).toBe("添加环境");

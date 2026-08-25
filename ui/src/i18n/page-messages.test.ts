@@ -410,6 +410,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueScheduledRetry, "lastAttemptFailed")).toContain("{{error}}");
   });
 
+  it("translates plan decomposition details", () => {
+    const issuePlanDecomposition = group("issuePlanDecomposition");
+    expect(entry(issuePlanDecomposition, "title")).toBe("计划拆解");
+    expect(entry(issuePlanDecomposition, "acceptedPlanRevision_other")).toContain("{{count}}");
+    expect(entry(issuePlanDecomposition, "childTasksCreated_other")).toContain("{{requested}}");
+    expect(entry(issuePlanDecomposition, "owner")).toContain("{{name}}");
+  });
+
   it("translates the small pages, search components, and blocked-inbox labels", () => {
     expect(entry(group("notFound"), "routeNotExist")).toBe("此路由不存在。");
     expect(entry(group("companiesPage"), "deleteConfirm")).toContain("无法撤销");

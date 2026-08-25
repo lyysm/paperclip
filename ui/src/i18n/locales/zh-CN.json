@@ -3812,6 +3812,25 @@
     "continuationScheduled": "已排期继续运行",
     "tryAgain": "再试一次"
   },
+  "issuePlanDecomposition": {
+    "acceptedPlanRevision_one": "1 个已接受的计划版本",
+    "acceptedPlanRevision_other": "{{count}} 个已接受的计划版本",
+    "agent": "智能体",
+    "childTasksCreated_one": "已创建 {{created}} / {{requested}} 个子任务",
+    "childTasksCreated_other": "已创建 {{created}} / {{requested}} 个子任务",
+    "completed": "已完成",
+    "completedAt": "完成于 {{time}}",
+    "idempotentClaim": "幂等认领",
+    "idempotentClaimDescription": "使用相同指纹的重复尝试会复用此记录，而不是创建新的子任务",
+    "inFlight": "执行中",
+    "owner": "负责人：{{name}}",
+    "planDocument": "计划文档",
+    "planRevision": "计划 {{revision}}",
+    "revision": "版本 {{id}}",
+    "started": "开始于 {{time}}",
+    "title": "计划拆解",
+    "updated": "更新于 {{time}}"
+  },
   "issueDetail": {
     "acceptFailed": "接受失败",
     "acceptedDraftsSkipped_one": "已接受 {{created}} 个草稿并跳过 {{skipped}} 个",

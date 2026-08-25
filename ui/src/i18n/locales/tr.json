@@ -3812,6 +3812,25 @@
     "continuationScheduled": "Continuation scheduled",
     "tryAgain": "Try again"
   },
+  "issuePlanDecomposition": {
+    "acceptedPlanRevision_one": "1 accepted plan revision",
+    "acceptedPlanRevision_other": "{{count}} accepted plan revisions",
+    "agent": "agent",
+    "childTasksCreated_one": "{{created}} of {{requested}} child task created",
+    "childTasksCreated_other": "{{created}} of {{requested}} child tasks created",
+    "completed": "Completed",
+    "completedAt": "Completed {{time}}",
+    "idempotentClaim": "Idempotent claim",
+    "idempotentClaimDescription": "Repeat attempts with this fingerprint reuse this record instead of creating new children",
+    "inFlight": "In flight",
+    "owner": "Owner: {{name}}",
+    "planDocument": "Plan document",
+    "planRevision": "Plan {{revision}}",
+    "revision": "revision {{id}}",
+    "started": "Started {{time}}",
+    "title": "Plan decomposition",
+    "updated": "Updated {{time}}"
+  },
   "issueDetail": {
     "acceptFailed": "Accept failed",
     "acceptedDraftsSkipped_one": "Accepted {{created}} draft and skipped {{skipped}}",

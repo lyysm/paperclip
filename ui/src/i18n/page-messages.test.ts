@@ -477,6 +477,18 @@ describe("zh-CN page-body messages", () => {
     expect(entry(auditFeed, "filteredEmptyDescription")).toContain("筛选");
   });
 
+  it("translates CLI authorization and board claim entry points", () => {
+    const cliAuth = group("cliAuth");
+    expect(entry(cliAuth, "approvedTitle")).toBe("CLI 访问已批准");
+    expect(entry(cliAuth, "requestedAccess")).toBe("请求的访问权限");
+    expect(entry(cliAuth, "signInCreateAccount")).toContain("登录");
+
+    const boardClaim = group("boardClaim");
+    expect(entry(boardClaim, "claimedTitle")).toBe("看板所有权已认领");
+    expect(entry(boardClaim, "claimDescription")).toContain("实例管理员");
+    expect(entry(boardClaim, "claiming")).toContain("认领");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

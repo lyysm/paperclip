@@ -103,6 +103,14 @@ describe("zh-CN page-body messages", () => {
     expect(entry(group("dashboard"), "agentsEnabled")).toBe("已启用智能体");
     expect(entry(group("dashboard"), "activeBudgetIncidents_other")).toContain("{{count}}");
 
+    const boardChat = group("boardChat");
+    expect(entry(boardChat, "conferenceRoom")).toBe("会议室");
+    expect(entry(boardChat, "welcomeBody")).toContain("{{company}}");
+    expect(entry(boardChat, "welcomeBody")).toContain("{{mission}}");
+    expect(entry(boardChat, "draftBriefPrompt")).toContain("{{company}}");
+    expect(entry(boardChat, "hiringPlanPrompt")).toContain("{{company}}");
+    expect(entry(boardChat, "introPitchPrompt")).toContain("{{company}}");
+
     const searchPage = group("searchPage");
     expect(entry(searchPage, "initialTitle")).toContain("搜索");
     expect(entry(searchPage, "noMatchInScope")).toContain("{{scope}}");

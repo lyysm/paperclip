@@ -4288,6 +4288,15 @@
       "beta": "Beta"
     }
   },
+  "issuesPage": {
+    "title": "任务",
+    "selectCompany": "选择公司以查看任务。"
+  },
+  "myIssues": {
+    "title": "我的任务",
+    "selectCompany": "选择公司以查看你的任务。",
+    "empty": "没有分配给你的任务。"
+  },
   "statusCards": {
     "breadcrumb": "状态",
     "experimental": "实验性",

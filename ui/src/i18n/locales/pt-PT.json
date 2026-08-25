@@ -4355,6 +4355,15 @@
       "beta": "Beta"
     }
   },
+  "issuesPage": {
+    "title": "Tasks",
+    "selectCompany": "Select a company to view tasks."
+  },
+  "myIssues": {
+    "title": "My Tasks",
+    "selectCompany": "Select a company to view your tasks.",
+    "empty": "No tasks assigned to you."
+  },
   "statusCards": {
     "breadcrumb": "Status",
     "experimental": "Experimental",

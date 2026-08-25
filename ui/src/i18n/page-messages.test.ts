@@ -526,6 +526,13 @@ describe("zh-CN page-body messages", () => {
     expect(entry(nested(agentSkills, "release"), "optionWithDate")).toContain("{{date}}");
   });
 
+  it("translates the task list page shells", () => {
+    expect(entry(group("issuesPage"), "title")).toBe("任务");
+    expect(entry(group("issuesPage"), "selectCompany")).toContain("选择公司");
+    expect(entry(group("myIssues"), "title")).toBe("我的任务");
+    expect(entry(group("myIssues"), "empty")).toContain("没有分配");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

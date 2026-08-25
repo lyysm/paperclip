@@ -433,7 +433,7 @@ export function StatusCardDetailDrawer({
                                 ? t(`statusCards.detail.trigger${update.trigger === "manual" ? "Manual" : update.trigger === "interval" ? "Interval" : update.trigger === "reactive" ? "Reactive" : update.trigger === "restore" ? "Restore" : ""}`, {
                                     defaultValue: update.trigger,
                                   })
-                                : t(`statusCards.detail.status${update.status === "ok" ? "Ok" : update.status === "failed" ? "Failed" : ""}`, {
+                                : t(update.status === "failed" ? "statusCards.detail.statusFailed" : "statuses.generic.running", {
                                     defaultValue: update.status,
                                   })}
                             </Badge>

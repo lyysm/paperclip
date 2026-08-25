@@ -499,6 +499,15 @@ describe("zh-CN page-body messages", () => {
     expect(entry(artifacts, "countPlural")).toContain("{{count}}");
   });
 
+  it("translates the projects page sorting and membership controls", () => {
+    const projects = group("projects");
+    expect(entry(projects, "title")).toBe("项目");
+    expect(entry(nested(projects, "sort"), "targetDate")).toBe("目标日期");
+    expect(entry(projects, "sortLabel")).toContain("{{sort}}");
+    expect(entry(group("membershipAction"), "joinResource")).toContain("{{name}}");
+    expect(entry(group("starToggle"), "unstarResource")).toContain("取消收藏");
+  });
+
   it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
     const agentConfig = group("agentConfig");
     expect(entry(agentConfig, "adapterType")).toBe("适配器类型");

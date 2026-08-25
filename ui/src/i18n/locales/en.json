@@ -4204,6 +4204,41 @@
     "countSingular": "{{count}} artifact",
     "countPlural": "{{count}} artifacts"
   },
+  "projects": {
+    "title": "Projects",
+    "selectCompany": "Select a company to view projects.",
+    "sortTitle": "Sort",
+    "sortLabel": "Sort: {{sort}}",
+    "sort": {
+      "name": "Name",
+      "updated": "Updated",
+      "created": "Created",
+      "targetDate": "Target date"
+    },
+    "asc": "Asc",
+    "desc": "Desc",
+    "addProject": "Add Project",
+    "noProjects": "No projects yet.",
+    "myProjects": "My Projects",
+    "otherProjects": "Other Projects",
+    "projectCountSingular": "{{count}} project",
+    "projectCountPlural": "{{count}} projects",
+    "taskCountSingular": "{{count}} task",
+    "taskCountPlural": "{{count}} tasks"
+  },
+  "membershipAction": {
+    "join": "Join",
+    "leave": "Leave",
+    "joining": "Joining...",
+    "leaving": "Leaving...",
+    "joinResource": "Join {{name}}",
+    "leaveResource": "Leave {{name}}"
+  },
+  "starToggle": {
+    "starResource": "Star {{name}}",
+    "unstarResource": "Unstar {{name}}",
+    "saveRetry": "Couldn't save — retry"
+  },
   "statusCards": {
     "breadcrumb": "Status",
     "experimental": "Experimental",

@@ -1,4 +1,5 @@
 import { cn } from "../../lib/utils";
+import { t, useTranslation } from "@/i18n";
 
 /**
  * The agent arc — create the agent, connect it, review — is the part of the
@@ -60,6 +61,12 @@ export function Stepper({
   canJumpToStep?: (target: number) => boolean;
   onJumpToStep?: (target: number) => void;
 }) {
+  const { t: translate } = useTranslation();
+  const stepLabels = [
+    translate("onboarding.step.createAgent", { defaultValue: AGENT_ARC_STEP_LABELS[0] }),
+    translate("onboarding.step.connectModel", { defaultValue: AGENT_ARC_STEP_LABELS[1] }),
+    translate("onboarding.step.review", { defaultValue: AGENT_ARC_STEP_LABELS[2] }),
+  ];
   return (
     <div className="mb-7 flex flex-col gap-3.5">
       <div className="flex items-center gap-2">
@@ -69,7 +76,7 @@ export function Stepper({
             <button
               key={segment}
               type="button"
-              aria-label={AGENT_ARC_STEP_LABELS[segment - 1] ?? `Step ${segment}`}
+              aria-label={stepLabels[segment - 1] ?? t("onboarding.step.fallback", { defaultValue: "Step {{number}}", number: segment })}
               aria-current={segment === step ? "step" : undefined}
               disabled={!jumpable}
               onClick={() => jumpable && onJumpToStep?.(segment)}
@@ -83,7 +90,7 @@ export function Stepper({
         })}
       </div>
       <span className="text-(length:--text-micro) font-medium uppercase tracking-widest text-muted-foreground">
-        Step {step} of {total}
+        {translate("onboarding.step.progress", { defaultValue: "Step {{step}} of {{total}}", step, total })}
       </span>
     </div>
   );

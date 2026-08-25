@@ -5,6 +5,7 @@ import {
   type RoutineListProjectSummary,
   type RoutineListRowItem,
 } from "@/components/RoutineList";
+import { useTranslation } from "@/i18n";
 
 export type ManagedRoutinesListAgent = {
   id: string;
@@ -93,6 +94,10 @@ export function ManagedRoutinesList({
   onReconcile,
   onReset,
 }: ManagedRoutinesListProps) {
+  const { t } = useTranslation();
+  const renderedEmptyMessage = emptyMessage === "No managed routines."
+    ? t("routines.noManagedRoutines", { defaultValue: "No managed routines." })
+    : emptyMessage;
   const agentById = new Map<string, RoutineListAgentSummary>(
     agents.map((agent) => [agent.id, { name: agent.name, icon: agent.icon }]),
   );
@@ -103,7 +108,7 @@ export function ManagedRoutinesList({
   if (routines.length === 0) {
     return (
       <div className="rounded-lg border border-border px-3 py-8 text-center text-sm text-muted-foreground">
-        {emptyMessage}
+        {renderedEmptyMessage}
       </div>
     );
   }
@@ -127,8 +132,8 @@ export function ManagedRoutinesList({
               runningRoutineId={runningRoutineKey}
               statusMutationRoutineId={statusMutationRoutineKey}
               href={href}
-              configureLabel="Configure"
-              managedByLabel={managedBy ? `Managed by ${managedBy}` : null}
+              configureLabel={t("routines.configure", { defaultValue: "Configure" })}
+              managedByLabel={managedBy ? t("routines.managedBy", { defaultValue: "Managed by {{name}}", name: managedBy }) : null}
               runNowButton
               hideArchiveAction
               disableRunNow={!canUseRoutine}
@@ -136,7 +141,7 @@ export function ManagedRoutinesList({
               secondaryDetails={
                 <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   {routine.resourceKey ? <span>{routine.resourceKey}</span> : null}
-                  {routine.cronExpression ? <span>Schedule {routine.cronExpression}</span> : null}
+                  {routine.cronExpression ? <span>{t("routines.schedule", { defaultValue: "Schedule {{cron}}", cron: routine.cronExpression })}</span> : null}
                 </span>
               }
               onRunNow={() => onRunNow?.(routine)}
@@ -152,8 +157,8 @@ export function ManagedRoutinesList({
               >
                 <span>
                   {missingRefs.length
-                    ? `Missing ${missingRefs.map((ref) => `${ref.resourceKind}:${ref.resourceKey}`).join(", ")}`
-                    : "Routine defaults can be repaired."}
+                    ? t("routines.missingReferences", { defaultValue: "Missing {{refs}}", refs: missingRefs.map((ref) => `${ref.resourceKind}:${ref.resourceKey}`).join(", ") })
+                    : t("routines.defaultsCanBeRepaired", { defaultValue: "Routine defaults can be repaired." })}
                 </span>
                 <span className="flex items-center gap-2">
                   {onReconcile ? (
@@ -163,7 +168,7 @@ export function ManagedRoutinesList({
                       disabled={reconcilingRoutineKey === routine.key}
                       onClick={() => onReconcile(routine)}
                     >
-                      {reconcilingRoutineKey === routine.key ? "Reconciling..." : "Reconcile"}
+                      {reconcilingRoutineKey === routine.key ? t("routines.reconciling", { defaultValue: "Reconciling..." }) : t("routines.reconcile", { defaultValue: "Reconcile" })}
                     </Button>
                   ) : null}
                   {onReset ? (
@@ -173,7 +178,7 @@ export function ManagedRoutinesList({
                       disabled={resettingRoutineKey === routine.key}
                       onClick={() => onReset(routine)}
                     >
-                      {resettingRoutineKey === routine.key ? "Resetting..." : "Reset"}
+                      {resettingRoutineKey === routine.key ? t("routines.resetting", { defaultValue: "Resetting..." }) : t("routines.reset", { defaultValue: "Reset" })}
                     </Button>
                   ) : null}
                 </span>

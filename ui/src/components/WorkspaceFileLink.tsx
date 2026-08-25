@@ -1,6 +1,7 @@
 import type { MouseEvent, ReactNode } from "react";
 import { FileCode2, FolderOpen } from "lucide-react";
 import { useLocation } from "@/lib/router";
+import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 import type { ParsedWorkspaceFileRef } from "@/lib/workspace-file-parser";
 import { formatWorkspaceFileRefDisplay } from "@/lib/workspace-file-parser";
@@ -29,20 +30,21 @@ export function WorkspaceFileLink({
   showIcon = true,
   title,
 }: WorkspaceFileLinkProps) {
+  const { t } = useTranslation();
   const viewer = useFileViewer();
   const location = useLocation();
   const display = typeof label !== "undefined" ? label : formatWorkspaceFileRefDisplay(workspaceFileRef);
   const canOpen = !!(onOpen || viewer);
   const isDirectory = workspaceFileRef.resourceKind === "directory" || workspaceFileRef.path.endsWith("/");
   const lineSuffix = workspaceFileRef.line
-    ? ` line ${workspaceFileRef.line}${workspaceFileRef.column ? ` column ${workspaceFileRef.column}` : ""}`
+    ? t("workspaceFiles.lineSuffix", { defaultValue: " line {{line}}{{column}}", line: workspaceFileRef.line, column: workspaceFileRef.column ? t("workspaceFiles.columnSuffix", { defaultValue: " column {{column}}", column: workspaceFileRef.column }) : "" })
     : "";
   const ariaLabel = canOpen
-    ? `Open ${workspaceFileRef.path}${lineSuffix} in the ${isDirectory ? "workspace browser" : "file viewer"}`
-    : `Workspace ${isDirectory ? "folder" : "file"} ${workspaceFileRef.path}${lineSuffix}`;
+    ? t("workspaceFiles.openRef", { defaultValue: "Open {{path}}{{lineSuffix}} in the {{target}}", path: workspaceFileRef.path, lineSuffix, target: isDirectory ? t("workspaceFiles.workspaceBrowser", { defaultValue: "workspace browser" }) : t("workspaceFiles.fileViewer", { defaultValue: "file viewer" }) })
+    : t("workspaceFiles.workspaceRef", { defaultValue: "Workspace {{kind}} {{path}}{{lineSuffix}}", kind: isDirectory ? t("workspaceFiles.folder", { defaultValue: "folder" }) : t("workspaceFiles.file", { defaultValue: "file" }), path: workspaceFileRef.path, lineSuffix });
   const tooltip = title ?? (canOpen
-    ? `Open ${workspaceFileRef.path}${lineSuffix} in the ${isDirectory ? "workspace browser" : "file viewer"}`
-    : `Workspace ${isDirectory ? "folder" : "file"} ${workspaceFileRef.path}${lineSuffix}`);
+    ? t("workspaceFiles.openRef", { defaultValue: "Open {{path}}{{lineSuffix}} in the {{target}}", path: workspaceFileRef.path, lineSuffix, target: isDirectory ? t("workspaceFiles.workspaceBrowser", { defaultValue: "workspace browser" }) : t("workspaceFiles.fileViewer", { defaultValue: "file viewer" }) })
+    : t("workspaceFiles.workspaceRef", { defaultValue: "Workspace {{kind}} {{path}}{{lineSuffix}}", kind: isDirectory ? t("workspaceFiles.folder", { defaultValue: "folder" }) : t("workspaceFiles.file", { defaultValue: "file" }), path: workspaceFileRef.path, lineSuffix }));
 
   const deepLinkSearch = isDirectory
     ? writeFolderViewerStateToSearch(location.search, {

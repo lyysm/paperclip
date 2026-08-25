@@ -435,4 +435,22 @@ describe("zh-CN page-body messages", () => {
     expect(entry(executionWorkspace, "backToTasks")).toBe("返回任务");
     expect(entry(executionWorkspace, "lastRunAt")).toContain("{{time}}");
   });
+
+  it("translates the agent, routine, workspace, onboarding, and access surfaces", () => {
+    const agentConfig = group("agentConfig");
+    expect(entry(agentConfig, "adapterType")).toBe("适配器类型");
+    expect(entry(nested(agentConfig, "pathInstructions"), "title")).toBe("如何获取完整路径");
+
+    expect(entry(group("routines"), "title")).toBe("例行程序");
+    expect(entry(group("projectWorkspace"), "workspaceName")).toBe("工作区名称");
+    expect(entry(group("workspaceFiles"), "searchPlaceholder")).toContain("搜索文件");
+    expect(entry(group("fileViewer"), "fileNotFoundBody")).toContain("工作区");
+
+    expect(entry(group("onboarding"), "defaultTaskTitle")).toContain("引导");
+    expect(entry(group("inviteLanding"), "joinCompany")).toContain("{{company}}");
+    expect(entry(group("companyImport"), "processedSummary")).toContain("{{company}}");
+    expect(entry(group("companyInvites"), "audienceBothWithRole")).toContain("{{role}}");
+    expect(entry(group("adapterManager"), "installedToastBody")).toContain("{{type}}");
+    expect(entry(group("orgChart"), "title")).toBe("组织架构图");
+  });
 });

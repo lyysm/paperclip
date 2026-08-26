@@ -3,6 +3,7 @@
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { i18n } from "@/i18n";
 import { queryKeys } from "@/lib/queryKeys";
 import { CompanySettingsSidebar } from "./CompanySettingsSidebar";
 
@@ -246,6 +247,51 @@ describe("CompanySettingsSidebar", () => {
     await act(async () => {
       root.unmount();
     });
+  });
+
+  it("uses the active locale for settings labels", async () => {
+    let root: ReturnType<typeof createRoot> | undefined;
+    try {
+      await i18n.changeLanguage("zh-CN");
+      root = createRoot(container);
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+
+      await act(async () => {
+        root?.render(
+          <QueryClientProvider client={queryClient}>
+            <CompanySettingsSidebar />
+          </QueryClientProvider>,
+        );
+      });
+      await flushReact();
+
+      for (const label of [
+        "通用",
+        "个人资料",
+        "成员",
+        "邀请",
+        "密钥",
+        "环境",
+        "访问",
+        "心跳",
+        "导出",
+        "导入",
+        "实验性",
+        "插件",
+        "适配器",
+      ]) {
+        expect(container.textContent).toContain(label);
+      }
+    } finally {
+      if (root) {
+        await act(async () => {
+          root?.unmount();
+        });
+      }
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("renders company settings pages contributed by ready plugins", async () => {

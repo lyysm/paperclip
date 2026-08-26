@@ -5,6 +5,7 @@ import {
   type AttentionDateRangeId,
 } from "../lib/attention";
 import { cn } from "../lib/utils";
+import { useTranslation } from "@/i18n";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
@@ -27,6 +28,7 @@ interface DecisionDateChipsProps {
  */
 export function DecisionDateChips({ value, custom, onChange }: DecisionDateChipsProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-wrap items-center gap-1.5" data-decision-date-chips>
@@ -42,14 +44,14 @@ export function DecisionDateChips({ value, custom, onChange }: DecisionDateChips
               <CalendarRange className="h-3.5 w-3.5" />
               {value === "custom" && (custom.from || custom.to)
                 ? `${custom.from ?? "…"} → ${custom.to ?? "…"}`
-                : "Custom"}
+                : t("decisions.custom", { defaultValue: "Custom" })}
             </button>
           </ChipButton>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto space-y-2 p-3">
           <div className="flex flex-col gap-1.5">
             <label className="text-(length:--text-nano) font-medium uppercase tracking-wide text-muted-foreground">
-              From
+              {t("decisions.from", { defaultValue: "From" })}
             </label>
             <input
               type="date"
@@ -61,7 +63,7 @@ export function DecisionDateChips({ value, custom, onChange }: DecisionDateChips
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-(length:--text-nano) font-medium uppercase tracking-wide text-muted-foreground">
-              To
+              {t("decisions.to", { defaultValue: "To" })}
             </label>
             <input
               type="date"
@@ -81,7 +83,7 @@ export function DecisionDateChips({ value, custom, onChange }: DecisionDateChips
                 setOpen(false);
               }}
             >
-              Clear
+              {t("decisions.clear", { defaultValue: "Clear" })}
             </Button>
           </div>
         </PopoverContent>

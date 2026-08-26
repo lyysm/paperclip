@@ -710,6 +710,11 @@ describe("zh-CN page-body messages", () => {
     expect(entry(workspaceServices, "servicesCount")).toContain("{{count}}");
     expect(entry(workspaceServices, "runningOf")).toContain("{{running}}");
     expect(entry(workspaceServices, "startingOnPort")).toContain("{{port}}");
+    const workspaceRuntimeControls = group("workspaceRuntimeControls");
+    expect(entry(workspaceRuntimeControls, "servicesRunning")).toContain("{{n}}");
+    expect(entry(workspaceRuntimeControls, "jobsAvailable_other")).toContain("{{count}}");
+    expect(entry(workspaceRuntimeControls, "port")).toContain("{{port}}");
+    expect(entry(nested(workspaceRuntimeControls, "status"), "runOnce")).toBe("运行一次");
     expect(entry(group("workspaceFiles"), "searchPlaceholder")).toContain("搜索文件");
     expect(entry(group("fileViewer"), "fileNotFoundBody")).toContain("工作区");
 

@@ -10434,5 +10434,58 @@
     "workspaceServiceRestarted": "工作区服务已重启。",
     "workspaceServiceStarted": "工作区服务已启动。",
     "workspaceServiceStopped": "工作区服务已停止。"
+  },
+  "workspaceRuntimeControls": {
+    "jobMissingCommand": "此作业缺少命令。",
+    "untrackedServiceReason": "此运行时服务已不再匹配已配置的工作区命令。",
+    "httpsUnavailable": "HTTPS 不可用",
+    "httpsUnavailableHint": "请检查 Tailscale broker 和节点 HTTPS 配置。",
+    "httpsCleanupPending": "HTTPS 清理待处理",
+    "httpsCleanupHint": "重新使用此端口前，请重启主机 broker。",
+    "serviceFailed": "服务失败{{when}}",
+    "provisioningHttps": "正在预置 HTTPS…",
+    "httpsReady": "HTTPS 已就绪",
+    "run": "运行",
+    "start": "启动",
+    "stop": "停止",
+    "restart": "重启",
+    "noServicesConfigured": "此工作区未配置服务。",
+    "noJobsConfigured": "此工作区未配置一次性作业。",
+    "workspaceCommands": "工作区命令",
+    "servicesRunning": "{{n}} 个服务正在运行",
+    "noServicesRunning": "没有服务正在运行",
+    "jobsAvailable_one": "{{count}} 个作业可按需运行。",
+    "jobsAvailable_other": "{{count}} 个作业可按需运行。",
+    "eachCommandIndependent": "每条命令都可以独立控制。",
+    "servicesTitle": "服务",
+    "servicesDescription": "Paperclip 可为此工作区监管的长期运行命令。",
+    "jobsTitle": "作业",
+    "jobsDescription": "立即运行、完成后退出的一次性命令。",
+    "untrackedTitle": "未跟踪的服务",
+    "untrackedDescription": "正在运行但已不再匹配当前工作区命令配置的服务。",
+    "kind": {
+      "service": "服务",
+      "job": "作业"
+    },
+    "status": {
+      "runOnce": "运行一次",
+      "provisioning": "预置中…",
+      "starting": "启动中…",
+      "running": "运行中",
+      "stopping": "停止中…",
+      "restarting": "重启中…",
+      "failed": "失败",
+      "stopped": "已停止"
+    },
+    "lifecycle": {
+      "shared": "共享",
+      "ephemeral": "临时"
+    },
+    "health": {
+      "unknown": "未知",
+      "healthy": "健康",
+      "unhealthy": "不健康"
+    },
+    "port": "端口 {{port}}"
   }
 }

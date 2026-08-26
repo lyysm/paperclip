@@ -10544,5 +10544,58 @@
     "workspaceServiceRestarted": "Workspace service restarted.",
     "workspaceServiceStarted": "Workspace service started.",
     "workspaceServiceStopped": "Workspace service stopped."
+  },
+  "workspaceRuntimeControls": {
+    "jobMissingCommand": "This job is missing a command.",
+    "untrackedServiceReason": "This runtime service no longer matches a configured workspace command.",
+    "httpsUnavailable": "HTTPS unavailable",
+    "httpsUnavailableHint": "Check the Tailscale broker and node HTTPS configuration.",
+    "httpsCleanupPending": "HTTPS cleanup pending",
+    "httpsCleanupHint": "Restart the host broker before reusing this port.",
+    "serviceFailed": "Service failed{{when}}",
+    "provisioningHttps": "Provisioning HTTPS…",
+    "httpsReady": "HTTPS ready",
+    "run": "Run",
+    "start": "Start",
+    "stop": "Stop",
+    "restart": "Restart",
+    "noServicesConfigured": "No services are configured for this workspace.",
+    "noJobsConfigured": "No one-shot jobs are configured for this workspace.",
+    "workspaceCommands": "Workspace commands",
+    "servicesRunning": "{{n}} services running",
+    "noServicesRunning": "No services running",
+    "jobsAvailable_one": "{{count}} job available to run on demand.",
+    "jobsAvailable_other": "{{count}} jobs available to run on demand.",
+    "eachCommandIndependent": "Each command can be controlled independently.",
+    "servicesTitle": "Services",
+    "servicesDescription": "Long-running commands that Paperclip can supervise for this workspace.",
+    "jobsTitle": "Jobs",
+    "jobsDescription": "One-shot commands that run now and exit when they finish.",
+    "untrackedTitle": "Untracked services",
+    "untrackedDescription": "Running services that no longer match the current workspace command config.",
+    "kind": {
+      "service": "Service",
+      "job": "Job"
+    },
+    "status": {
+      "runOnce": "Run once",
+      "provisioning": "Provisioning…",
+      "starting": "Starting…",
+      "running": "Running",
+      "stopping": "Stopping…",
+      "restarting": "Restarting…",
+      "failed": "Failed",
+      "stopped": "Stopped"
+    },
+    "lifecycle": {
+      "shared": "Shared",
+      "ephemeral": "Ephemeral"
+    },
+    "health": {
+      "unknown": "Unknown",
+      "healthy": "Healthy",
+      "unhealthy": "Unhealthy"
+    },
+    "port": "Port {{port}}"
   }
 }

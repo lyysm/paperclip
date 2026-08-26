@@ -219,7 +219,7 @@ describe("zh-CN page-body messages", () => {
 
   it("translates the Skill Studio surface", () => {
     const skillStudio = group("skillStudio");
-    expect(entry(skillStudio, "studio")).toBe("Studio");
+    expect(entry(skillStudio, "studio")).toBe("工作室");
     expect(entry(skillStudio, "newSkillTitle")).toBe("新技能");
     expect(entry(skillStudio, "createNewSkillTitle")).toBe("创建新技能");
     expect(entry(skillStudio, "forkSkillTitle")).toBe("复刻技能");
@@ -245,7 +245,7 @@ describe("zh-CN page-body messages", () => {
     expect(entry(skillsImport, "noSkillsSearch")).toContain("{{count}}");
     expect(entry(skillsImport, "selectCandidate")).toContain("{{name}}");
     expect(entry(skillsImport, "renameCandidate")).toContain("{{name}}");
-    expect(entry(skillsImport, "resultDescription")).toContain("Skill Studio");
+    expect(entry(skillsImport, "resultDescription")).toContain("技能工作室");
     expect(entry(nested(skillsImport, "workspaceKind"), "local")).toBe("本地");
   });
 

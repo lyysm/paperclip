@@ -18,16 +18,12 @@ function installStorageMock(target: Record<string, unknown>) {
   });
 }
 
-if (
-  typeof globalThis.localStorage?.getItem !== "function"
-  || typeof globalThis.localStorage?.setItem !== "function"
-  || typeof globalThis.localStorage?.removeItem !== "function"
-  || typeof globalThis.localStorage?.clear !== "function"
-) {
-  installStorageMock(globalThis);
-}
-
-if (typeof window !== "undefined" && window.localStorage !== globalThis.localStorage) {
+// Do not probe `globalThis.localStorage` here. Node 24 exposes a native
+// localStorage getter that emits a warning when no valid --localstorage-file
+// is configured. The tests already use a deterministic in-memory store, so
+// install it directly in both Node and jsdom environments.
+installStorageMock(globalThis);
+if (typeof window !== "undefined") {
   installStorageMock(window as unknown as Record<string, unknown>);
 }
 

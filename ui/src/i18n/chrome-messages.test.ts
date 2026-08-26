@@ -52,4 +52,17 @@ describe("zh-CN app chrome messages", () => {
     expect(t("agents.openActions", { name: "Nova" })).toBe("打开 Nova 的操作");
     expect(t("language.switchTo", { name: "English" })).toBe("切换到English");
   });
+
+  it("localizes the remaining user-facing technical labels", () => {
+    expect(t("nav.betaBadge")).toBe("测试版");
+    expect(t("issuesList.tokensCount", { count: 3 })).toBe("3 个令牌");
+    expect(t("userProfile.tokens")).toBe("令牌");
+    expect(t("costsPage.tokensShort", { count: 12 })).toBe("12 个令牌");
+    expect(t("skillStudio.slugLabel")).toBe("标识符（slug）");
+    expect(t("skillStudio.studio")).toBe("工作室");
+    expect(t("companySettings.logo")).toBe("徽标");
+    expect(t("routines.comingSoon")).toBe("即将推出");
+    expect(t("routines.active")).toBe("已启用");
+    expect(t("toolsPage.smokeLab.title")).toBe("冒烟实验室");
+  });
 });

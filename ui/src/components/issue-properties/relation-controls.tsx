@@ -20,6 +20,7 @@ import {
 import { ArrowUpRight, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { StatusIcon } from "../StatusIcon";
+import { useTranslation } from "@/i18n";
 
 export function RemovableIssueReferencePill({
   issue,
@@ -30,6 +31,7 @@ export function RemovableIssueReferencePill({
   onRemove: (issueId: string) => void;
   isMobile?: boolean;
 }) {
+  const { t } = useTranslation();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const issueLabel = issue.identifier ?? issue.title;
   const confirmLabel = issue.identifier ? `${issue.identifier}: ${issue.title}` : issue.title;
@@ -44,7 +46,7 @@ export function RemovableIssueReferencePill({
       <span className="truncate">{issueLabel}</span>
     </>
   );
-  const removeLabel = `Remove ${issueLabel} as blocker`;
+  const removeLabel = t("issueProperties.removeAsBlocker", { defaultValue: "Remove {{label}} as blocker", label: issueLabel });
   const openRemoveConfirmation = () => setIsConfirmOpen(true);
   const handleRemove = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -67,7 +69,7 @@ export function RemovableIssueReferencePill({
                 data-mention-kind="issue"
                 className={chipClassName}
                 title={issue.title}
-                aria-label={`Actions for blocker ${issueLabel}`}
+                aria-label={t("issueProperties.blockerActionsAria", { defaultValue: "Actions for blocker {{label}}", label: issueLabel })}
               >
                 {content}
               </button>
@@ -77,13 +79,13 @@ export function RemovableIssueReferencePill({
                 <DropdownMenuItem asChild>
                   <Link to={`/issues/${issue.identifier}`}>
                     <ArrowUpRight className="h-4 w-4" />
-                    Visit task
+                    {t("issueProperties.visitTask", { defaultValue: "Visit task" })}
                   </Link>
                 </DropdownMenuItem>
               ) : null}
               <DropdownMenuItem variant="destructive" onSelect={openRemoveConfirmation}>
                 <X className="h-4 w-4" />
-                Remove blocker
+                {t("issueProperties.removeBlocker", { defaultValue: "Remove blocker" })}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -104,7 +106,7 @@ export function RemovableIssueReferencePill({
                 data-mention-kind="issue"
                 className={chipClassName}
                 title={issue.title}
-                aria-label={`Task ${issueLabel}: ${issue.title}`}
+                aria-label={t("issueProperties.taskAria", { defaultValue: "Task {{label}}: {{title}}", label: issueLabel, title: issue.title })}
               >
                 {content}
               </Link>
@@ -113,7 +115,7 @@ export function RemovableIssueReferencePill({
                 data-mention-kind="issue"
                 className={chipClassName}
                 title={issue.title}
-                aria-label={`Task: ${issue.title}`}
+                aria-label={t("issueProperties.taskTitleAria", { defaultValue: "Task: {{title}}", title: issue.title })}
               >
                 {content}
               </span>
@@ -124,17 +126,17 @@ export function RemovableIssueReferencePill({
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Remove blocker?</DialogTitle>
+            <DialogTitle>{t("issueProperties.removeBlockerTitle", { defaultValue: "Remove blocker?" })}</DialogTitle>
             <DialogDescription>
-              Remove {confirmLabel} as a blocker for this task.
+              {t("issueProperties.removeBlockerDescription", { defaultValue: "Remove {{label}} as a blocker for this task.", label: confirmLabel })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">{t("common.cancel", { defaultValue: "Cancel" })}</Button>
             </DialogClose>
             <Button type="button" variant="destructive" onClick={confirmRemove}>
-              Remove blocker
+              {t("issueProperties.removeBlocker", { defaultValue: "Remove blocker" })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -152,15 +154,20 @@ export function ExpandRelationListButton({
   expanded: boolean;
   onClick: () => void;
 }) {
+  const { t } = useTranslation();
   if (!expanded && hiddenCount <= 0) return null;
   return (
     <button
       type="button"
       className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
       onClick={onClick}
-      aria-label={expanded ? "Show fewer items" : `Show ${hiddenCount} more items`}
+      aria-label={expanded
+        ? t("issueProperties.showFewerItems", { defaultValue: "Show fewer items" })
+        : t("issueProperties.showMoreItems", { defaultValue: "Show {{count}} more items", count: hiddenCount })}
     >
-      {expanded ? "Show less" : `Show ${hiddenCount} more`}
+      {expanded
+        ? t("issueProperties.showLess", { defaultValue: "Show less" })
+        : t("issueProperties.showMore", { defaultValue: "Show {{count}} more", count: hiddenCount })}
     </button>
   );
 }

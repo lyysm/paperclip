@@ -407,6 +407,27 @@
     "showingOf": "Showing {{shown}} of {{total}}"
   },
   "activity": {
+    "feedTitle": "Agent Feed",
+    "feedSubtitle": "Live activity from your agents",
+    "earlier": "Earlier",
+    "otherActivity": "Other activity",
+    "madeUpdatesTo": "made {{n}} updates to",
+    "filter": {
+      "all": "All",
+      "in-progress": "In Progress",
+      "for-review": "In Review",
+      "completed": "Done"
+    },
+    "showAllActivity": "Show all activity",
+    "groupByTaskAria": "group by task",
+    "groupByTask": "Group by task",
+    "showFlat": "Show flat",
+    "filterByAria": "filter by",
+    "filterBy": "Filter by",
+    "emptyNoAgents": "No agents set up yet. Add an agent to get started.",
+    "emptyAllPaused": "All agents are paused. Resume agents from the sidebar to see activity.",
+    "emptyRunning": "Your agents are running — activity will appear here shortly.",
+    "emptyFallback": "Activity from your agents will appear here.",
     "board": "Board",
     "you": "You",
     "system": "System",
@@ -1577,6 +1598,12 @@
     "loadMore": "Load more"
   },
   "blockedInbox": {
+    "loadFailedTitle": "Couldn't load the Blocked tab.",
+    "otherTabsWork": "Other Inbox tabs still work. {{message}}",
+    "trying": "Trying…",
+    "emptyTitle": "No work is stopped.",
+    "emptyBody": "Tasks that need a decision, recovery, or external action will appear here.",
+    "noSearchResults": "No stopped items match your search.",
     "variant": {
       "needs_decision": "Needs decision",
       "stalled": "Blocked chain stalled",
@@ -9852,5 +9879,66 @@
       "runYourOwn": "Run your own",
       "smokeLab": "Smoke Lab"
     }
+  },
+  "routeError": {
+    "title": "This page hit an error",
+    "description": "Something went wrong while rendering this page. You can go back and try again, or reload.",
+    "goBack": "Go back",
+    "reloadPage": "Reload page"
+  },
+  "toast": {
+    "dismissNotification": "Dismiss notification"
+  },
+  "scrollToBottom": {
+    "label": "Scroll to bottom"
+  },
+  "issueSiblingNavigation": {
+    "navLabel": "Sub-task navigation",
+    "previous": "Previous",
+    "next": "Next",
+    "previousSubTask": "Previous sub-task",
+    "nextSubTask": "Next sub-task",
+    "ariaLabel": "{{direction}}: {{identifier}} - {{title}}"
+  },
+  "issueRow": {
+    "archive": "Archive",
+    "productivityReviewTitle": "Productivity review: {{trigger}}",
+    "productivityReviewOpen": "Productivity review open",
+    "parkedBlockerTitle": "Blocked by parked work — at least one assigned blocker is in backlog and will not wake its assignee.",
+    "parkedBlockerLabel": "Blocked by parked work",
+    "openSrLabel": "Open {{identifier}}: {{title}}",
+    "recoveryAriaWithDetail": "{{label}} — {{detail}}",
+    "recoveryTitleWithDetail": "{{label}} — {{detail}}. Open the source task to act.",
+    "recoveryTitle": "{{label}} — open the source task to act."
+  },
+  "companySwitcher": {
+    "companies": "Companies",
+    "loadFailed": "Couldn't load companies",
+    "manageCompanies": "Manage Companies"
+  },
+  "appsSidebar": {
+    "companyFallback": "Company",
+    "apps": "Apps",
+    "browse": "Browse",
+    "review": "Review",
+    "waitingForOk": "waiting for your OK",
+    "developer": "Developer",
+    "developerCaption": "Advanced setup for developers. Most teams never open this.",
+    "connections": "Connections"
+  },
+  "markdownBody": {
+    "copyFailed": "Copy failed",
+    "copied": "Copied!",
+    "copy": "Copy",
+    "unwrapLines": "Unwrap lines",
+    "wrapLines": "Wrap lines",
+    "copyCode": "Copy code",
+    "mermaidRenderFailed": "Unable to render Mermaid diagram: {{error}}",
+    "mermaidRendering": "Rendering Mermaid diagram...",
+    "mermaidFailedFallback": "Failed to render Mermaid diagram.",
+    "issueLabelWithTitle": "Issue {{identifier}}: {{title}}",
+    "issueLabel": "Issue {{identifier}}",
+    "caseLabel": "Case {{identifier}}",
+    "scrollableTable": "Scrollable table"
   }
 }

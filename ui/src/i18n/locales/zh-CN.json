@@ -407,6 +407,27 @@
     "showingOf": "共 {{total}} 项，当前显示 {{shown}} 项"
   },
   "activity": {
+    "feedTitle": "智能体动态",
+    "feedSubtitle": "智能体的实时动态",
+    "earlier": "更早",
+    "otherActivity": "其他动态",
+    "madeUpdatesTo": "进行了 {{n}} 次更新：",
+    "filter": {
+      "all": "全部",
+      "in-progress": "进行中",
+      "for-review": "待审阅",
+      "completed": "已完成"
+    },
+    "showAllActivity": "显示全部动态",
+    "groupByTaskAria": "按任务分组",
+    "groupByTask": "按任务分组",
+    "showFlat": "平铺显示",
+    "filterByAria": "筛选",
+    "filterBy": "筛选",
+    "emptyNoAgents": "还没有智能体。添加一个智能体即可开始。",
+    "emptyAllPaused": "所有智能体均已暂停。在侧边栏恢复智能体后即可看到动态。",
+    "emptyRunning": "智能体正在运行——动态稍后会显示在这里。",
+    "emptyFallback": "智能体的动态将显示在这里。",
     "board": "看板",
     "you": "你",
     "system": "系统",
@@ -1577,6 +1598,12 @@
     "loadMore": "加载更多"
   },
   "blockedInbox": {
+    "loadFailedTitle": "无法加载「已阻塞」标签页。",
+    "otherTabsWork": "收件箱其他标签页仍可正常使用。{{message}}",
+    "trying": "正在尝试…",
+    "emptyTitle": "没有停滞的工作。",
+    "emptyBody": "需要决策、恢复或外部操作的任务会显示在这里。",
+    "noSearchResults": "没有符合搜索条件的停滞条目。",
     "variant": {
       "needs_decision": "需要决策",
       "stalled": "阻塞链停滞",
@@ -9742,5 +9769,66 @@
       "runYourOwn": "运行自有工具",
       "smokeLab": "Smoke Lab"
     }
+  },
+  "routeError": {
+    "title": "此页面出现错误",
+    "description": "渲染此页面时出现问题。你可以返回重试，或重新加载页面。",
+    "goBack": "返回",
+    "reloadPage": "重新加载页面"
+  },
+  "toast": {
+    "dismissNotification": "关闭通知"
+  },
+  "scrollToBottom": {
+    "label": "滚动到底部"
+  },
+  "issueSiblingNavigation": {
+    "navLabel": "子任务导航",
+    "previous": "上一个",
+    "next": "下一个",
+    "previousSubTask": "上一个子任务",
+    "nextSubTask": "下一个子任务",
+    "ariaLabel": "{{direction}}：{{identifier}} - {{title}}"
+  },
+  "issueRow": {
+    "archive": "归档",
+    "productivityReviewTitle": "效率回顾：{{trigger}}",
+    "productivityReviewOpen": "效率回顾已开启",
+    "parkedBlockerTitle": "被搁置的工作阻塞——至少一个已分配的阻塞项处于待办状态，不会唤醒其负责人。",
+    "parkedBlockerLabel": "被搁置的工作阻塞",
+    "openSrLabel": "打开 {{identifier}}：{{title}}",
+    "recoveryAriaWithDetail": "{{label}} — {{detail}}",
+    "recoveryTitleWithDetail": "{{label}} — {{detail}}。打开源任务以采取行动。",
+    "recoveryTitle": "{{label}} — 打开源任务以采取行动。"
+  },
+  "companySwitcher": {
+    "companies": "公司",
+    "loadFailed": "无法加载公司列表",
+    "manageCompanies": "管理公司"
+  },
+  "appsSidebar": {
+    "companyFallback": "公司",
+    "apps": "应用",
+    "browse": "浏览",
+    "review": "待审",
+    "waitingForOk": "等待你确认",
+    "developer": "开发者",
+    "developerCaption": "面向开发者的高级设置。大多数团队不会用到。",
+    "connections": "连接"
+  },
+  "markdownBody": {
+    "copyFailed": "复制失败",
+    "copied": "已复制！",
+    "copy": "复制",
+    "unwrapLines": "取消自动换行",
+    "wrapLines": "自动换行",
+    "copyCode": "复制代码",
+    "mermaidRenderFailed": "无法渲染 Mermaid 图：{{error}}",
+    "mermaidRendering": "正在渲染 Mermaid 图...",
+    "mermaidFailedFallback": "Mermaid 图渲染失败。",
+    "issueLabelWithTitle": "任务 {{identifier}}：{{title}}",
+    "issueLabel": "任务 {{identifier}}",
+    "caseLabel": "案例 {{identifier}}",
+    "scrollableTable": "可滚动表格"
   }
 }

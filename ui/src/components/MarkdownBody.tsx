@@ -38,6 +38,7 @@ import {
 } from "../lib/external-objects";
 import { normalizeExternalObjectHref } from "../lib/external-object-href";
 import { copyTextToClipboard } from "../lib/clipboard";
+import { useTranslation } from "@/i18n";
 import type {
   ExternalObjectLivenessState,
   ExternalObjectStatusCategory,
@@ -118,7 +119,10 @@ function MarkdownIssueLink({
   const identifier = data?.identifier ?? issuePathId;
   const title = data?.title ?? identifier;
   const status = data?.status;
-  const issueLabel = title !== identifier ? `Issue ${identifier}: ${title}` : `Issue ${identifier}`;
+  const { t } = useTranslation();
+  const issueLabel = title !== identifier
+    ? t("markdownBody.issueLabelWithTitle", { defaultValue: "Issue {{identifier}}: {{title}}", identifier, title })
+    : t("markdownBody.issueLabel", { defaultValue: "Issue {{identifier}}", identifier });
 
   return (
     <Link
@@ -148,12 +152,13 @@ function MarkdownCaseLink({
   // Cases resolve via the get-by-identifier route; navigate there on click.
   // Kept boxless/underlined to match the issue mention treatment.
   const caseHref = useCaseHref();
+  const { t } = useTranslation();
   return (
     <Link
       to={caseHref(identifier)}
       data-mention-kind="case"
       className={cn("paperclip-markdown-case-ref", "font-normal underline")}
-      aria-label={`Case ${identifier}`}
+      aria-label={t("markdownBody.caseLabel", { defaultValue: "Case {{identifier}}", identifier })}
     >
       {children}
     </Link>
@@ -558,6 +563,7 @@ function CodeBlock({
   children: ReactNode;
   preProps: React.HTMLAttributes<HTMLPreElement>;
 }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [failed, setFailed] = useState(false);
   const [wrapLines, setWrapLines] = useState(false);
@@ -583,8 +589,14 @@ function CodeBlock({
     }, 1500);
   }, [children]);
 
-  const copyLabel = failed ? "Copy failed" : copied ? "Copied!" : "Copy";
-  const wrapLabel = wrapLines ? "Unwrap lines" : "Wrap lines";
+  const copyLabel = failed
+    ? t("markdownBody.copyFailed", { defaultValue: "Copy failed" })
+    : copied
+      ? t("markdownBody.copied", { defaultValue: "Copied!" })
+      : t("markdownBody.copy", { defaultValue: "Copy" });
+  const wrapLabel = wrapLines
+    ? t("markdownBody.unwrapLines", { defaultValue: "Unwrap lines" })
+    : t("markdownBody.wrapLines", { defaultValue: "Wrap lines" });
 
   return (
     <div className="paperclip-markdown-codeblock" data-wrap-lines={wrapLines || undefined}>
@@ -631,7 +643,7 @@ function CodeBlock({
         <button
           type="button"
           onClick={handleCopy}
-          aria-label="Copy code"
+          aria-label={t("markdownBody.copyCode", { defaultValue: "Copy code" })}
           title={copyLabel}
           className="paperclip-markdown-codeblock-action paperclip-markdown-codeblock-copy"
           style={codeBlockActionStyle}
@@ -651,9 +663,11 @@ function CodeBlock({
 }
 
 function MermaidDiagramBlock({ source, darkMode }: { source: string; darkMode: boolean }) {
+  const { t } = useTranslation();
   const renderId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const failedFallback = t("markdownBody.mermaidFailedFallback", { defaultValue: "Failed to render Mermaid diagram." });
 
   useEffect(() => {
     let active = true;
@@ -678,14 +692,14 @@ function MermaidDiagramBlock({ source, darkMode }: { source: string; darkMode: b
         const message =
           err instanceof Error && err.message
             ? err.message
-            : "Failed to render Mermaid diagram.";
+            : failedFallback;
         setError(message);
       });
 
     return () => {
       active = false;
     };
-  }, [darkMode, renderId, source]);
+  }, [darkMode, renderId, source, failedFallback]);
 
   return (
     <div className="paperclip-mermaid">
@@ -694,7 +708,9 @@ function MermaidDiagramBlock({ source, darkMode }: { source: string; darkMode: b
       ) : (
         <>
           <p className={cn("paperclip-mermaid-status", error && "paperclip-mermaid-status-error")}>
-            {error ? `Unable to render Mermaid diagram: ${error}` : "Rendering Mermaid diagram..."}
+            {error
+              ? t("markdownBody.mermaidRenderFailed", { defaultValue: "Unable to render Mermaid diagram: {{error}}", error })
+              : t("markdownBody.mermaidRendering", { defaultValue: "Rendering Mermaid diagram..." })}
           </p>
           <pre className="paperclip-mermaid-source">
             <code className="language-mermaid">{source}</code>
@@ -721,6 +737,7 @@ function MarkdownBodyImpl({
   resolveWorkspaceFileRef,
 }: MarkdownBodyProps) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   // Read company prefixes non-throwingly: MarkdownBody renders in surfaces that
   // may lack a CompanyProvider. A null context (or no companies yet) leaves
   // knownPrefixes undefined, which keeps issue auto-linking permissive.
@@ -784,7 +801,7 @@ function MarkdownBodyImpl({
       </blockquote>
     ),
     table: ({ node: _node, style: tableStyle, children: tableChildren, ...tableProps }) => (
-      <div className="paperclip-markdown-table-scroll" role="region" aria-label="Scrollable table" tabIndex={0}>
+      <div className="paperclip-markdown-table-scroll" role="region" aria-label={t("markdownBody.scrollableTable", { defaultValue: "Scrollable table" })} tabIndex={0}>
         <table {...tableProps} style={tableStyle as React.CSSProperties | undefined}>
           {tableChildren}
         </table>
@@ -929,7 +946,7 @@ function MarkdownBodyImpl({
       };
     }
     return map;
-  }, [theme, linkIssueReferences, linkCaseReferences, externalReferenceLookup, resolveImageSrc, onImageClick]);
+  }, [theme, t, linkIssueReferences, linkCaseReferences, externalReferenceLookup, resolveImageSrc, onImageClick]);
 
   return (
     <div

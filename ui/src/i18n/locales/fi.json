@@ -10125,5 +10125,38 @@
     "deletingDots": "Deleting...",
     "selectedCount": "{{n}} selected",
     "deselectAll": "Deselect all"
+  },
+  "agentActions": {
+    "runNow": "Run now",
+    "pause": "Pause",
+    "clearError": "Clear error",
+    "clearErrorAria": "Clear error and return agent to idle",
+    "duplicateAgent": "Duplicate Agent",
+    "duplicateConfirm": "Duplicate {{name}} as {{nextName}}?",
+    "copyAgentId": "Copy Agent ID",
+    "resetSessions": "Reset Sessions",
+    "terminate": "Terminate",
+    "pauseAnyway": "Pause anyway",
+    "agentNotReadyToDuplicate": "Agent is not ready to duplicate",
+    "agentDuplicatedTitle": "Agent duplicated",
+    "failedToDuplicateAgent": "Failed to duplicate agent",
+    "couldNotDuplicateAgent": "Could not duplicate agent",
+    "failedToResetSession": "Failed to reset session"
+  },
+  "agentProperties": {
+    "status": "Status",
+    "errorReason": "Error reason",
+    "role": "Role",
+    "title": "Title",
+    "adapter": "Adapter",
+    "lastError": "Last error",
+    "lastRunError": "Last run error",
+    "lastHeartbeat": "Last Heartbeat",
+    "reportsTo": "Reports To",
+    "created": "Created"
+  },
+  "agentIconPicker": {
+    "searchIcons": "Search icons...",
+    "noIconsMatch": "No icons match"
   }
 }

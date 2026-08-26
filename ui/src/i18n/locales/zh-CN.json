@@ -10015,5 +10015,38 @@
     "deletingDots": "删除中...",
     "selectedCount": "已选择 {{n}} 项",
     "deselectAll": "取消全选"
+  },
+  "agentActions": {
+    "runNow": "立即运行",
+    "pause": "暂停",
+    "clearError": "清除错误",
+    "clearErrorAria": "清除错误并让智能体恢复空闲",
+    "duplicateAgent": "复制智能体",
+    "duplicateConfirm": "将 {{name}} 复制为 {{nextName}}？",
+    "copyAgentId": "复制智能体 ID",
+    "resetSessions": "重置会话",
+    "terminate": "终止",
+    "pauseAnyway": "仍要暂停",
+    "agentNotReadyToDuplicate": "智能体尚未准备好，无法复制",
+    "agentDuplicatedTitle": "智能体已复制",
+    "failedToDuplicateAgent": "复制智能体失败",
+    "couldNotDuplicateAgent": "无法复制智能体",
+    "failedToResetSession": "重置会话失败"
+  },
+  "agentProperties": {
+    "status": "状态",
+    "errorReason": "错误原因",
+    "role": "角色",
+    "title": "职位",
+    "adapter": "适配器",
+    "lastError": "上次错误",
+    "lastRunError": "上次运行错误",
+    "lastHeartbeat": "上次心跳",
+    "reportsTo": "汇报对象",
+    "created": "创建时间"
+  },
+  "agentIconPicker": {
+    "searchIcons": "搜索图标...",
+    "noIconsMatch": "没有匹配的图标"
   }
 }

@@ -8,6 +8,7 @@ import {
   TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
+import { currentLocale, useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 export type SystemNoticeTone = "neutral" | "info" | "success" | "warning" | "danger";
@@ -100,7 +101,7 @@ const TONE_TOKENS: Record<SystemNoticeTone, ToneTokens> = {
 
 function formatTimestamp(ts: string) {
   try {
-    return new Date(ts).toLocaleString(undefined, {
+    return new Date(ts).toLocaleString(currentLocale(), {
       month: "short",
       day: "numeric",
       hour: "numeric",
@@ -248,6 +249,7 @@ export function SystemNotice({
   timestamp,
   className,
 }: SystemNoticeProps) {
+  const { t } = useTranslation();
   const tokens = TONE_TOKENS[tone];
   const ToneIcon = tokens.icon;
   const [open, setOpen] = useState(detailsDefaultOpen);
@@ -256,11 +258,11 @@ export function SystemNotice({
   const resolvedLabel =
     label ??
     {
-      neutral: "System notice",
-      info: "System notice",
-      success: "System notice",
-      warning: "System warning",
-      danger: "System alert",
+      neutral: t("systemNotice.notice", { defaultValue: "System notice" }),
+      info: t("systemNotice.notice", { defaultValue: "System notice" }),
+      success: t("systemNotice.notice", { defaultValue: "System notice" }),
+      warning: t("systemNotice.warning", { defaultValue: "System warning" }),
+      danger: t("systemNotice.alert", { defaultValue: "System alert" }),
     }[tone];
 
   return (
@@ -326,7 +328,11 @@ export function SystemNotice({
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
             )}
           >
-            <span>{open ? "Hide details" : "Details"}</span>
+            <span>
+              {open
+                ? t("systemNotice.hideDetails", { defaultValue: "Hide details" })
+                : t("systemNotice.details", { defaultValue: "Details" })}
+            </span>
             <ChevronDown
               className={cn(
                 "h-3.5 w-3.5 transition-transform duration-150",

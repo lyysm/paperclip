@@ -2690,7 +2690,11 @@ function StaleDispositionWarningDetails({
   sections: SystemNoticeMetadataSection[];
 }) {
   if (sections.length === 0) {
-    return <div className="text-xs leading-5 text-muted-foreground">No additional details.</div>;
+    return (
+      <div className="text-xs leading-5 text-muted-foreground">
+        {t("systemNotice.noAdditionalDetails", { defaultValue: "No additional details." })}
+      </div>
+    );
   }
 
   return (
@@ -2741,7 +2745,7 @@ function StaleDispositionWarningRow({
             onClick={() => setOpen((value) => !value)}
           >
             <span className="text-sm font-medium text-foreground/80">
-              Stale disposition warning
+              {t("systemNotice.staleDispositionWarning", { defaultValue: "Stale disposition warning" })}
             </span>
             <span className="ml-auto flex items-center gap-1.5">
               {message.createdAt ? (
@@ -2885,6 +2889,7 @@ function SystemNoticeCommentRow({
   const props = buildSystemNoticeProps({
     presentation,
     metadata: commentMetadata,
+    bodyText,
     body: (
       <MarkdownBody className="text-sm leading-6" softBreaks onImageClick={onImageClick}>
         {bodyText}

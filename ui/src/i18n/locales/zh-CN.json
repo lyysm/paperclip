@@ -5890,6 +5890,40 @@
     "recorded": "已记录",
     "ancestry": "祖先"
   },
+  "systemNotice": {
+    "notice": "系统通知",
+    "warning": "系统警告",
+    "alert": "系统告警",
+    "details": "详情",
+    "hideDetails": "隐藏详情",
+    "noAdditionalDetails": "没有更多详情。",
+    "successfulRunHandoff": {
+      "title": "缺少任务处置",
+      "body": "Paperclip 需要先为此任务选择处置方式，才能继续。",
+      "requiredAction": "必要操作",
+      "sourceIssue": "源任务",
+      "assignee": "负责人",
+      "missingDisposition": "缺少处置",
+      "validDispositions": "有效处置方式",
+      "runEvidence": "运行证据",
+      "successfulRun": "成功运行",
+      "runStatus": "运行状态",
+      "normalizedCause": "规范化原因",
+      "detectedProgress": "检测到的进展",
+      "automaticRetry": "自动重试",
+      "validDispositionsValue": "done、cancelled、由负责人持有的 in_review、带阻塞项的 blocked、已委派后续工作，或明确继续执行",
+      "automaticRetryValue": "已排队一次纠正性交接唤醒",
+      "detectedProgressValue": "运行产生了具体操作证据：{{issueComments}} 条任务评论、{{workspaceOperations}} 次工作区操作、{{activityEvents}} 个活动事件、{{toolActionEvents}} 个工具/操作事件"
+    },
+    "metadata": {
+      "detail": "详情",
+      "code": "代码",
+      "task": "任务",
+      "agent": "智能体",
+      "run": "运行"
+    },
+    "staleDispositionWarning": "处置状态过期警告"
+  },
   "executionWorkspace": {
     "tabTasks": "任务",
     "tabServices": "服务",

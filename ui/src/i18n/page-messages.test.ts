@@ -541,6 +541,13 @@ describe("zh-CN page-body messages", () => {
     expect(entry(issueRecovery, "boardActor")).toBe("看板");
     expect(entry(issueRecovery, "systemActor")).toBe("系统");
     expect(entry(issueRecovery, "restoreTo")).toBe("恢复至");
+
+    const systemNotice = group("systemNotice");
+    expect(entry(systemNotice, "details")).toBe("详情");
+    const successfulRunHandoff = nested(systemNotice, "successfulRunHandoff");
+    expect(entry(successfulRunHandoff, "title")).toBe("缺少任务处置");
+    expect(entry(successfulRunHandoff, "sourceIssue")).toBe("源任务");
+    expect(entry(successfulRunHandoff, "detectedProgressValue")).toContain("{{issueComments}}");
   });
 
   it("translates the execution workspace detail page", () => {

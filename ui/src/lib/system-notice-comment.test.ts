@@ -1,7 +1,12 @@
 // @vitest-environment node
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { i18n } from "@/i18n";
 import { buildSystemNoticeProps, mapCommentMetadataToSystemNoticeSections } from "./system-notice-comment";
+
+afterEach(async () => {
+  await i18n.changeLanguage("en");
+});
 
 describe("mapCommentMetadataToSystemNoticeSections", () => {
   it("maps server metadata row types to SystemNotice rows", () => {
@@ -78,6 +83,79 @@ describe("mapCommentMetadataToSystemNoticeSections", () => {
   it("returns an empty array for null metadata", () => {
     expect(mapCommentMetadataToSystemNoticeSections(null)).toEqual([]);
     expect(mapCommentMetadataToSystemNoticeSections(undefined)).toEqual([]);
+  });
+
+  it("translates the successful-run handoff card while preserving machine values", async () => {
+    await i18n.changeLanguage("zh-CN");
+
+    const metadata = {
+      version: 1 as const,
+      sections: [
+        {
+          title: "Required action",
+          rows: [
+            { type: "issue_link" as const, label: "Source issue", issueId: "i1", identifier: "PAP-3440", title: "Recovery" },
+            { type: "agent_link" as const, label: "Assignee", agentId: "agent-1", name: "ly" },
+            { type: "key_value" as const, label: "Missing disposition", value: "clear_next_step" },
+            {
+              type: "key_value" as const,
+              label: "Valid dispositions",
+              value: "done, cancelled, in_review with an owner, blocked with blockers, delegated follow-up, or explicit continuation",
+            },
+          ],
+        },
+        {
+          title: "Run evidence",
+          rows: [
+            { type: "run_link" as const, label: "Successful run", runId: "681d0938-0000-4000-8000-000000000000", title: "succeeded" },
+            { type: "key_value" as const, label: "Run status", value: "succeeded" },
+            { type: "key_value" as const, label: "Normalized cause", value: "successful_run_missing_state" },
+            {
+              type: "key_value" as const,
+              label: "Detected progress",
+              value: "Run produced concrete action evidence: 2 issue comment(s), 2 workspace operation(s), 3 activity event(s), 13 tool/action event(s)",
+            },
+            { type: "key_value" as const, label: "Automatic retry", value: "one corrective handoff wake queued" },
+          ],
+        },
+      ],
+    };
+
+    const sections = mapCommentMetadataToSystemNoticeSections(metadata);
+    expect(sections[0]?.title).toBe("必要操作");
+    expect(sections[0]?.rows.map((row) => row.label)).toEqual([
+      "源任务",
+      "负责人",
+      "缺少处置",
+      "有效处置方式",
+    ]);
+    expect(sections[0]?.rows[2]).toMatchObject({ value: "clear_next_step" });
+    expect(sections[1]?.title).toBe("运行证据");
+    expect(sections[1]?.rows[0]).toMatchObject({ label: "成功运行", status: "已成功" });
+    expect(sections[1]?.rows[1]).toMatchObject({ label: "运行状态", value: "已成功" });
+    expect(sections[1]?.rows[2]).toMatchObject({ value: "successful_run_missing_state" });
+    expect(sections[1]?.rows[3]).toMatchObject({
+      label: "检测到的进展",
+      value: "运行产生了具体操作证据：2 条任务评论、2 次工作区操作、3 个活动事件、13 个工具/操作事件",
+    });
+    expect(sections[1]?.rows[4]).toMatchObject({
+      label: "自动重试",
+      value: "已排队一次纠正性交接唤醒",
+    });
+
+    const props = buildSystemNoticeProps({
+      presentation: {
+        kind: "system_notice",
+        tone: "warning",
+        title: "Missing issue disposition",
+        detailsDefaultOpen: true,
+      },
+      metadata,
+      body: "server body",
+      bodyText: "Paperclip needs a disposition before this issue can continue.",
+    });
+    expect(props.label).toBe("缺少任务处置");
+    expect(props.body).toBe("Paperclip 需要先为此任务选择处置方式，才能继续。");
   });
 });
 

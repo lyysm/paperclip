@@ -5889,6 +5889,40 @@
     "ancestry": "Ancestry",
     "creating": "Creating…",
     "createReissue": "Create isolated re-issue"  },
+  "systemNotice": {
+    "notice": "System notice",
+    "warning": "System warning",
+    "alert": "System alert",
+    "details": "Details",
+    "hideDetails": "Hide details",
+    "noAdditionalDetails": "No additional details.",
+    "successfulRunHandoff": {
+      "title": "Missing issue disposition",
+      "body": "Paperclip needs a disposition before this issue can continue.",
+      "requiredAction": "Required action",
+      "sourceIssue": "Source issue",
+      "assignee": "Assignee",
+      "missingDisposition": "Missing disposition",
+      "validDispositions": "Valid dispositions",
+      "runEvidence": "Run evidence",
+      "successfulRun": "Successful run",
+      "runStatus": "Run status",
+      "normalizedCause": "Normalized cause",
+      "detectedProgress": "Detected progress",
+      "automaticRetry": "Automatic retry",
+      "validDispositionsValue": "done, cancelled, in_review with an owner, blocked with blockers, delegated follow-up, or explicit continuation",
+      "automaticRetryValue": "one corrective handoff wake queued",
+      "detectedProgressValue": "Run produced concrete action evidence: {{issueComments}} issue comment(s), {{workspaceOperations}} workspace operation(s), {{activityEvents}} activity event(s), {{toolActionEvents}} tool/action event(s)"
+    },
+    "metadata": {
+      "detail": "Detail",
+      "code": "Code",
+      "task": "Task",
+      "agent": "Agent",
+      "run": "Run"
+    },
+    "staleDispositionWarning": "Stale disposition warning"
+  },
   "executionWorkspace": {
     "tabTasks": "Tasks",
     "tabServices": "Services",
